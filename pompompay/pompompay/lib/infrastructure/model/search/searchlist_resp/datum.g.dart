@@ -1,0 +1,73 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'datum.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+Datumlist _$DatumlistFromJson(Map<String, dynamic> json) => Datumlist(
+  busId: json['bus_id'] as String?,
+  shortName: json['short_name'] as String?,
+  busName: json['bus_name'] as String?,
+  registrationNo: json['registration_no'] as String?,
+  ownerId: json['owner_id'] as String?,
+  conductorId: json['conductor_id'] as String?,
+  driverId: json['driver_id'] as String?,
+  busType: json['bus_type'] as String?,
+  tripNos: json['trip_nos'],
+  activeTrip: json['active_trip'] as String?,
+  permitNo: json['permit_no'] as String?,
+  validFrom: json['valid_from'] as String?,
+  validTo: json['valid_to'] as String?,
+  createdBy: json['created_by'] as String?,
+  createdTime: json['created_time'] as String?,
+  modifiedBy: json['modified_by'] as String?,
+  modifiedDate: json['modified_date'] as String?,
+  tripId: json['trip_id'] as String?,
+  tripNo: json['trip_no'] as String?,
+  tripName: json['trip_name'] as String?,
+  via: json['via'] as String?,
+  fromStation: json['from_station'] as String?,
+  toStation: json['to_station'] as String?,
+  startTime: json['start_time'] as String?,
+  endTime: json['end_time'] as String?,
+  fromStop: json['from_stop'] as String?,
+  toStop: json['to_stop'] as String?,
+  fromArrival: json['from_arrival'] as String?,
+  toArrival: json['to_arrival'] as String?,
+  duration: json['duration'] as String?,
+);
+
+Map<String, dynamic> _$DatumlistToJson(Datumlist instance) => <String, dynamic>{
+  'bus_id': instance.busId,
+  'short_name': instance.shortName,
+  'bus_name': instance.busName,
+  'registration_no': instance.registrationNo,
+  'owner_id': instance.ownerId,
+  'conductor_id': instance.conductorId,
+  'driver_id': instance.driverId,
+  'bus_type': instance.busType,
+  'trip_nos': instance.tripNos,
+  'active_trip': instance.activeTrip,
+  'permit_no': instance.permitNo,
+  'valid_from': instance.validFrom,
+  'valid_to': instance.validTo,
+  'created_by': instance.createdBy,
+  'created_time': instance.createdTime,
+  'modified_by': instance.modifiedBy,
+  'modified_date': instance.modifiedDate,
+  'trip_id': instance.tripId,
+  'trip_no': instance.tripNo,
+  'trip_name': instance.tripName,
+  'via': instance.via,
+  'from_station': instance.fromStation,
+  'to_station': instance.toStation,
+  'start_time': instance.startTime,
+  'end_time': instance.endTime,
+  'from_stop': instance.fromStop,
+  'to_stop': instance.toStop,
+  'from_arrival': instance.fromArrival,
+  'to_arrival': instance.toArrival,
+  'duration': instance.duration,
+};
