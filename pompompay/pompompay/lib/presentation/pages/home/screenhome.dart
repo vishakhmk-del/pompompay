@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:intl/intl.dart';
 import 'package:pompompay/core/hook/hooks.dart';
 import 'package:sizer/sizer.dart';
@@ -22,8 +24,8 @@ class _ScreenHomeState extends State<ScreenHome> {
   List<Datum>? filteredToPlace = [];
   bool showFromDropdown = false;
   bool showToDropdown = false;
-  final _fromtimeController = TextEditingController();
-  final _totimeController = TextEditingController();
+  TextEditingController _fromtimeController = TextEditingController();
+  TextEditingController _totimeController = TextEditingController();
   TimeOfDay _time = const TimeOfDay(hour: 7, minute: 15);
   final _formkey = GlobalKey<FormState>();
   bool isLoadingRecent = true;
@@ -32,6 +34,21 @@ class _ScreenHomeState extends State<ScreenHome> {
   @override
   void initState() {
     super.initState();
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+      Livelocationfun.instance.startTracking(
+          context: context,
+          onLocationUpdate: (position) {
+           // if (!mounted) return;
+            setState(() {
+              doublelat = position.latitude;
+              doublelong = position.longitude;
+              locationMessage =
+                  'Latitude: ${position.latitude}, Longitude: ${position.longitude}';
+              log("homescreen init:$locationMessage");
+            });
+          });
+          
+          });
     fetchstop(context);
     userdet();
     recentValue();
@@ -102,14 +119,14 @@ class _ScreenHomeState extends State<ScreenHome> {
               "Exit App?",
               style: Theme.of(
                 context,
-              ).textTheme.titleSmall?.copyWith(fontSize: 18.sp),
+              ).textTheme.titleSmall?.copyWith(fontSize: 18.sp,color:Colors.white),
             ),
           ),
           content: Text(
             "Are you sure you want to exit?",
             style: Theme.of(
               context,
-            ).textTheme.titleSmall?.copyWith(fontSize: 18.sp),
+            ).textTheme.titleSmall?.copyWith(fontSize: 18.sp,color:Colors.white),
           ),
           actions: [
             ElevatedButton(
@@ -119,7 +136,7 @@ class _ScreenHomeState extends State<ScreenHome> {
               onPressed: () => Navigator.pop(context, false),
               child: Text(
                 'NO',
-                style: Theme.of(context).textTheme.displayMedium,
+                style: Theme.of(context).textTheme.displayMedium?.copyWith(color:Colors.white),
               ),
             ),
             ElevatedButton(
@@ -132,7 +149,7 @@ class _ScreenHomeState extends State<ScreenHome> {
               },
               child: Text(
                 'YES',
-                style: Theme.of(context).textTheme.displayMedium,
+                style: Theme.of(context).textTheme.displayMedium?.copyWith(color:Colors.white),
               ),
             ),
           ],
@@ -263,8 +280,11 @@ Future<void> recentValue() async {
                                 },
                                 onTap: () {
                                   setState(() {
-                                    showFromDropdown = true;
-                                  });
+                                      showFromDropdown = !showFromDropdown;
+                                      if (showFromDropdown) {
+                                        showToDropdown = false;
+                                      }
+                                    });
                                 },
 
                                 validator: (value) {
@@ -310,9 +330,12 @@ Future<void> recentValue() async {
                                   showToDropdown = true;
                                 },
                                 onTap: () {
-                                  setState(() {
-                                    showToDropdown = true;
-                                  });
+                                   setState(() {
+                                      showToDropdown = !showToDropdown;
+                                      if (showToDropdown) {
+                                        showFromDropdown = false;
+                                      }
+                                    });
                                 },
 
                                 validator: (value) {
@@ -444,6 +467,15 @@ Future<void> recentValue() async {
                                       final String to = tocontroller.text;
                                       final String frmTime =_fromtimeController.text;
                                       final String toTime =_totimeController.text;
+
+                                      final DateFormat inputFormat = DateFormat('hh:mm a');
+                                      final DateTime datefrmTime = inputFormat.parse(frmTime);
+                                      final DateTime datetoTime = inputFormat.parse(toTime);
+
+                                      final DateFormat outputFormat = DateFormat('hh:mm:ss a');
+                                      final frmtm= outputFormat.format(datefrmTime);
+                                      final totm= outputFormat.format(datetoTime);
+                                      log("fromtime:$frmtm,totime:$totm");
                                       final now = DateTime.now();
                                       final date = DateFormat('dd-MM-yyyy').format(now);
                                       final time = DateFormat('hh:mm a').format(now); 
@@ -451,8 +483,8 @@ Future<void> recentValue() async {
                                         final farereq = Farereq(
                                           fromPlace: from,
                                           toPlace: to,
-                                          startTime: frmTime,
-                                          endTime: toTime,
+                                          startTime: frmtm,
+                                          endTime: totm,
                                           crntDt: date,
                                           crntTm: time
                                         );
@@ -685,8 +717,7 @@ Future<void> recentValue() async {
                       filteredFromPlace!.isNotEmpty) ...[
                     Positioned(
                       top:
-                          MediaQuery.of(context).size.height /
-                          5.8, // Adjust position
+                          MediaQuery.of(context).size.height /5.8, // Adjust position
                       left: MediaQuery.of(context).size.width / 28,
                       right: MediaQuery.of(context).size.width / 28,
                       child: Container(
@@ -862,14 +893,15 @@ Future<void> recentValue() async {
                               margin: EdgeInsets.symmetric(vertical: 2),
                               child:Container(
                                   decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Theme.of(context).colorScheme.secondary,
-                                        Theme.of(context).colorScheme.primary,
-                                      ],
-                                    ),
+                                    color:Colors.white,
+                                    // gradient: LinearGradient(
+                                    //   begin: Alignment.topCenter,
+                                    //   end: Alignment.bottomCenter,
+                                    //   colors: [
+                                    //     Theme.of(context).colorScheme.secondary,
+                                    //     Theme.of(context).colorScheme.primary,
+                                    //   ],
+                                    // ),
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
                                       color:
@@ -877,15 +909,47 @@ Future<void> recentValue() async {
                                     ),
                                   ),
                                 child: ListTile(
-                                  leading: Icon(Icons.history),
-                                  title: Text('${item.fromPlace} → ${item.toPlace}'),
-                                  subtitle: Text('Date: ${item.crntDt} | Time: ${item.crntTm}'),
-                                  onTap: () {
-                                    setState(() {
-                                      fromcontroller.text = item.fromPlace ?? '';
-                                      tocontroller.text = item.toPlace ?? '';
-                                      // trigger search if needed
-                                    });
+                                  leading: Icon(Icons.history,color:Colors.black),
+                                  title: Text('${item.fromPlace} → ${item.toPlace}',style:Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(fontSize: 18,fontWeight: FontWeight.w800),),
+                                  subtitle: Text('Date: ${item.crntDt} | Time: ${item.crntTm}',style:Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(fontSize: 14),),
+                                  onTap: () async{
+                                    // setState(() {
+                                    //   fromcontroller.text = item.fromPlace ?? '';
+                                    //   tocontroller.text = item.toPlace ?? '';
+                                    // _fromtimeController.text=item.startTime;
+                                    // _totimeController.text=item.endTime;
+                                      
+                                    // });
+                                    final now = DateTime.now();
+                                      final date = DateFormat('dd-MM-yyyy').format(now);
+                                      final time = DateFormat('hh:mm a').format(now); 
+                                      
+                                    final farereq = Farereq(
+                                          fromPlace: item.fromPlace ?? '',
+                                          toPlace: item.toPlace ?? '',
+                                          startTime: item.startTime,
+                                          endTime: item.endTime,
+                                          crntDt: date,
+                                          crntTm: time
+                                        );
+                                        await SharedPrefManager.instance.saveRecentSearch(farereq);
+                                        if (!context.mounted) return;
+                                        await SearchFun.instance.searchBus(farereq,context);
+                                        if (!context.mounted) return;
+                                        Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) => ScreenSearchList(
+                                                  req: farereq,
+                                                ),
+                                          ),
+                                        );
                                   },
                                 ),
                               ),
@@ -971,7 +1035,7 @@ Future<void> recentValue() async {
     TextEditingController controller,
   ) async {
     final DateFormat timeFormat = DateFormat(
-      'hh:mm:ss a',
+      'hh:mm a',
     ); // 12-hour format with AM/PM
     final TimeOfDay? newTime = await showTimePicker(
       context: context,
@@ -998,7 +1062,7 @@ Future<void> recentValue() async {
           now.day,
           newTime.hour,
           newTime.minute,
-          0,
+          // 0,
         );
         controller.text = timeFormat.format(formattedTime); // Show AM/PM format
       });

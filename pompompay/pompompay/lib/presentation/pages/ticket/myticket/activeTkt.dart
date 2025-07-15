@@ -1,5 +1,4 @@
 import 'package:pompompay/core/hook/hooks.dart';
-import 'package:pompompay/presentation/pages/ticket/activetkt/screenLiveTicket.dart';
 
 class TicketListWidget extends StatefulWidget {
   const TicketListWidget({super.key, required this.ticketStatus});
@@ -55,7 +54,7 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                       //height: 330,
                       child: GestureDetector(
                         onTap: () {
-                          Navigator.of(context).pushReplacement(
+                          Navigator.of(context).push(
                             MaterialPageRoute(
                               builder:
                                   (originalContext) => ScreenLiveTicket(
@@ -64,6 +63,7 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                                         widget.ticketStatus == activetkt
                                             ? "Active Ticket"
                                             : "Inactive Ticket",
+                                    initialTab: widget.ticketStatus == activetkt? 0:1,
                                   ),
                             ),
                           );

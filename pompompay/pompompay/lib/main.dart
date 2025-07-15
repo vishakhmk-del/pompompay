@@ -1,4 +1,5 @@
-import 'package:payment_gateway_plugin/payment_gateway_plugin.dart';
+
+
 import 'package:pompompay/core/hook/hooks.dart';
 import 'package:sizer/sizer.dart';
 
@@ -8,9 +9,13 @@ const savedevicetkn = '_userDeviceTkn';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   PaymentGatewayPlugin.init();
+//  startForegroundService();
   runApp(const MyApp());
 }
-
+// void startForegroundService() async {
+//   ForegroundService().start();
+//   debugPrint("Started service");
+// }
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -36,7 +41,7 @@ class MyApp extends StatelessWidget {
               builder: (context, orientation, screenType) {
                 return MaterialApp(
                   // navigatorKey: navigatorKey,
-                  title: 'CRM',
+                  title: 'Pompay',
                   themeMode: themeProvider.themeMode,
                   theme: themeProvider.lightScheme,
                   darkTheme: themeProvider.darkScheme,

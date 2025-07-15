@@ -68,7 +68,7 @@ class Ticketview {
   String? studentfare;
   @JsonKey(name: 'handicapped_fare')
   String? handicappedfare;
-  @JsonKey(name: 'totalfare')
+  @JsonKey(name: 'total_fare')
   String? totalfare;
 
   Ticketview({

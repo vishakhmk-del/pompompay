@@ -1307,7 +1307,6 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
         "udf3": "",
         "udf4": "",
         "udf5": "",
-
         // Optional: Use real phone number if available
       };
       final params = generatePaymentParams(paymentData);
@@ -1567,6 +1566,7 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                                                 ScreenLiveTicket(
                                                   tktvw: ticketvalue,
                                                   title: "Active Ticket",
+                                                  initialTab: 0,
                                                 ),
                                       ),
                                       (Route<dynamic> route) => false,
@@ -1579,8 +1579,6 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                                     // );
                                   } else {
                                     Navigator.pop(context);
-
-                                    // Wait a moment to ensure dialog is fully dismissed
                                     Future.delayed(
                                       Duration(milliseconds: 200),
                                       () {
@@ -1591,9 +1589,6 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                                         }
                                       },
                                     );
-                                    // await initiateOmniwarePayment(context);
-                                    // if(!context.mounted) return;
-                                    // Navigator.pop(context); // Close the dialog
                                   }
                                 },
                                 child: Text(

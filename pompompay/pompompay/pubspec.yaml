@@ -60,7 +60,7 @@ dependencies:
   mobile_scanner: ^7.0.1
   dropdown_button2: ^2.3.9
   dotted_line: ^3.1.0
-  payment_gateway_plugin: ^5.0.8
+  payment_gateway_plugin: ^5.0.9
   crypto: ^3.0.3
   webview_flutter: ^4.4.2
   qr_flutter: ^4.1.0
@@ -111,6 +111,8 @@ flutter:
     - assets/image/login/Untitled design (5).png
     - assets/lottie/transaction/Animation - 1750913123081.json
     - assets/lottie/transaction/Animation - 1750914295922.json
+    - assets/image/tracking/Untitled_design__7_-removebg-preview.png
+    - assets/image/tracking/Untitled_design__8_-removebg-preview.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

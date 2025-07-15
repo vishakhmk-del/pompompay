@@ -383,15 +383,12 @@ class Pompaydata extends Apicalls {
     } on dio.DioException catch (ex) {
       // Check for timeout or other errors
       if (ex.type == DioExceptionType.connectionTimeout) {
-        // Return a custom response or throw an exception with more details
         return dio.Response(
           requestOptions: ex.requestOptions,
           statusCode: 408, // HTTP 408 Request Timeout
           statusMessage: "Connection Timeout",
         );
       }
-
-      // Return the error response from DioException
       return dio.Response(
         requestOptions: ex.requestOptions,
         statusCode:

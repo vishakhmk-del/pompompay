@@ -1,11 +1,13 @@
 import 'dart:developer';
 import 'package:pompompay/core/hook/hooks.dart';
+import 'package:pompompay/presentation/pages/ticket/myticket/screenMyTicket.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class ScreenLiveTicket extends StatefulWidget {
-  const ScreenLiveTicket({super.key, required this.tktvw, required this.title});
+  const ScreenLiveTicket({super.key, required this.tktvw, required this.title,required this.initialTab});
   final Ticketview tktvw;
   final String title;
+  final int initialTab;
 
   @override
   State<ScreenLiveTicket> createState() => _ScreenLiveTicketState();
@@ -13,7 +15,15 @@ class ScreenLiveTicket extends StatefulWidget {
 
 class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
   Future<bool?> popscreen(BuildContext context) async {
-    Navigator.pushReplacement(context, Approutes().mytickets);
+   // Navigator.pushReplacement(context, Approutes().mytickets);
+    Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder:
+                                  (originalContext) => ScreenMyTickets(
+                                    initialTabIndex: widget.initialTab,
+                                  ),
+                            ),
+                          );
     return true;
   }
 
@@ -56,10 +66,18 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                               color: Colors.white,
                             ),
                             onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                Approutes().mytickets,
-                              );
+                              // Navigator.pushReplacement(
+                              //   context,
+                              //   Approutes().mytickets,
+                              // );
+                               Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder:
+                                  (originalContext) => ScreenMyTickets(
+                                    initialTabIndex: widget.initialTab,
+                                  ),
+                            ),
+                          );
                             },
                           ),
                         ),

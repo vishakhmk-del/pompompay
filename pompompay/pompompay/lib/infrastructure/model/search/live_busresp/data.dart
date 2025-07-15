@@ -5,6 +5,8 @@ part 'data.g.dart';
 
 @JsonSerializable()
 class Datalive {
+  @JsonKey(name: 'bus_location')
+  BusLocation? busLocation;
   @JsonKey(name: 'bus_id')
   String? busId;
   String? latitude;
@@ -13,15 +15,14 @@ class Datalive {
   String? createdAt;
   @JsonKey(name: 'modify_by')
   String? modifyBy;
-  @JsonKey(name: 'bus_location')
-  BusLocation? busLocation;
   Datalive({
+    this.busLocation,
     this.busId,
     this.latitude,
     this.longitude,
     this.createdAt,
     this.modifyBy,
-    this.busLocation
+    
   });
 
   factory Datalive.fromJson(Map<String, dynamic> json) => _$DataliveFromJson(json);

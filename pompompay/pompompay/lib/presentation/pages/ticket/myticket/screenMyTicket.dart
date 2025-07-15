@@ -2,8 +2,8 @@ import 'dart:developer';
 import 'package:pompompay/core/hook/hooks.dart';
 
 class ScreenMyTickets extends StatefulWidget {
-  const ScreenMyTickets({super.key});
-
+  const ScreenMyTickets({super.key,this.initialTabIndex = 0});
+final int initialTabIndex;
   @override
   State<ScreenMyTickets> createState() => _ScreenMyTicketsState();
 }
@@ -15,11 +15,22 @@ class _ScreenMyTicketsState extends State<ScreenMyTickets>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    // _tabController = TabController(length: 2, vsync: this);
+
+    // _tabController.addListener(() {
+    //   if (_tabController.indexIsChanging) return; // avoid intermediate states
+    //   setState(() {}); // Triggers rebuild to reflect active tab visually
+    //   log('Tab changed to: ${_tabController.index}');
+    // });
+     _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialTabIndex, // Set initial tab
+    );
 
     _tabController.addListener(() {
-      if (_tabController.indexIsChanging) return; // avoid intermediate states
-      setState(() {}); // Triggers rebuild to reflect active tab visually
+      if (_tabController.indexIsChanging) return;
+      setState(() {});
       log('Tab changed to: ${_tabController.index}');
     });
   }
@@ -119,12 +130,45 @@ class _ScreenMyTicketsState extends State<ScreenMyTickets>
                         ),
                         dividerColor: Colors.white,
                         indicator: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
+                          //borderRadius: BorderRadius.circular(5),
                           color: const Color(0xffffa600),
+                          border: Border.all(
+                                      color:Colors.white,
+                                    ),
                         ),
                         indicatorSize: TabBarIndicatorSize.tab,
                         tabs: const [Tab(text: "Active"), Tab(text: "History")],
                       ),
+                    //   Container(
+                    //   margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+                    //   decoration: BoxDecoration(
+                    //     color:  const Color(0xffffa600)// Light background for whole TabBar
+                    //   //  borderRadius: BorderRadius.circular(8),
+                    //   ),
+                    //   child: TabBar(
+                    //     controller: _tabController,
+                    //     labelColor: Colors.white,
+                    //     unselectedLabelColor: Colors.white,
+                    //     labelStyle: const TextStyle(
+                    //       fontWeight: FontWeight.bold,
+                    //       fontSize: 16,
+                    //     ),
+                    //     unselectedLabelStyle: const TextStyle(
+                    //       fontWeight: FontWeight.normal,
+                    //       fontSize: 14,
+                    //     ),
+                    //     indicator: BoxDecoration(
+                    //       color: Theme.of(context).colorScheme.secondary, // Background color for selected tab
+                    //       //borderRadius: BorderRadius.circular(8),
+                    //     ),
+                    //     dividerColor: Colors.transparent,
+                    //     indicatorSize: TabBarIndicatorSize.tab,
+                    //     tabs: const [
+                    //       Tab(text: "Active"),
+                    //       Tab(text: "History"),
+                    //     ],
+                    //   ),
+                    // ),
                       Expanded(
                         child: TabBarView(
                           controller: _tabController,

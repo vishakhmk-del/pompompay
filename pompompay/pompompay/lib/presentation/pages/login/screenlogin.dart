@@ -250,7 +250,7 @@ class _ScreenloginState extends State<Screenlogin> {
                                       });
                                     },
                                     child: Text(
-                                      'Register',
+                                      'Sign UP',
                                       style: Theme.of(
                                         context,
                                       ).textTheme.labelSmall?.copyWith(

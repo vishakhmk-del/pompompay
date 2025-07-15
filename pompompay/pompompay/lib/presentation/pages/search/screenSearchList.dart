@@ -29,6 +29,15 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
   @override
   void initState() {
     super.initState();
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+      Livelocationfun.instance.startTracking(
+          context: context,
+          onLocationUpdate: (position) {
+           
+            log("serachlist screen init:");
+          });
+          
+          });
     sortTimeController.text =
         timeOptions.entries
             .firstWhere((e) => e.value == selectedSortTimeValue)
@@ -361,6 +370,10 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                           15,
+                                                        ),
+                                                        border: Border.all(
+                                                          color:
+                                                              Theme.of(context).colorScheme.primary,
                                                         ),
                                                   ),
                                                   child: Column(

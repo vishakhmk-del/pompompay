@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:pompompay/core/hook/hooks.dart';
 
 class SearchFun {
@@ -227,13 +228,14 @@ class SearchFun {
     }
     return null;
   }
-  Future<Datalive?> fetchLiveBusLoc(Farereq req,BuildContext context) async {
-      Datalive? value;
+  Future<BusLocation?> fetchLiveBusLoc(Farereq req,BuildContext context) async {
+      //Datalive? value;
+      BusLocation? busLocation;
     try {
       final bnkLstresp = await Pompaydata().liveBusLoc(req);
       String? message;
       if (bnkLstresp == null) {
-        if (!context.mounted) return value;
+        if (!context.mounted) return busLocation;
         CommonFun.instance.showApierror(context, "Something went wrong");
       } else if (bnkLstresp.statusCode == 200) {
         final resultAsJson = jsonDecode(bnkLstresp.toString());
@@ -241,36 +243,39 @@ class SearchFun {
           resultAsJson as Map<String, dynamic>,
         );
         if (bnklstVal.status == 'success') {
-          final cpaymob = bnklstVal.data;
+          final cpaymob = bnklstVal.data?.busLocation;
           return cpaymob;
         } else if (bnklstVal.status == 'failed') {
-          if (!context.mounted) return value;
-          CommonFun.instance.showApierror(
-            context,
-            "Trip is not Active",
-          );
-          return value;
+          // if (!context.mounted) return value;
+          // CommonFun.instance.showApierror(
+          //   context,
+          //   "Gps connection lost",
+          // );
+          // final cpaymob = bnklstVal.data;
+          // return cpaymob;
+          //return value;
+          log("no live location fetch");
         }
       } else if (message == 'Unauthenticated' || bnkLstresp.statusCode == 401) {
-        if (!context.mounted) return value;
+        if (!context.mounted) return busLocation;
         CommonFun.instance.showApierror(context, "Unauthenticated");
       } else if (bnkLstresp.statusCode == 500) {
-        if (!context.mounted) return value;
+        if (!context.mounted) return busLocation;
         CommonFun.instance.showApierror(context, "Sever Not reached");
         // showLoginerror(context, 3);
       } else if (bnkLstresp.statusCode == 408) {
-        if (!context.mounted) return value;
+        if (!context.mounted) return busLocation;
         CommonFun.instance.showApierror(context, "Connection time out");
 
         //showLoginerror(context, 4);
       } else {
-        if (!context.mounted) return value;
+        if (!context.mounted) return busLocation;
 
         CommonFun.instance.showApierror(context, "Something went wrong");
         //showLoginerror(context, 5);
       }
     } catch (e) {
-      if (!context.mounted) return value;
+      if (!context.mounted) return busLocation;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('An unexpected error occurred')),
       );

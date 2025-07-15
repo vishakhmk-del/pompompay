@@ -39,7 +39,7 @@ Ticketview _$TicketviewFromJson(Map<String, dynamic> json) => Ticketview(
   singlekids: json['unit_kids_fare'] as String?,
   singlestudent: json['unit_student_fare'] as String?,
   singlehandicapped: json['unit_handicapped_fare'] as String?,
-  totalfare: json['totalfare'] as String?,
+  totalfare: json['total_fare'] as String?,
   adultfare: json['adult_fare'] as String?,
   kidsfare: json['kids_fare'] as String?,
   handicappedfare: json['handicapped_fare'] as String?,
@@ -84,5 +84,5 @@ Map<String, dynamic> _$TicketviewToJson(Ticketview instance) =>
       'kids_fare': instance.kidsfare,
       'student_fare': instance.studentfare,
       'handicapped_fare': instance.handicappedfare,
-      'totalfare': instance.totalfare,
+      'total_fare': instance.totalfare,
     };

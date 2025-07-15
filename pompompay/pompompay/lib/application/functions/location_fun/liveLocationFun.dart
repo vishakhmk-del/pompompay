@@ -68,6 +68,7 @@ class Livelocationfun {
             _positionSubscription?.cancel();
             if (!_isServiceRestarting) {
               _isServiceRestarting = true;
+              if(!context.mounted) return;
               await _handleLocationDisabled(context);
               _isServiceRestarting = false;
             }

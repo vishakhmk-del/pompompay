@@ -48,7 +48,7 @@ class _QRScannerScreenState extends State<QRScannerScreen>
 
   Future<bool?> popscreen(BuildContext context) async {
     // BankAccountFun.instance.getbnkLstNotifier.value = [];
-    Navigator.pushReplacement(context, Approutes().homescreen);
+    Navigator.pushReplacement(context, Approutes().mainScreen);
     return true;
   }
 
@@ -81,7 +81,7 @@ class _QRScannerScreenState extends State<QRScannerScreen>
               color: Theme.of(context).colorScheme.onPrimary,
             ),
             onPressed: () async {
-              Navigator.pushReplacement(context, Approutes().homescreen);
+              Navigator.pushReplacement(context, Approutes().mainScreen);
             },
           ),
           title: Text(
