@@ -130,7 +130,7 @@ class _ScreenMyTicketsState extends State<ScreenMyTickets>
                         ),
                         dividerColor: Colors.white,
                         indicator: BoxDecoration(
-                          //borderRadius: BorderRadius.circular(5),
+                          borderRadius: BorderRadius.circular(8),
                           color: const Color(0xffffa600),
                           border: Border.all(
                                       color:Colors.white,

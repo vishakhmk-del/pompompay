@@ -52,7 +52,7 @@ class Approutes {
     duration: const Duration(microseconds: 500),
   );
   PageTransition menuScreen = PageTransition(
-    child: ScreenMenu(),
+    child: ScreenMenu(screen: menu,),
     type: PageTransitionType.fade,
     alignment: Alignment.center,
     curve: Curves.easeInOutBack,

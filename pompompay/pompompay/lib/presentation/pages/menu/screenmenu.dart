@@ -3,8 +3,8 @@ import 'package:pompompay/core/hook/hooks.dart';
 import 'package:sizer/sizer.dart';
 
 class ScreenMenu extends StatefulWidget {
-  const ScreenMenu({super.key});
-
+  const ScreenMenu({super.key,required this.screen});
+final int screen;
   @override
   State<ScreenMenu> createState() => _ScreenMenuState();
 }
@@ -63,7 +63,7 @@ class _ScreenMenuState extends State<ScreenMenu> {
                   children: [
                     Container(
                       width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height / 1.3,
+                      height: widget.screen==menu?MediaQuery.of(context).size.height / 1.3:MediaQuery.of(context).size.height / 1.3,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
@@ -83,7 +83,7 @@ class _ScreenMenuState extends State<ScreenMenu> {
                   ],
                 ),
                 Positioned(
-                  top: MediaQuery.of(context).size.height * .14,
+                  top: widget.screen==menu?MediaQuery.of(context).size.height * .14:MediaQuery.of(context).size.height * .14,
                   left: MediaQuery.of(context).size.width * 0.05,
                   right: MediaQuery.of(context).size.width * 0.19,
                   child: Row(
@@ -148,53 +148,53 @@ class _ScreenMenuState extends State<ScreenMenu> {
                     ],
                   ),
                 ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height / 1.5,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
+                // Align(
+                //   alignment: Alignment.bottomCenter,
+                //   child: Container(
+                //     width: MediaQuery.of(context).size.width,
+                //     height: MediaQuery.of(context).size.height / 1.5,
+                //     decoration: BoxDecoration(
+                //       color: Theme.of(context).colorScheme.primary,
 
-                      // borderRadius:const BorderRadius.only(bottomRight: Radius.circular(70))
-                    ),
-                  ),
-                ),
+                //       // borderRadius:const BorderRadius.only(bottomRight: Radius.circular(70))
+                //     ),
+                //   ),
+                // ),
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Container(
                     width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height / 1.42,
+                    height:widget.screen==menu? MediaQuery.of(context).size.height / 1.42:MediaQuery.of(context).size.height / 1.65,
                     //padding: const EdgeInsets.only(top: 10, bottom: 10),
                     decoration: const BoxDecoration(color: Colors.white),
                     child: ListView(
                       children: [
-                        ListTile(
-                          leading: Icon(
-                            Icons.account_balance_outlined,
-                            size: 25,
-                            color: Theme.of(context).colorScheme.primary,
-                            //color: Appcolors.labelclr,
-                          ),
-                          title: Text(
-                            "Transaction",
-                            style: TextStyle(
-                              fontFamily: 'Poppins-Medium',
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black,
-                            ),
-                            textScaler: TextScaler.noScaling,
-                          ),
-                          onTap: () {},
-                        ),
-                        SizedBox(height: 10),
-                        Divider(
-                          color: Colors.black26, // Set the color of the divider
-                          thickness: .5, // Set the thickness of the divider
-                          // indent: 5,          // Optional: Add left spacing
-                          // endIndent: 5,       // Optional: Add right spacing
-                        ),
+                        // ListTile(
+                        //   leading: Icon(
+                        //     Icons.account_balance_outlined,
+                        //     size: 25,
+                        //     color: Theme.of(context).colorScheme.primary,
+                        //     //color: Appcolors.labelclr,
+                        //   ),
+                        //   title: Text(
+                        //     "Transaction",
+                        //     style: TextStyle(
+                        //       fontFamily: 'Poppins-Medium',
+                        //       fontSize: 18,
+                        //       fontWeight: FontWeight.w500,
+                        //       color: Colors.black,
+                        //     ),
+                        //     textScaler: TextScaler.noScaling,
+                        //   ),
+                        //   onTap: () {},
+                        // ),
+                        // SizedBox(height: 10),
+                        // Divider(
+                        //   color: Colors.black26, // Set the color of the divider
+                        //   thickness: .5, // Set the thickness of the divider
+                        //   // indent: 5,          // Optional: Add left spacing
+                        //   // endIndent: 5,       // Optional: Add right spacing
+                        // ),
                         ListTile(
                           leading: Icon(
                             Icons.privacy_tip_outlined,
@@ -259,7 +259,7 @@ class _ScreenMenuState extends State<ScreenMenu> {
                   ),
                 ),
 
-                Positioned(
+               widget.screen==menu? Positioned(
                   top: 40,
                   left: 10,
                   right: 10,
@@ -290,7 +290,7 @@ class _ScreenMenuState extends State<ScreenMenu> {
                       ),
                     ],
                   ),
-                ),
+                ):SizedBox.shrink()
               ],
             ),
           ),

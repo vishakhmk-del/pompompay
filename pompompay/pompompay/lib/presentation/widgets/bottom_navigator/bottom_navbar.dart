@@ -27,12 +27,12 @@ class BottomNavigationWidget extends StatelessWidget {
           items: [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
-              icon: Icon(Icons.route_outlined),
-              label: 'Bus Route',
+              icon: Icon(Icons.credit_card_outlined),
+              label: 'Transaction',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person_2_outlined),
-              label: 'Account',
+              label: 'Profile',
             ),
           ],
         );
