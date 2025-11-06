@@ -2,8 +2,8 @@ import 'dart:developer';
 import 'package:pompompay/core/hook/hooks.dart';
 
 class ScreenMyTickets extends StatefulWidget {
-  const ScreenMyTickets({super.key,this.initialTabIndex = 0});
-final int initialTabIndex;
+  const ScreenMyTickets({super.key, this.initialTabIndex = 0});
+  final int initialTabIndex;
   @override
   State<ScreenMyTickets> createState() => _ScreenMyTicketsState();
 }
@@ -11,6 +11,7 @@ final int initialTabIndex;
 class _ScreenMyTicketsState extends State<ScreenMyTickets>
     with TickerProviderStateMixin {
   late TabController _tabController;
+  String? usrid;
 
   @override
   void initState() {
@@ -22,7 +23,9 @@ class _ScreenMyTicketsState extends State<ScreenMyTickets>
     //   setState(() {}); // Triggers rebuild to reflect active tab visually
     //   log('Tab changed to: ${_tabController.index}');
     // });
-     _tabController = TabController(
+    fetchtkt(context);
+
+    _tabController = TabController(
       length: 2,
       vsync: this,
       initialIndex: widget.initialTabIndex, // Set initial tab
@@ -33,6 +36,16 @@ class _ScreenMyTicketsState extends State<ScreenMyTickets>
       setState(() {});
       log('Tab changed to: ${_tabController.index}');
     });
+  }
+
+  Future fetchtkt(BuildContext context) async {
+    final val = await SharedPrefManager.instance.getSharedData();
+    setState(() {
+      usrid = val?.userId ?? '';
+    });
+    final tktreq = Farereq(userId: usrid, ticketstatus: 1);
+    if (!context.mounted) return;
+    await TicketFun.instance.fetchTket(tktreq, context);
   }
 
   Future<bool?> popscreen(BuildContext context) async {
@@ -88,12 +101,8 @@ class _ScreenMyTicketsState extends State<ScreenMyTickets>
                             color: Colors.white,
                           ),
                           onPressed: () {
-                            TicketFun.instance.getActiveTktListNotifier.value =
-                                [];
-                            TicketFun
-                                .instance
-                                .getDeactiveTktListNotifier
-                                .value = [];
+                            TicketFun.instance.getActiveTktListNotifier.value =[];
+                            TicketFun.instance.getDeactiveTktListNotifier.value = [];
 
                             Navigator.pushReplacement(
                               context,
@@ -132,43 +141,41 @@ class _ScreenMyTicketsState extends State<ScreenMyTickets>
                         indicator: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
                           color: const Color(0xffffa600),
-                          border: Border.all(
-                                      color:Colors.white,
-                                    ),
+                          border: Border.all(color: Colors.white),
                         ),
                         indicatorSize: TabBarIndicatorSize.tab,
-                        tabs: const [Tab(text: "Active"), Tab(text: "History")],
+                        tabs: const [Tab(text: "Active"), Tab(text: "Pending")],
                       ),
-                    //   Container(
-                    //   margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-                    //   decoration: BoxDecoration(
-                    //     color:  const Color(0xffffa600)// Light background for whole TabBar
-                    //   //  borderRadius: BorderRadius.circular(8),
-                    //   ),
-                    //   child: TabBar(
-                    //     controller: _tabController,
-                    //     labelColor: Colors.white,
-                    //     unselectedLabelColor: Colors.white,
-                    //     labelStyle: const TextStyle(
-                    //       fontWeight: FontWeight.bold,
-                    //       fontSize: 16,
-                    //     ),
-                    //     unselectedLabelStyle: const TextStyle(
-                    //       fontWeight: FontWeight.normal,
-                    //       fontSize: 14,
-                    //     ),
-                    //     indicator: BoxDecoration(
-                    //       color: Theme.of(context).colorScheme.secondary, // Background color for selected tab
-                    //       //borderRadius: BorderRadius.circular(8),
-                    //     ),
-                    //     dividerColor: Colors.transparent,
-                    //     indicatorSize: TabBarIndicatorSize.tab,
-                    //     tabs: const [
-                    //       Tab(text: "Active"),
-                    //       Tab(text: "History"),
-                    //     ],
-                    //   ),
-                    // ),
+                      //   Container(
+                      //   margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+                      //   decoration: BoxDecoration(
+                      //     color:  const Color(0xffffa600)// Light background for whole TabBar
+                      //   //  borderRadius: BorderRadius.circular(8),
+                      //   ),
+                      //   child: TabBar(
+                      //     controller: _tabController,
+                      //     labelColor: Colors.white,
+                      //     unselectedLabelColor: Colors.white,
+                      //     labelStyle: const TextStyle(
+                      //       fontWeight: FontWeight.bold,
+                      //       fontSize: 16,
+                      //     ),
+                      //     unselectedLabelStyle: const TextStyle(
+                      //       fontWeight: FontWeight.normal,
+                      //       fontSize: 14,
+                      //     ),
+                      //     indicator: BoxDecoration(
+                      //       color: Theme.of(context).colorScheme.secondary, // Background color for selected tab
+                      //       //borderRadius: BorderRadius.circular(8),
+                      //     ),
+                      //     dividerColor: Colors.transparent,
+                      //     indicatorSize: TabBarIndicatorSize.tab,
+                      //     tabs: const [
+                      //       Tab(text: "Active"),
+                      //       Tab(text: "History"),
+                      //     ],
+                      //   ),
+                      // ),
                       Expanded(
                         child: TabBarView(
                           controller: _tabController,

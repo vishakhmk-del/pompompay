@@ -15,9 +15,13 @@ DataList _$DataListFromJson(Map<String, dynamic> json) => DataList(
       json['bus_location'] == null
           ? null
           : BusLocation.fromJson(json['bus_location'] as Map<String, dynamic>),
+  bus:json['bus'] == null
+          ? null
+          : BusValue.fromJson(json['bus'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$DataListToJson(DataList instance) => <String, dynamic>{
   'stops': instance.stops,
   'bus_location': instance.busLocation,
+  'bus':instance.bus
 };

@@ -44,6 +44,13 @@ class Approutes {
     curve: Curves.easeInOutBack,
     duration: const Duration(microseconds: 500),
   );
+  PageTransition scanpay = PageTransition(
+    child: ScreenScanPay(busid: ''),
+    type: PageTransitionType.fade,
+    alignment: Alignment.center,
+    curve: Curves.easeInOutBack,
+    duration: const Duration(microseconds: 500),
+  );
   PageTransition mytickets = PageTransition(
     child: ScreenMyTickets(),
     type: PageTransitionType.fade,
@@ -52,7 +59,7 @@ class Approutes {
     duration: const Duration(microseconds: 500),
   );
   PageTransition menuScreen = PageTransition(
-    child: ScreenMenu(screen: menu,),
+    child: ScreenMenu(screen: menu),
     type: PageTransitionType.fade,
     alignment: Alignment.center,
     curve: Curves.easeInOutBack,

@@ -3,7 +3,11 @@ import 'package:pompompay/core/hook/hooks.dart';
 class ScreenMainpage extends StatelessWidget {
   ScreenMainpage({super.key});
 
-  final pages = [ScreenHome(), ScreenBusRoute(), ScreenMenu(screen: profile,)];
+  final pages = [
+    ScreenHome(),
+    ScreenTransaction(),
+    ScreenMenu(screen: profile),
+  ];
 
   @override
   Widget build(BuildContext context) {

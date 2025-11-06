@@ -26,9 +26,28 @@ class TicketsaveReq {
   int? handiselected;
   int? studselected;
   String? amount;
+  String? adultFare;
+  String? kidsFare;
+  String? studentSingleFare;
+  String? handiSingleFare;
+  @JsonKey(name: 'order_id')
+  String? orderId;
+  @JsonKey(name: 'payment_mode')
+  String? paymentMode;
+  @JsonKey(name: 'payment_channel')
+  String? paymentChannel;
+  @JsonKey(name: 'payment_datetime')
+  String? paymentDatetime;
+  @JsonKey(name: 'response_code')
+  int? responseCode;
+  @JsonKey(name: 'response_message')
+  String? responseMessage;
+  @JsonKey(name: 'error_desc')
+  String? errorDesc;
+  @JsonKey(name: 'card_masked')
+  String? cardMasked;
   @JsonKey(name: 'req_time')
   String? reqTime;
-
   TicketsaveReq({
     this.tripId,
     this.busid,
@@ -46,6 +65,18 @@ class TicketsaveReq {
     this.handiselected,
     this.studselected,
     this.amount,
+    this.adultFare,
+    this.kidsFare,
+    this.studentSingleFare,
+    this.handiSingleFare,
+    this.orderId,
+    this.paymentMode,
+    this.paymentChannel,
+    this.paymentDatetime,
+    this.responseCode,
+    this.responseMessage,
+    this.errorDesc,
+    this.cardMasked,
     this.reqTime,
   });
 

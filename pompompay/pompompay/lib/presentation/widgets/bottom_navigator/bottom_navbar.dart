@@ -27,8 +27,8 @@ class BottomNavigationWidget extends StatelessWidget {
           items: [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
-              icon: Icon(Icons.credit_card_outlined),
-              label: 'Transaction',
+              icon: Icon(Icons.history),
+              label: 'History',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person_2_outlined),

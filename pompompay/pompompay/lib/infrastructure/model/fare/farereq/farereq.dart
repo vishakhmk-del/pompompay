@@ -19,6 +19,8 @@ class Farereq {
   String? seatno;
   @JsonKey(name: 'user_id')
   String? userId;
+  @JsonKey(name: 'order_id')
+  String? orderId;
   @JsonKey(name: 'ticket_status')
   dynamic ticketstatus;
   @JsonKey(name: 'start_time')
@@ -37,6 +39,8 @@ class Farereq {
   String? crntDt;
   @JsonKey(name: 'crntTm')
   String? crntTm;
+  @JsonKey(name: 'status')
+  dynamic status;
   Farereq({
     this.tripId,
     this.busId,
@@ -49,6 +53,7 @@ class Farereq {
     this.kids,
     this.seatno,
     this.userId,
+    this.orderId,
     this.ticketstatus,
     this.startTime,
     this.endTime,
@@ -57,7 +62,8 @@ class Farereq {
     this.type,
     this.flag,
     this.crntDt,
-    this.crntTm
+    this.crntTm,
+    this.status,
   });
 
   factory Farereq.fromJson(Map<String, dynamic> json) {

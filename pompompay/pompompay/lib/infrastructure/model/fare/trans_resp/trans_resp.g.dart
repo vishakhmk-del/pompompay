@@ -14,6 +14,10 @@ TransResp _$TransRespFromJson(Map<String, dynamic> json) => TransResp(
       json['response'] == null
           ? null
           : TransResponse.fromJson(json['response'] as Map<String, dynamic>),
+  data:
+      json['data'] == null
+          ? null
+          : TransResponse.fromJson(json['data'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$TransRespToJson(TransResp instance) => <String, dynamic>{
@@ -21,4 +25,5 @@ Map<String, dynamic> _$TransRespToJson(TransResp instance) => <String, dynamic>{
   'code': instance.code,
   'message': instance.message,
   'response': instance.response,
+  'data': instance.data,
 };

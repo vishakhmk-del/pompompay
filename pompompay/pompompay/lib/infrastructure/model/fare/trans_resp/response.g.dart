@@ -30,11 +30,17 @@ TransResponse _$TransResponseFromJson(Map<String, dynamic> json) =>
       paymentMode: json['payment_mode'] as String?,
       paymentChannel: json['payment_channel'] as String?,
       paymentDatetime: json['payment_datetime'] as String?,
-      responseCode: (json['response_code'] as num?)?.toInt(),
+      responseCode: json['response_code'],
       responseMessage: json['response_message'] as String?,
       errorDesc: json['error_desc'] as String?,
       cardmasked: json['cardmasked'] as String?,
       hash: json['hash'] as String?,
+      custphone: json['customer_phone'] as String?,
+      customerName: json['customer_name'] as String?,
+      custmail: json['customer_email'] as String?,
+      bankRefId: json['bank_ref_id'] as String?,
+      
+
     );
 
 Map<String, dynamic> _$TransResponseToJson(TransResponse instance) =>
@@ -66,4 +72,8 @@ Map<String, dynamic> _$TransResponseToJson(TransResponse instance) =>
       'error_desc': instance.errorDesc,
       'cardmasked': instance.cardmasked,
       'hash': instance.hash,
+      'customer_phone': instance.custphone,
+      'customer_name': instance.customerName,
+      'customer_email': instance.custmail,
+      'bank_ref_id': instance.bankRefId,
     };

@@ -3,7 +3,8 @@ import 'package:sizer/sizer.dart';
 
 const primaryColor = Color(0xff0077C8);
 // #00c7c8
-const secondaryColor = Color(0xff00c7c8);
+// const secondaryColor = Color(0xff00c7c8);
+const secondaryColor = Color.fromARGB(255, 11, 167, 219);
 
 class MyTheme {
   static final lightTheme = ThemeData(

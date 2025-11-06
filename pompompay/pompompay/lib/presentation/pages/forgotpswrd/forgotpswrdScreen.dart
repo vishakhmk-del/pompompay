@@ -334,7 +334,7 @@ class _ScreenForgotPswrdState extends State<ScreenForgotPswrd> {
   Future userVerify(String? mob, BuildContext context) async {
     try {
       final loadingProvider = context.read<LoadingProvider>();
-      loadingProvider.toggleLoading();
+      loadingProvider.show();
 
       final val = UserCmnReq(mobno: mob);
 
@@ -344,7 +344,7 @@ class _ScreenForgotPswrdState extends State<ScreenForgotPswrd> {
         resultAsjson as Map<String, dynamic>,
       );
 
-      loadingProvider.toggleLoading();
+      loadingProvider.resetAll();
       if (chngresp == null) {
         if (!context.mounted) return;
         CommonFun.instance.showApierror(context, "Something went wrong");

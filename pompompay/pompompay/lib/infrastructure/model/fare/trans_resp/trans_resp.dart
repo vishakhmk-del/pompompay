@@ -10,8 +10,9 @@ class TransResp {
   String? code;
   String? message;
   TransResponse? response;
+  TransResponse? data;
 
-  TransResp({this.status, this.code, this.message, this.response});
+  TransResp({this.status, this.code, this.message, this.response, this.data});
 
   factory TransResp.fromJson(Map<String, dynamic> json) {
     return _$TransRespFromJson(json);

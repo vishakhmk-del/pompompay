@@ -28,7 +28,7 @@ class Ticketview {
   String? amount;
   @JsonKey(name: 'pay_mode')
   String? payMode;
-  String? status;
+  dynamic status;
   @JsonKey(name: 'sp_type')
   dynamic spType;
   @JsonKey(name: 'sp_count')

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pompompay/core/hook/hooks.dart';
 
 class SharedPrefManager {
@@ -12,23 +13,30 @@ class SharedPrefManager {
   }
 
   //----end singleton
+final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+
   Future<void> addSharedData(Sharedpref value) async {
     final sharedprefes = await SharedPreferences.getInstance();
     await sharedprefes.setBool(savekeyname, true);
-    await sharedprefes.setString('USERID', value.userId ?? '');
+    // await sharedprefes.setString('USERID', value.userId ?? '');
+    await _secureStorage.write(key: 'USERID', value: value.userId ?? '');
+    
     await sharedprefes.setString('NAME', value.name ?? '');
-    await sharedprefes.setString('ACCESSTOKEN', value.accessTkn ?? '');
+    // await sharedprefes.setString('ACCESSTOKEN', value.accessTkn ?? '');
     await sharedprefes.setString('MOBNO', value.mobno ?? '');
+        await _secureStorage.write(key: 'ACCESSTOKEN', value: value.accessTkn ?? '');
   }
 
   Future<Sharedpref?> getSharedData() async {
     final sharedprefs = await SharedPreferences.getInstance();
 
-    final userid = sharedprefs.getString('USERID') ?? '';
-
+    // final userid = sharedprefs.getString('USERID') ?? '';
+    final userid = await _secureStorage.read(key: 'USERID') ?? '';
+    
     final name = sharedprefs.getString('NAME') ?? '';
 
-    final accesstkn = sharedprefs.getString('ACCESSTOKEN') ?? '';
+    // final accesstkn = sharedprefs.getString('ACCESSTOKEN') ?? '';
+    final accesstkn = await _secureStorage.read(key: 'ACCESSTOKEN') ?? '';
 
     final mobno = sharedprefs.getString('MOBNO') ?? '';
 
@@ -103,34 +111,34 @@ class SharedPrefManager {
     final tkn = Deviceinfo(devicetoken: devicetkn);
     return tkn;
   }
+
   // Save a search request (recent search)
-Future<void> saveRecentSearch(Farereq request) async {
-  final prefs = await SharedPreferences.getInstance();
-  final List<String> existingList =
-      prefs.getStringList('recent_searches') ?? [];
+  Future<void> saveRecentSearch(Farereq request) async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<String> existingList =
+        prefs.getStringList('recent_searches') ?? [];
 
-  final String jsonRequest = jsonEncode(request.toJson());
+    final String jsonRequest = jsonEncode(request.toJson());
 
-  // Avoid duplicates
-  if (!existingList.contains(jsonRequest)) {
-    existingList.insert(0, jsonRequest);
-    if (existingList.length > 5) {
-      existingList.removeLast(); // Keep only last 5 searches
+    // Avoid duplicates
+    if (!existingList.contains(jsonRequest)) {
+      existingList.insert(0, jsonRequest);
+      if (existingList.length > 5) {
+        existingList.removeLast(); // Keep only last 5 searches
+      }
     }
+
+    await prefs.setStringList('recent_searches', existingList);
   }
 
-  await prefs.setStringList('recent_searches', existingList);
-}
+  // Load recent searches
+  Future<List<Farereq>> loadRecentSearches() async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<String> jsonList = prefs.getStringList('recent_searches') ?? [];
 
-// Load recent searches
-Future<List<Farereq>> loadRecentSearches() async {
-  final prefs = await SharedPreferences.getInstance();
-  final List<String> jsonList = prefs.getStringList('recent_searches') ?? [];
-
-  return jsonList.map((jsonStr) {
-    final Map<String, dynamic> jsonMap = jsonDecode(jsonStr);
-    return Farereq.fromJson(jsonMap);
-  }).toList();
-}
-
+    return jsonList.map((jsonStr) {
+      final Map<String, dynamic> jsonMap = jsonDecode(jsonStr);
+      return Farereq.fromJson(jsonMap);
+    }).toList();
+  }
 }

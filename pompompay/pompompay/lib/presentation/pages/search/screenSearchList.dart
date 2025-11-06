@@ -29,15 +29,14 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
   @override
   void initState() {
     super.initState();
-     WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       Livelocationfun.instance.startTracking(
-          context: context,
-          onLocationUpdate: (position) {
-           
-            log("serachlist screen init:");
-          });
-          
-          });
+        context: context,
+        onLocationUpdate: (position) {
+          log("serachlist screen init:");
+        },
+      );
+    });
     sortTimeController.text =
         timeOptions.entries
             .firstWhere((e) => e.value == selectedSortTimeValue)
@@ -371,10 +370,12 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                                         BorderRadius.circular(
                                                           15,
                                                         ),
-                                                        border: Border.all(
-                                                          color:
-                                                              Theme.of(context).colorScheme.primary,
-                                                        ),
+                                                    border: Border.all(
+                                                      color:
+                                                          Theme.of(
+                                                            context,
+                                                          ).colorScheme.primary,
+                                                    ),
                                                   ),
                                                   child: Column(
                                                     children: [
@@ -686,7 +687,8 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                     type: sortTypeController.text,
                                     flag: selectedSortTimeValue,
                                   );
-                                  SearchFun.instance.getBusListNotifier.value =[];
+                                  SearchFun.instance.getBusListNotifier.value =
+                                      [];
 
                                   await SearchFun.instance.sortBus(
                                     sortreq,

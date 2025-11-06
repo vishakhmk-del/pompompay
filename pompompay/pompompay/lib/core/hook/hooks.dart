@@ -43,6 +43,7 @@ export 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 
 export 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
+export 'package:qr_flutter/qr_flutter.dart';
 // *************************************
 
 // ***************Core*****************
@@ -93,7 +94,7 @@ export 'package:pompompay/presentation/pages/otpscreen/ScreenOtp.dart';
 
 export 'package:pompompay/presentation/pages/home/screenhome.dart';
 
-export 'package:pompompay/presentation/pages/busroute/screenbusroute.dart';
+export 'package:pompompay/presentation/pages/Transaction/screentrans.dart';
 
 export 'package:pompompay/presentation/pages/menu/screenmenu.dart';
 
@@ -112,6 +113,8 @@ export 'package:pompompay/presentation/pages/tracking/screenMapTracking.dart';
 export 'package:pompompay/presentation/pages/ticket/activetkt/screenLiveTicket.dart';
 
 export 'package:pompompay/presentation/pages/ticket/myticket/activeTkt.dart';
+
+export 'package:pompompay/presentation/pages/ticket/myticket/screenMyTicket.dart';
 
 // *************************************
 
@@ -172,6 +175,7 @@ export 'package:pompompay/infrastructure/model/search/stoploc_resp/data.dart';
 export 'package:pompompay/infrastructure/model/search/stoploc_resp/stoploc_resp.dart';
 
 export 'package:pompompay/infrastructure/model/search/searchlist_resp/datum.dart';
+
 // *************************************
 
 // ***************functions*****************

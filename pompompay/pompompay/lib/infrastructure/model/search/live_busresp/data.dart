@@ -22,10 +22,10 @@ class Datalive {
     this.longitude,
     this.createdAt,
     this.modifyBy,
-    
   });
 
-  factory Datalive.fromJson(Map<String, dynamic> json) => _$DataliveFromJson(json);
+  factory Datalive.fromJson(Map<String, dynamic> json) =>
+      _$DataliveFromJson(json);
 
   Map<String, dynamic> toJson() => _$DataliveToJson(this);
 }

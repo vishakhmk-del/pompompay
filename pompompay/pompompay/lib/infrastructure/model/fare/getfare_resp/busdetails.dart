@@ -9,6 +9,8 @@ class Busdetails {
   String? name;
   String? address;
   String? upid;
+  @JsonKey(name: 'salt_key')
+  String? saltKey;
   @JsonKey(name: 'mercnt_code')
   String? mercntCode;
   @JsonKey(name: 'account_no')
@@ -54,6 +56,7 @@ class Busdetails {
     this.name,
     this.address,
     this.upid,
+    this.saltKey,
     this.mercntCode,
     this.accountNo,
     this.mobileNo,

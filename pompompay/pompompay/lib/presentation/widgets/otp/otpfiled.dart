@@ -260,7 +260,7 @@ class _OtpFiledState extends State<OtpFiled> {
 
   Future buildotpvrf(UserCmnReq val, BuildContext context) async {
     final loadingProvider = context.read<LoadingProvider>();
-    loadingProvider.toggleLoading();
+    loadingProvider.show();
     try {
       dio.Response<dynamic>? chngresp;
       if (val.type == frgtpswrdType) {
@@ -277,7 +277,7 @@ class _OtpFiledState extends State<OtpFiled> {
         resultAsjson as Map<String, dynamic>,
       );
 
-      loadingProvider.toggleLoading();
+      loadingProvider.resetAll();
       if (chngresp == null) {
         if (!context.mounted) return;
         CommonFun.instance.showApierror(context, "Something went wrong");

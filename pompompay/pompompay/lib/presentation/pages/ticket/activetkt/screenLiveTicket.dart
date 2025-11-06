@@ -1,29 +1,30 @@
 import 'dart:developer';
 import 'package:pompompay/core/hook/hooks.dart';
-import 'package:pompompay/presentation/pages/ticket/myticket/screenMyTicket.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 class ScreenLiveTicket extends StatefulWidget {
-  const ScreenLiveTicket({super.key, required this.tktvw, required this.title,required this.initialTab});
+  const ScreenLiveTicket({
+    super.key,
+    required this.tktvw,
+    required this.title,
+    required this.initialTab,
+  });
   final Ticketview tktvw;
   final String title;
   final int initialTab;
-
   @override
   State<ScreenLiveTicket> createState() => _ScreenLiveTicketState();
 }
 
 class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
   Future<bool?> popscreen(BuildContext context) async {
-   // Navigator.pushReplacement(context, Approutes().mytickets);
+    // Navigator.pushReplacement(context, Approutes().mytickets);
     Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                              builder:
-                                  (originalContext) => ScreenMyTickets(
-                                    initialTabIndex: widget.initialTab,
-                                  ),
-                            ),
-                          );
+      MaterialPageRoute(
+        builder:
+            (originalContext) =>
+                ScreenMyTickets(initialTabIndex: widget.initialTab),
+      ),
+    );
     return true;
   }
 
@@ -66,18 +67,14 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                               color: Colors.white,
                             ),
                             onPressed: () {
-                              // Navigator.pushReplacement(
-                              //   context,
-                              //   Approutes().mytickets,
-                              // );
-                               Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                              builder:
-                                  (originalContext) => ScreenMyTickets(
-                                    initialTabIndex: widget.initialTab,
-                                  ),
-                            ),
-                          );
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                  builder:
+                                      (originalContext) => ScreenMyTickets(
+                                        initialTabIndex: widget.initialTab,
+                                      ),
+                                ),
+                              );
                             },
                           ),
                         ),
@@ -115,7 +112,6 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                               ),
                               child: Column(
                                 children: [
-                                  /// Header info
                                   Column(
                                     children: [
                                       Row(
@@ -296,8 +292,6 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                                   ),
 
                                   const SizedBox(height: 14),
-
-                                  /// Separator line (simulated dotted separator)
                                   CustomPaint(
                                     painter: DottedSeparatorLine(
                                       yOffsetFactor: 0,
@@ -310,8 +304,6 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                                   ),
 
                                   const SizedBox(height: 14),
-
-                                  /// Fare breakdown
                                   Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
@@ -422,24 +414,19 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
 
                                       if (widget.tktvw.tiketNo != null)
                                         QrImageView(
-                                          data:
-                                              widget
-                                                  .tktvw
-                                                  .tiketNo!, // Encode ticket number
+                                          data: widget.tktvw.tiketNo!,
                                           version: QrVersions.auto,
                                           size: 150.0,
                                           backgroundColor: Colors.white,
                                           eyeStyle: const QrEyeStyle(
                                             color: Colors.black,
-                                            eyeShape:
-                                                QrEyeShape.square, // Optional
+                                            eyeShape: QrEyeShape.square,
                                           ),
                                           dataModuleStyle:
                                               const QrDataModuleStyle(
                                                 color: Colors.black,
                                                 dataModuleShape:
-                                                    QrDataModuleShape
-                                                        .square, // Optional
+                                                    QrDataModuleShape.square,
                                               ),
                                           errorCorrectionLevel:
                                               QrErrorCorrectLevel.H,

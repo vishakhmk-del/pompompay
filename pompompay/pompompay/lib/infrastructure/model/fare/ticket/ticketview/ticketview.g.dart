@@ -22,7 +22,7 @@ Ticketview _$TicketviewFromJson(Map<String, dynamic> json) => Ticketview(
   travelTime: json['travel_time'] as String?,
   amount: json['amount'] as String?,
   payMode: json['pay_mode'] as String?,
-  status: json['status'] as String?,
+  status: json['status'],
   spType: json['sp_type'],
   spCount: json['sp_count'],
   spAmount: json['sp_amount'],

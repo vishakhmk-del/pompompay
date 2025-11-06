@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:pompompay/core/hook/hooks.dart';
+import 'package:pompompay/core/security/security_check.dart';
 import 'package:sizer/sizer.dart';
 
 class Screenlogin extends StatefulWidget {
@@ -20,7 +21,9 @@ class _ScreenloginState extends State<Screenlogin> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async{
+    //  await SecurityCheck.checkAndExitIfCompromised(context);
+if(!mounted)return;
       Livelocationfun.instance.startTracking(
         context: context,
         onLocationUpdate: (position) {
@@ -262,6 +265,19 @@ class _ScreenloginState extends State<Screenlogin> {
                                 ],
                               ),
                             ),
+                            SizedBox(height: 1.h),
+                          Consumer<LoadingProvider>(
+                              builder: (context, loadingProvider, child) {
+                            return loadingProvider.isLoading
+                                ? const Center(
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                : const SizedBox.shrink();
+                          }),
                           ],
                         ),
                       ),
@@ -269,17 +285,7 @@ class _ScreenloginState extends State<Screenlogin> {
                   ),
                 ),
               ),
-
-              // // Bottom: White area with logo
-              // Container(
-              //   width: double.infinity,
-              //   color: Colors.white,
-              //   padding: const EdgeInsets.symmetric(vertical: 13),
-              //   child: Image.asset(
-              //     "assets/image/login/logo_dits.png",
-              //     height: 45,
-              //   ),
-              // ),
+                 
             ],
           ),
         ),

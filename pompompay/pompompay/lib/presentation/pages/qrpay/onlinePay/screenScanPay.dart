@@ -12,6 +12,7 @@ class ScreenScanPay extends StatefulWidget {
 }
 
 class _ScreenScanPayState extends State<ScreenScanPay> {
+
   int countkid = 0;
   int countadult = 1;
   int countstud = 0;
@@ -37,7 +38,9 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
   TransResponse? transRespVal;
   String? transdate;
   String? transtime;
-
+  Sharedpref? val;
+  TransResponse? ticketStatus;
+  Map<String, dynamic>? params;
   @override
   void initState() {
     super.initState();
@@ -67,13 +70,23 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
     final value = Farereq(busidNo: widget.busid);
     if (!context.mounted) return;
     busdetails = await TicketFun.instance.fetchFareDet(value, context);
-    setState(() {
+    if(mounted){
+      setState(() {
       busdet = busdetails?.busdetails;
       stopsdet = busdetails?.stopsdetails ?? [];
       if (stopsdet != null && stopsdet!.isNotEmpty) {
         stoplst = stopsdet!.map((bus) => bus.stopName ?? "").toList();
       }
     });
+    }
+    
+  }
+
+  List<String> get filteredToStops {
+    if (selectedFromList == null) return [];
+    final fromIndex = stoplst.indexOf(selectedFromList!);
+    if (fromIndex == -1 || fromIndex == stoplst.length - 1) return [];
+    return stoplst.sublist(fromIndex + 1);
   }
 
   @override
@@ -96,6 +109,12 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
               log('Screen was popped with result: $result');
               return;
             }
+            // Only allow going back if not loading
+          // final isLoading = context.read<LoadingProvider>().isLoading;
+          // if (isLoading) {
+          //   log('Back button disabled while loading');
+          //   return;
+          // }
             log('BackButton pressed! Navigating to login screen.');
             await popscreen(context);
           },
@@ -231,7 +250,8 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                                               value: selectedFromList,
                                               onChanged: (value) {
                                                 setState(() {
-                                                  selectedFromList = value!;
+                                                  selectedFromList = value;
+                                                  selectedToList = null;
                                                 });
                                               },
                                               items:
@@ -337,161 +357,207 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                                               ),
                                             ),
                                             SizedBox(height: 1.h),
-                                            DropdownButtonFormField2<String>(
-                                              isExpanded: true,
-                                              value: selectedToList,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  selectedToList = value!;
-                                                });
-                                              },
-                                              items:
-                                                  stoplst.map((valueItem) {
-                                                    return DropdownMenuItem<
-                                                      String
-                                                    >(
-                                                      value: valueItem,
-                                                      child: Text(
+                                            // ----- TO STOP -----
+                                            Stack(
+                                              children: [
+                                                // The actual dropdown (disabled when From is not selected)
+                                                DropdownButtonFormField2<String>(
+                                                  isExpanded: true,
+                                                  value: selectedToList,
+                                                  items:
+                                                      filteredToStops.map((
                                                         valueItem,
-                                                        overflow:
-                                                            TextOverflow
-                                                                .ellipsis,
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .bodySmall
-                                                            ?.copyWith(
-                                                              fontSize: 16,
-                                                            ),
-                                                      ),
-                                                    );
-                                                  }).toList(),
-                                              decoration: InputDecoration(
-                                                labelText: 'To Stop',
-                                                labelStyle: Theme.of(
-                                                  context,
-                                                ).textTheme.bodySmall?.copyWith(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                                border: OutlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                    color: Color(0xFFE1E1E1),
-                                                    width: 1.0,
+                                                      ) {
+                                                        return DropdownMenuItem<String>(
+                                                          value: valueItem,
+                                                          child: Text(
+                                                            valueItem,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: Theme.of(
+                                                                  context,
+                                                                )
+                                                                .textTheme
+                                                                .bodySmall
+                                                                ?.copyWith(
+                                                                  fontSize: 16,
+                                                                ),
+                                                          ),
+                                                        );
+                                                      }).toList(),
+                                                  onChanged:
+                                                      (selectedFromList == null)
+                                                          ? null // disable when From not selected (gives disabled styling)
+                                                          : (value) {
+                                                            setState(() {
+                                                              selectedToList = value!;
+                                                            });
+                                                          },
+                                                  decoration: InputDecoration(
+                                                    labelText: 'To Stop',
+                                                    labelStyle: Theme.of(
+                                                          context,
+                                                        ).textTheme.bodySmall
+                                                        ?.copyWith(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                    border:
+                                                        const OutlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide(
+                                                                color: Color(
+                                                                  0xFFE1E1E1,
+                                                                ),
+                                                                width: 1.0,
+                                                              ),
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                Radius.circular(
+                                                                  4.0,
+                                                                ),
+                                                              ),
+                                                        ),
+                                                    enabledBorder:
+                                                        const OutlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide(
+                                                                color: Color(
+                                                                  0xFFE1E1E1,
+                                                                ),
+                                                                width: 1.0,
+                                                              ),
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                Radius.circular(
+                                                                  4.0,
+                                                                ),
+                                                              ),
+                                                        ),
+                                                    disabledBorder:
+                                                        const OutlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide(
+                                                                color: Color(
+                                                                  0xFFE1E1E1,
+                                                                ),
+                                                                width: 1.0,
+                                                              ),
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                Radius.circular(
+                                                                  4.0,
+                                                                ),
+                                                              ),
+                                                        ),
+                                                    focusedBorder:
+                                                        const OutlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide(
+                                                                color: Color(
+                                                                  0xFFE1E1E1,
+                                                                ),
+                                                                width: 2.0,
+                                                              ),
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                Radius.circular(
+                                                                  4.0,
+                                                                ),
+                                                              ),
+                                                        ),
                                                   ),
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                        Radius.circular(4.0),
-                                                      ),
+                                                  dropdownStyleData: DropdownStyleData(
+                                                    maxHeight: 200,
+                                                    width:
+                                                        MediaQuery.of(
+                                                          context,
+                                                        ).size.width *
+                                                        0.9,
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 10,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            8,
+                                                          ),
+                                                    ),
+                                                  ),
                                                 ),
-                                                enabledBorder:
-                                                    OutlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                        color: Color(
-                                                          0xFFE1E1E1,
-                                                        ),
-                                                        width: 1.0,
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                            Radius.circular(
-                                                              4.0,
+
+                                                // Transparent tap-catcher when From is NOT selected -> shows toast
+                                                if (selectedFromList == null)
+                                                  Positioned.fill(
+                                                    child: Material(
+                                                      color: Colors.transparent,
+                                                      child: InkWell(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              4,
                                                             ),
-                                                          ),
-                                                    ),
-                                                focusedBorder:
-                                                    OutlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                        color: Color(
-                                                          0xFFE1E1E1,
-                                                        ),
-                                                        width: 2.0,
+                                                        onTap: () {
+                                                          Fluttertoast.showToast(
+                                                            msg:
+                                                                "Please select From Stop first",
+                                                            toastLength:
+                                                                Toast
+                                                                    .LENGTH_SHORT,
+                                                            gravity:
+                                                                ToastGravity
+                                                                    .CENTER,
+                                                            backgroundColor:
+                                                                Colors.white,
+                                                            textColor:
+                                                                Colors.red,
+                                                            fontSize: 16.0,
+                                                          );
+                                                        },
                                                       ),
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                            Radius.circular(
-                                                              4.0,
-                                                            ),
-                                                          ),
                                                     ),
-                                                disabledBorder:
-                                                    OutlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                        color: Color(
-                                                          0xFFE1E1E1,
-                                                        ),
-                                                        width: 1.0,
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                            Radius.circular(
-                                                              4.0,
-                                                            ),
-                                                          ),
-                                                    ),
-                                              ),
-                                              dropdownStyleData: DropdownStyleData(
-                                                maxHeight: 200,
-                                                width:
-                                                    MediaQuery.of(
-                                                      context,
-                                                    ).size.width *
-                                                    0.9,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 10,
-                                                    ),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                              ),
+                                                  ),
+                                              ],
                                             ),
+
                                           ],
                                         ),
                                       ),
-                                      SizedBox(width: 10),
-                                      // Center-aligned icon
-                                      Align(
-                                        alignment: Alignment.center,
-                                        child: SizedBox(
-                                          width: 6.5.w,
-                                          height: 6.5.h,
-                                          child: ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                              padding: EdgeInsets.zero,
-                                              shape: const CircleBorder(),
-                                              backgroundColor: Colors.white,
-                                              foregroundColor:
-                                                  Theme.of(
-                                                    context,
-                                                  ).colorScheme.primary,
-                                              elevation: 2,
-                                            ),
-                                            onPressed: () {
-                                              setState(() {
-                                                final temp = selectedFromList;
-                                                selectedFromList =
-                                                    selectedToList;
-                                                selectedToList = temp;
-                                              });
-                                            },
-                                            child: const Icon(
-                                              Icons.swap_vert,
-                                              size: 20,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
+                                      // SizedBox(width: 10),
+                                      // // Center-aligned icon
                                       // Align(
                                       //   alignment: Alignment.center,
-                                      //   child: IconButton(onPressed: () {
-                                      //       setState(() {
-                                      //         final temp = selectedFromList;
-                                      //         selectedFromList = selectedToList;
-                                      //         selectedToList = temp;
-                                      //       });
-                                      //     },icon: const Icon(Icons.swap_vert, size: 20),),
+                                      //   child: SizedBox(
+                                      //     width: 6.5.w,
+                                      //     height: 6.5.h,
+                                      //     child: ElevatedButton(
+                                      //       style: ElevatedButton.styleFrom(
+                                      //         padding: EdgeInsets.zero,
+                                      //         shape: const CircleBorder(),
+                                      //         backgroundColor: Colors.white,
+                                      //         foregroundColor:
+                                      //             Theme.of(
+                                      //               context,
+                                      //             ).colorScheme.primary,
+                                      //         elevation: 2,
+                                      //       ),
+                                      //       onPressed: () {
+                                      //         setState(() {
+                                      //           final temp = selectedFromList;
+                                      //           selectedFromList =
+                                      //               selectedToList;
+                                      //           selectedToList = temp;
+                                      //         });
+                                      //       },
+                                      //       child: const Icon(
+                                      //         Icons.swap_vert,
+                                      //         size: 20,
+                                      //       ),
+                                      //     ),
+                                      //   ),
                                       // ),
                                     ],
                                   ),
@@ -626,8 +692,7 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                                             tripId: busdet?.tripId ?? '',
                                             userId: usrid,
                                           );
-                                          calcFare = await TicketFun.instance
-                                              .calculateFare(req, context);
+                                          calcFare = await TicketFun.instance.calculateFare(req, context);
                                           if (!context.mounted) return;
                                           showModalBottomSheet(
                                             enableDrag: true,
@@ -643,7 +708,7 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                                             ),
 
                                             context: context,
-                                            builder: (context) => buildSheet(),
+                                            builder: (context) => buildSheet(context),
                                           ).whenComplete(() {
                                             // Reset the button state when bottom sheet is closed
                                             if (!context.mounted) return;
@@ -664,26 +729,7 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(height: 10),
-                                  Consumer<LoadingProvider>(
-                                    builder: (context, loadingProvider, child) {
-                                      return loadingProvider.isLoading
-                                          ? const Center(
-                                            child: CircularProgressIndicator(
-                                              valueColor:
-                                                  AlwaysStoppedAnimation<Color>(
-                                                    Color.fromARGB(
-                                                      255,
-                                                      2,
-                                                      128,
-                                                      6,
-                                                    ),
-                                                  ),
-                                            ),
-                                          )
-                                          : const SizedBox.shrink();
-                                    },
-                                  ),
+                                  
                                 ],
                               ),
                             ),
@@ -694,7 +740,7 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                   ] else ...[
                     FutureBuilder(
                       future: Future.delayed(
-                        const Duration(seconds: 5),
+                        const Duration(seconds: 15),
                       ), // Add a delay of 5 seconds
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
@@ -707,7 +753,7 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                                 horizontal:
                                     MediaQuery.of(context).size.width / 2.3,
                               ),
-                              child: const CircularProgressIndicator(),
+                              child: const CircularProgressIndicator(color: Colors.white,),
                             ),
                           );
                         } else {
@@ -717,7 +763,7 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                                 vertical:
                                     MediaQuery.of(context).size.height / 2.5,
                                 horizontal:
-                                    MediaQuery.of(context).size.width / 3.5,
+                                    MediaQuery.of(context).size.width / 4,
                               ),
                               child: Text(
                                 'No acitve trip found',
@@ -730,6 +776,7 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                               ),
                             ),
                           );
+
                         }
                       },
                     ),
@@ -739,6 +786,27 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
             ),
           ),
         ),
+        Consumer<LoadingProvider>(
+          builder: (context, loadingProvider, child) {
+            if (!loadingProvider.isLoading) return const SizedBox.shrink();
+
+            return PopScope(
+           canPop: false, 
+              child: AbsorbPointer(
+                absorbing: true, 
+                child: Container(
+                  color: Colors.black54,
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+
       ],
     );
   }
@@ -795,7 +863,7 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
     );
   }
 
-  Widget buildSheet() {
+  Widget buildSheet(BuildContext parentContext) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
@@ -951,7 +1019,7 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                                         const SizedBox(height: 10),
                                       ],
                                     ),
-
+                
                                     /// Route section
                                     Row(
                                       children: [
@@ -982,7 +1050,7 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                                             ],
                                           ),
                                         ),
-
+                
                                         /// Dotted line + bus
                                         Column(
                                           children: [
@@ -1021,7 +1089,7 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                                             ),
                                           ],
                                         ),
-
+                
                                         /// TO
                                         Expanded(
                                           child: Column(
@@ -1051,9 +1119,9 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                                         ),
                                       ],
                                     ),
-
+                
                                     const SizedBox(height: 14),
-
+                
                                     /// Separator line (simulated dotted separator)
                                     CustomPaint(
                                       painter: DottedSeparatorLine(
@@ -1065,9 +1133,9 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                                         height: 1,
                                       ),
                                     ),
-
+                
                                     const SizedBox(height: 14),
-
+                
                                     /// Fare breakdown
                                     Column(
                                       crossAxisAlignment:
@@ -1165,7 +1233,7 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                                           ),
                                         ),
                                         SizedBox(height: .3.h),
-
+                
                                         SizedBox(
                                           height: 40,
                                           width: double.infinity,
@@ -1180,20 +1248,45 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                                                     BorderRadius.circular(10),
                                               ),
                                             ),
-                                            onPressed: () async {
-                                              await initiateOmniwarePayment(
-                                                context,
-                                              );
-                                            },
-                                            child: Text(
-                                              'Proceed',
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.titleMedium?.copyWith(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
+                                            onPressed:  () async {
+                                                  final loadingProvider = Provider.of<LoadingProvider>(context, listen: false);
+                                                  if(!loadingProvider.isLoading){
+                                                    if(!context.mounted)return;
+                                                  await initiateOmniwarePayment(context);
+                                                  }else{
+                                                    CommonFun.instance.showApierror(context, "Please wait while your request is being processed.");
+                                                  }
+                                                  
+                                                  
+                                                },
+                
+                                            child:
+                                            //  _isLoading
+                                            //   ? const SizedBox(
+                                            //       height: 24,
+                                            //       width: 24,
+                                            //       child: CircularProgressIndicator(
+                                            //         color: Colors.white,
+                                            //         strokeWidth: 2,
+                                            //       ),
+                                            //     )
+                                            //   : 
+                                              Text(
+                                                  'Proceed',
+                                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                                        color: Colors.white,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                ),
+                                            // Text(
+                                            //   'Proceed',
+                                            //   style: Theme.of(
+                                            //     context,
+                                            //   ).textTheme.titleMedium?.copyWith(
+                                            //     color: Colors.white,
+                                            //     fontWeight: FontWeight.bold,
+                                            //   ),
+                                            // ),
                                           ),
                                         ),
                                       ],
@@ -1278,26 +1371,60 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
 
   Future<void> initiateOmniwarePayment(BuildContext context) async {
     try {
-      final val = await SharedPrefManager.instance.getSharedData();
-      //final salt="dc413f7c2ddfd4d9ae63dddef2fcc5564c5309ac";
+      val = await SharedPrefManager.instance.getSharedData();
+
+      //*_____________________LIVE_________________________*
+      // final paymentData = {
+      //   "api_key": busdet?.upid ?? '',
+      //   "salt_key": busdet?.saltKey ?? '',
+      //   "payment_url": "https://pgbiz.omniware.in",
+      //   "name": val?.name ?? '',
+      //   "email": busdet?.emailId ?? '',
+      //   "phone": busdet?.mobileNo ?? '',
+      //   "amount": calcFare?.totalFare??'',
+      //   // "amount": '2',
+      //   "description": "bus ticket payment",
+      //   "address_line_1": "test",
+      //   "address_line_2": "text",
+      //   "city": busdet?.city ?? '',
+      //   "state": busdet?.state ?? '',
+      //   "country": busdet?.country ?? '',
+      //   "zip_code": busdet?.zip ?? '',
+      //   "currency": "INR",
+      //   "mode": "LIVE",
+      //   "order_id": "TKT${DateTime.now().millisecondsSinceEpoch}",
+      //   "return_url": "https://pgbiz.omniware.in/tnpv2/return_page.php",
+      //   //"merchant_id": busdet?.mercntCode??'',
+      //   "enable_auto_refund": "n",
+      //   "udf1": "",
+      //   "udf2": "",
+      //   "udf3": "",
+      //   "udf4": "",
+      //   "udf5": "",
+      //   // Optional: Use real phone number if available
+      // };
+
+      //*_____________________***_________________________*
+
+      //*_____________________TEST_________________________*
 
       final paymentData = {
-        "api_key": busdet?.upid ?? '',
-        "salt_key": "dc413f7c2ddfd4d9ae63dddef2fcc5564c5309ac",
+        "api_key": 'fb6bca86-b429-4abf-a42f-824bdd29022e',
+        // "salt_key": busdet?.saltKey??'',
         "payment_url": "https://pgbiz.omniware.in",
-        "name": val?.name ?? '',
-        "email": "shilucks@gmail.com",
-        "phone": busdet?.mobileNo ?? '',
-        "amount": "2",
+        "name":'Rohith Test',
+        "email":'rsn7rohith@gmail.com',
+        "phone":'9745528173',
+        "amount": calcFare?.totalFare??'',
         "description": "bus ticket payment",
         "address_line_1": "test",
-        "address_line_2": "text", // Total from your UI
-        "city": "Kannur",
-        "state": "Kerala",
-        "country": "IND",
-        "zip_code": "670002",
+        "address_line_2": "text",
+        "city": busdet?.city??'',
+        "state": busdet?.state??'',
+        "country": busdet?.country??'',
+        "zip_code": busdet?.zip??'',
         "currency": "INR",
-        "mode": "LIVE",
+        "mode": "TEST",
         "order_id": "TKT${DateTime.now().millisecondsSinceEpoch}",
         "return_url": "https://pgbiz.omniware.in/tnpv2/return_page.php",
         //"merchant_id": busdet?.mercntCode??'',
@@ -1309,7 +1436,44 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
         "udf5": "",
         // Optional: Use real phone number if available
       };
-      final params = generatePaymentParams(paymentData);
+
+      //*_____________________***_________________________*
+
+      params = generatePaymentParams(paymentData);
+      //final value = await SharedPrefManager.instance.getSharedData();
+      final tktreq = TicketsaveReq(
+        tripId: busdet?.tripId ?? '',
+        busid: busdet?.busid ?? '',
+        approvalRefNo: transRespVal?.transactionId ?? '',
+        frmselected: selectedFromList,
+        toselected: selectedToList,
+        adultsselected: countadult,
+        kidsselected: countkid,
+        handiselected: counthandi,
+        studselected: countstud,
+        userId: val?.userId ?? '',
+        userName: val?.name ?? '',
+        phoneNo: val?.mobno ?? "",
+        merchantCode: busdet?.mercntCode ?? "",
+        amount: calcFare?.totalFare ?? "",
+        adultFare: calcFare?.adultFare ?? "",
+        kidsFare: calcFare?.kidsFare ?? "",
+        studentSingleFare: calcFare?.singlestud ?? "",
+        handiSingleFare: calcFare?.handicappedFare ?? "",
+        orderId: params?["order_id"] ?? '',
+        paymentMode: transRespVal?.paymentMode ?? '',
+        paymentChannel: transRespVal?.paymentChannel ?? '',
+        paymentDatetime: transRespVal?.paymentDatetime ?? '',
+        responseCode: transRespVal?.responseCode,
+        responseMessage: transRespVal?.responseMessage ?? '',
+        errorDesc: transRespVal?.errorDesc ?? '',
+        cardMasked: transRespVal?.cardmasked ?? '',
+        reqTime: formatted,
+      );
+      if (!context.mounted) return;
+      ticketdata = await TicketFun.instance.ticketSave(tktreq, context);
+      // setState(() => _isLoading = false);
+
       if (!context.mounted) return;
       open(params, context);
     } catch (e, st) {
@@ -1318,7 +1482,7 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
     }
   }
 
-  void open(Map<String, dynamic> request, BuildContext context) async {
+  void open(Map<String, dynamic>? request, BuildContext context) async {
     try {
       log("Request Params => $request");
       response = await PaymentGatewayPlugin.open(
@@ -1330,71 +1494,94 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
         log("Response => $response");
         //final status="${response['status']}";
         final message = "${response['message']}";
-        final resp = "${response['response']}";
-        //final code="${response['code']}";
-        final resultAsJson = jsonDecode(resp.toString());
-        transRespVal = TransResponse.fromJson(
-          resultAsJson as Map<String, dynamic>,
-        );
-        final dttime = transRespVal?.paymentDatetime;
-        DateTime parsed = DateTime.parse(dttime ?? '');
-
-        formatted = DateFormat("yyyy-MM-dd h:mm:ss a").format(parsed);
-        log(formatted ?? '');
-        if (formatted != null) {
-          List<String> parts = formatted!.split(' ');
-          transdate = parts[0];
-          transtime = '${parts[1]} ${parts[2]}';
-          log(transdate ?? 'null');
-          log(transtime ?? 'null');
+        if (response['response'] == null) {
+          log("Payment was cancelled by the user");
+          if (!context.mounted) return;
+          transCncl(context, request, 0);
         } else {
-          transdate = '';
-          transtime = '';
-        }
-        //final validHash = hash == transRespVal?.hash ? "Yes" : "No";
-        final respcode = transRespVal?.responseCode;
-        final respmsg = transRespVal?.responseMessage ?? '';
-        final status =
-            (respcode == 0)
-                ? "success"
-                : (respcode == 1000)
-                ? "failed"
-                : (respcode == 1006)
-                ? "WAITING-BANK-RESPONSE"
-                : (respcode == 1015)
-                ? "INSUFFICIENT-FUND"
-                : "unknown";
-        if (status == "success") {
-          log("success resp");
-          log(respmsg);
-          final val = await SharedPrefManager.instance.getSharedData();
-          final tktreq = TicketsaveReq(
-            tripId: busdet?.tripId ?? '',
-            busid: busdet?.busid ?? '',
-            approvalRefNo: transRespVal?.transactionId ?? '',
-            frmselected: selectedFromList,
-            toselected: selectedToList,
-            adultsselected: countadult,
-            kidsselected: countkid,
-            handiselected: counthandi,
-            studselected: countstud,
-            userId: val?.userId ?? '',
-            userName: val?.name ?? '',
-            phoneNo: val?.mobno ?? "",
-            merchantCode: busdet?.mercntCode ?? "",
-            amount: calcFare?.totalFare ?? "",
-            reqTime: formatted,
+          final resp = "${response['response']}";
+          //final code="${response['code']}";
+
+          final resultAsJson = jsonDecode(resp.toString());
+          transRespVal = TransResponse.fromJson(
+            resultAsJson as Map<String, dynamic>,
           );
-          if (!context.mounted) return;
-          ticketdata = await TicketFun.instance.ticketSave(tktreq, context);
+          final dttime = transRespVal?.paymentDatetime;
+          DateTime parsed = DateTime.parse(dttime ?? '');
 
-          if (!context.mounted) return;
-          transBox(context, transRespVal, respcode, respmsg);
-        } else {
-          log("failed resp");
-          log(message);
-          if (!context.mounted) return;
-          transBox(context, transRespVal, respcode, respmsg);
+          formatted = DateFormat("yyyy-MM-dd h:mm:ss a").format(parsed);
+          log(formatted ?? '');
+          if (formatted != null) {
+            List<String> parts = formatted!.split(' ');
+            transdate = parts[0];
+            transtime = '${parts[1]} ${parts[2]}';
+            log(transdate ?? 'null');
+            log(transtime ?? 'null');
+          } else {
+            transdate = '';
+            transtime = '';
+          }
+          //final validHash = hash == transRespVal?.hash ? "Yes" : "No";
+          final respcode = transRespVal?.responseCode;
+          final respmsg = transRespVal?.responseMessage ?? '';
+          final status =
+              (respcode == 0)
+                  ? "success"
+                  : (respcode == 1000)
+                  ? "failed"
+                  : (respcode == 1006)
+                  ? "WAITING-BANK-RESPONSE"
+                  : (respcode == 1015)
+                  ? "INSUFFICIENT-FUND"
+                  : "unknown";
+          if (status == "success") {
+            log("success resp");
+            log(respmsg);
+            final val = await SharedPrefManager.instance.getSharedData();
+            final tktreq = TicketsaveReq(
+              approvalRefNo: transRespVal?.transactionId ?? '',
+              userId: val?.userId ?? '',
+              userName: val?.name ?? '',
+              phoneNo: val?.mobno ?? "",
+              merchantCode: busdet?.mercntCode ?? "",
+              orderId:transRespVal?.orderId ??'',
+              paymentMode: transRespVal?.paymentMode??'',
+              paymentChannel: transRespVal?.paymentChannel??'',
+              paymentDatetime: transRespVal?.paymentDatetime??'',
+              responseCode: transRespVal?.responseCode,
+              responseMessage: transRespVal?.responseMessage??'',
+              errorDesc: transRespVal?.errorDesc??'',
+              cardMasked: transRespVal?.cardmasked??'',
+            );
+            if (!context.mounted) return;
+             await TicketFun.instance.paymentStatusUpdt(tktreq, context);
+
+            if (!context.mounted) return;
+            transBox(context, transRespVal, respcode, respmsg);
+          } else {
+            log("failed resp");
+            log(message);
+            final val = await SharedPrefManager.instance.getSharedData();
+            final tktreq = TicketsaveReq(
+              approvalRefNo: transRespVal?.transactionId ?? '',
+              userId: val?.userId ?? '',
+              userName: val?.name ?? '',
+              phoneNo: val?.mobno ?? "",
+              merchantCode: busdet?.mercntCode ?? "",
+              orderId:transRespVal?.orderId ??'',
+              paymentMode: transRespVal?.paymentMode??'',
+              paymentChannel: transRespVal?.paymentChannel??'',
+              paymentDatetime: transRespVal?.paymentDatetime??'',
+              responseCode: transRespVal?.responseCode,
+              responseMessage: transRespVal?.responseMessage??'',
+              errorDesc: transRespVal?.errorDesc??'',
+              cardMasked: transRespVal?.cardmasked??'',
+            );
+            if (!context.mounted) return;
+             await TicketFun.instance.paymentStatusUpdt(tktreq, context);
+            if (!context.mounted) return;
+            transBox(context, transRespVal, respcode, respmsg);
+          }
         }
       } else {
         setState(() {
@@ -1409,6 +1596,204 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
     }
   }
 
+  Future<void> transCncl(
+    BuildContext originalContext,
+    Map<String, dynamic>? request,
+    int retryCount,
+  ) async {
+    if (!originalContext.mounted) return;
+
+    showDialog(
+      context: originalContext,
+      barrierDismissible: false,
+      builder: (context) {
+        return PopScope(
+          canPop: false,
+          child: StatefulBuilder(
+            builder: (context, setState) {
+              return Center(
+                child: Material(
+                  color: Colors.transparent,
+                  child: Container(
+                    margin: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10,
+                          offset: Offset(0, -4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.history,
+                              color: Colors.amber,
+                              size: 35,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              "Processing",
+                              style: Theme.of(
+                                context,
+                              ).textTheme.titleMedium?.copyWith(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "Please check ticket status",
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleMedium?.copyWith(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                elevation: 2,
+                                backgroundColor: const Color(0xffffa600),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              onPressed:(){
+                                        Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => ScreenScanPay(
+                                            busid: widget.busid,
+                                          ),
+                                    ),
+                                  );
+                              },
+                                  
+                              child: Text(
+                                "Cancel" ,
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.titleMedium?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                elevation: 2,
+                                backgroundColor: const Color(0xffffa600),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              onPressed:
+                                  retryCount >= 3
+                                      ? null // disable after 2 taps
+                                      : () async {
+                                        Navigator.pop(context);
+                            
+                                        Future.delayed(
+                                          const Duration(milliseconds: 200),
+                                          () async {
+                                            if (!originalContext.mounted) return;
+                            
+                                            final req = Farereq(
+                                              userId: val?.userId ?? "",
+                                              orderId: params?["order_id"],
+                                            );
+                            
+                                            ticketStatus = await TicketFun.instance.ckeckPayStatus(req,context);
+                            
+                                            final int? respCode =
+                                                ticketStatus?.responseCode is String
+                                                    ? int.tryParse(
+                                                      ticketStatus?.responseCode ?? "",
+                                                    )
+                                                    : ticketStatus?.responseCode;
+                            
+                                            retryCount++; // increment tap count
+                            
+                                            if (respCode == 500 && retryCount < 3) {
+                                              if (!originalContext.mounted) return;
+                                              transCncl(
+                                                originalContext,
+                                                request,
+                                                retryCount,
+                                              );
+                                            } else {
+                                              if (respCode == 500) {
+                                                if (!originalContext.mounted)return;
+                            
+                                                Navigator.of(
+                                                  originalContext,
+                                                ).pushAndRemoveUntil(
+                                                  MaterialPageRoute(
+                                                    builder:
+                                                        (originalContext) =>
+                                                            ScreenMyTickets(
+                                                              initialTabIndex: 1,
+                                                            ),
+                                                  ),
+                                                  (Route<dynamic> route) => false,
+                                                );
+                                              } else {
+                                                if (!originalContext.mounted)return;
+                                                transBox(
+                                                  originalContext,
+                                                  ticketStatus,
+                                                  respCode,
+                                                  respCode == 0
+                                                      ? "Transaction Successfull"
+                                                      : "Transaction Failed",
+                                                );
+                                              }
+                                            }
+                                          },
+                                        );
+                                      },
+                              child: Text(
+                                retryCount == 0 ? "Check Status" : "Retry",
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.titleMedium?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> transBox(
     BuildContext originalContext,
     TransResponse? val,
@@ -1421,108 +1806,81 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
       context: originalContext,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return Center(
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10,
-                    offset: Offset(0, -4),
-                  ),
-                ],
-              ),
-              child: FutureBuilder(
-                future: Future.delayed(Duration(seconds: isSuccess ? 1 : 1)),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Lottie.asset(
-                          isSuccess
-                              ? 'assets/lottie/transaction/Animation - 1750913123081.json'
-                              : 'assets/lottie/transaction/Animation - 1750914295922.json',
-                          width:
-                              MediaQuery.of(context).size.width /
-                              (isSuccess ? 1.5 : 1.5),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          isSuccess
-                              ? "Transaction Successful"
-                              : "Transaction Failed",
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodySmall?.copyWith(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: isSuccess ? Colors.green : Colors.red,
+        return PopScope(
+          canPop: false,
+          child: Center(
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                margin: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 10,
+                      offset: Offset(0, -4),
+                    ),
+                  ],
+                ),
+                child: FutureBuilder(
+                  future: Future.delayed(Duration(seconds: isSuccess ? 1 : 1)),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Lottie.asset(
+                            isSuccess
+                                ? 'assets/lottie/transaction/Animation - 1750913123081.json'
+                                : 'assets/lottie/transaction/Animation - 1750914295922.json',
+                            width:
+                                MediaQuery.of(context).size.width /
+                                (isSuccess ? 1.5 : 1.5),
                           ),
-                        ),
-                      ],
-                    );
-                  } else {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          isSuccess
-                              ? "Transaction Successful"
-                              : "Transaction Failed",
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodySmall?.copyWith(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: isSuccess ? Colors.green : Colors.red,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        if (isSuccess)
-                          buildTransactionTable(val, msg)
-                        else
-                          buildTransactionTable(val, msg),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                elevation: 2,
-                                backgroundColor: const Color(0xffffa600),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              onPressed: () async {
-                                isSuccess
-                                    ? Navigator.pushReplacement(
-                                      context,
-                                      Approutes().qrscreen,
-                                    )
-                                    : Navigator.pop(context);
-                              },
-                              child: Text(
-                                isSuccess ? 'Back' : 'Cancel',
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.titleMedium?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                          const SizedBox(height: 16),
+                          Text(
+                            isSuccess
+                                ? "Transaction Successful"
+                                : "Transaction Failed",
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodySmall?.copyWith(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: isSuccess ? Colors.green : Colors.red,
                             ),
-                            SizedBox(
-                              height: 40,
-                              //width: double.infinity,
-                              child: ElevatedButton(
+                          ),
+                        ],
+                      );
+                    } else {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            isSuccess
+                                ? "Transaction Successful"
+                                : "Transaction Failed",
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodySmall?.copyWith(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: isSuccess ? Colors.green : Colors.red,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          if (isSuccess)
+                            buildTransactionTable(val, msg)
+                          else
+                            buildTransactionTable(val, msg),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   elevation: 2,
                                   backgroundColor: const Color(0xffffa600),
@@ -1531,68 +1889,17 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                                   ),
                                 ),
                                 onPressed: () async {
-                                  if (isSuccess) {
-                                    final ticketvalue = Ticketview(
-                                      tiketNo: ticketdata?.ticketNo ?? '',
-                                      busId: ticketdata?.busid ?? '',
-                                      tripId: busdet?.tripId ?? '',
-                                      fromPlace: selectedFromList,
-                                      toPlace: selectedToList,
-                                      adults: countadult.toString(),
-                                      student: countstud.toString(),
-                                      kids: countkid.toString(),
-                                      handicapped: counthandi.toString(),
-                                      busName: busdet?.busName ?? '',
-                                      registrationNo:
-                                          busdet?.registrationNo ?? '',
-                                      travelDate: transdate,
-                                      travelTime: transtime,
-                                      transactionId:
-                                          transRespVal?.transactionId ?? '',
-                                      singleadult: calcFare?.singleadult ?? '',
-                                      singlekids: calcFare?.singlekid ?? '',
-                                      singlestudent: calcFare?.singlestud ?? '',
-                                      adultfare: calcFare?.adultFare ?? '',
-                                      kidsfare: calcFare?.kidsFare ?? '',
-                                      studentfare: calcFare?.studentFare ?? '',
-                                      totalfare: calcFare?.totalFare ?? '',
-                                    );
-                                    Navigator.of(
-                                      originalContext,
-                                    ).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                        builder:
-                                            (originalContext) =>
-                                                ScreenLiveTicket(
-                                                  tktvw: ticketvalue,
-                                                  title: "Active Ticket",
-                                                  initialTab: 0,
-                                                ),
-                                      ),
-                                      (Route<dynamic> route) => false,
-                                    );
-                                    // Navigator.of(originalContext).pushReplacement(
-                                    //   MaterialPageRoute(
-                                    //     builder:
-                                    //         (originalContext) => ScreenLiveTicket(tktvw: ticketvalue,),
-                                    //   ),
-                                    // );
-                                  } else {
-                                    Navigator.pop(context);
-                                    Future.delayed(
-                                      Duration(milliseconds: 200),
-                                      () {
-                                        if (originalContext.mounted) {
-                                          initiateOmniwarePayment(
-                                            originalContext,
-                                          );
-                                        }
-                                      },
-                                    );
-                                  }
+                                  Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => ScreenScanPay(
+                                            busid: widget.busid,
+                                          ),
+                                    ),
+                                  );
                                 },
                                 child: Text(
-                                  isSuccess ? 'View Ticket' : 'TryAgain',
+                                  isSuccess ? 'Back' : 'Cancel',
                                   style: Theme.of(
                                     context,
                                   ).textTheme.titleMedium?.copyWith(
@@ -1601,13 +1908,95 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    );
-                  }
-                },
+                              SizedBox(
+                                height: 40,
+                                //width: double.infinity,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    elevation: 2,
+                                    backgroundColor: const Color(0xffffa600),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    if (isSuccess) {
+                                      final ticketvalue = Ticketview(
+                                        tiketNo: ticketdata?.ticketNo ?? '',
+                                        busId: ticketdata?.busid ?? '',
+                                        tripId: busdet?.tripId ?? '',
+                                        fromPlace: selectedFromList,
+                                        toPlace: selectedToList,
+                                        adults: countadult.toString(),
+                                        student: countstud.toString(),
+                                        kids: countkid.toString(),
+                                        handicapped: counthandi.toString(),
+                                        busName: busdet?.busName ?? '',
+                                        registrationNo:busdet?.registrationNo ?? '',
+                                        travelDate: transdate,
+                                        travelTime: transtime,
+                                        transactionId:transRespVal?.transactionId ?? '',
+                                        singleadult:calcFare?.singleadult ?? '',
+                                        singlekids: calcFare?.singlekid ?? '',
+                                        singlestudent:calcFare?.singlestud ?? '',
+                                        adultfare: calcFare?.adultFare ?? '',
+                                        kidsfare: calcFare?.kidsFare ?? '',
+                                        studentfare:calcFare?.studentFare ?? '',
+                                        totalfare: calcFare?.totalFare ?? '',
+                                      );
+                                      Navigator.of(
+                                        originalContext,
+                                      ).pushAndRemoveUntil(
+                                        MaterialPageRoute(
+                                          builder:
+                                              (originalContext) =>
+                                                  ScreenLiveTicket(
+                                                    tktvw: ticketvalue,
+                                                    title: "Active Ticket",
+                                                    initialTab: 0,
+                                                  ),
+                                        ),
+                                        (Route<dynamic> route) => false,
+                                      );
+                                      // Navigator.of(originalContext).pushReplacement(
+                                      //   MaterialPageRoute(
+                                      //     builder:
+                                      //         (originalContext) => ScreenLiveTicket(tktvw: ticketvalue,),
+                                      //   ),
+                                      // );
+                                    } else {
+                                      Navigator.pop(context);
+                                      Future.delayed(
+                                        Duration(milliseconds: 200),
+                                        () {
+                                          if (originalContext.mounted) {
+                                            initiateOmniwarePayment(
+                                              originalContext,
+                                            );
+                                            // open(params,originalContext);
+                                          }
+                                        },
+                                      );
+                                    }
+                                  },
+                                  child: Text(
+                                    isSuccess ? 'View Ticket' : 'TryAgain',
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    }
+                  },
+                ),
               ),
             ),
           ),
@@ -1628,14 +2017,14 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
           children: [
             _buildFareCell(context, "Trans. ID"),
             _buildFareCell(context, ":"),
-            _buildFareCell(context, val?.transactionId ?? ''),
+            _buildFareCell(context, val?.transactionId ?? val?.orderId??''),
           ],
         ),
         TableRow(
           children: [
             _buildFareCell(context, "Trans. Amount"),
             _buildFareCell(context, ":"),
-            _buildFareCell(context, val?.amount ?? ''),
+            _buildFareCell(context, calcFare?.totalFare ?? ''),
           ],
         ),
         TableRow(

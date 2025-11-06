@@ -29,7 +29,7 @@ class _ScreenSplashState extends State<ScreenSplash> {
     } else {
       final sharevalue = await SharedPrefManager.instance.getSharedData();
 
-      if (sharevalue?.userId != null) {
+      if (sharevalue?.userId != null && sharevalue!.userId!.isNotEmpty) {
         await Future.delayed(const Duration(seconds: 3));
 
         if (!context.mounted) return;

@@ -18,6 +18,7 @@ Farereq _$FarereqFromJson(Map<String, dynamic> json) => Farereq(
   kids: json['kids'] as String?,
   seatno: json['seatno'] as String?,
   userId: json['user_id'] as String?,
+  orderId: json['order_id'] as String?,
   ticketstatus: json['ticket_status'],
   startTime: json['start_time'],
   endTime: json['end_time'],
@@ -27,7 +28,7 @@ Farereq _$FarereqFromJson(Map<String, dynamic> json) => Farereq(
   flag: json['flag'] as String?,
   crntDt: json['crntDt'] as String?,
   crntTm: json['crntTm'] as String?,
-
+  status: json['status'],
 );
 
 Map<String, dynamic> _$FarereqToJson(Farereq instance) => <String, dynamic>{
@@ -42,6 +43,7 @@ Map<String, dynamic> _$FarereqToJson(Farereq instance) => <String, dynamic>{
   'kids': instance.kids,
   'seatno': instance.seatno,
   'user_id': instance.userId,
+  'order_id': instance.orderId,
   'ticket_status': instance.ticketstatus,
   'start_time': instance.startTime,
   'end_time': instance.endTime,
@@ -49,6 +51,7 @@ Map<String, dynamic> _$FarereqToJson(Farereq instance) => <String, dynamic>{
   'to_place': instance.toPlace,
   'type': instance.type,
   'flag': instance.flag,
-  'crntTm':instance.crntTm,
-  'crntDt':instance.crntDt
+  'crntDt': instance.crntDt,
+  'crntTm': instance.crntTm,
+  'status': instance.status,
 };

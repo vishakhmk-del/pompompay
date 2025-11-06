@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart' as dio;
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart' as dio;
 import 'package:pompompay/core/hook/hooks.dart';
 
 abstract class Apicalls {
@@ -18,6 +21,11 @@ abstract class Apicalls {
   Future<dio.Response<dynamic>?> sortBus(Farereq value);
   Future<dio.Response<dynamic>?> fetchStopLoc(Farereq value);
   Future<dio.Response<dynamic>?> liveBusLoc(Farereq value);
+  Future<dio.Response<dynamic>?> ticketStatus(Farereq value);
+  Future<dio.Response<dynamic>?> checkPayStatus(Farereq value);
+  Future<dio.Response<dynamic>?> paymntUpdate(TicketsaveReq value);
+
+
 }
 
 class Pompaydata extends Apicalls {
@@ -29,6 +37,11 @@ class Pompaydata extends Apicalls {
       baseUrl: url.baseUrl,
       responseType: dio.ResponseType.plain,
     );
+      (dioclient.httpClientAdapter as dio.IOHttpClientAdapter).createHttpClient = () {
+    final client = HttpClient();
+    client.badCertificateCallback = (cert, host, port) => true;
+    return client;
+  };
   }
   @override
   Future<dio.Response<dynamic>?> login(UserCmnReq value) async {
@@ -45,7 +58,6 @@ class Pompaydata extends Apicalls {
           statusMessage: "Connection Timeout",
         );
       }
-
       // Return the error response from DioException
       return dio.Response(
         requestOptions: ex.requestOptions,
@@ -266,7 +278,7 @@ class Pompaydata extends Apicalls {
         // Return a custom response or throw an exception with more details
         return dio.Response(
           requestOptions: ex.requestOptions,
-          statusCode: 408, // HTTP 408 Request Timeout
+          statusCode: 408,
           statusMessage: "Connection Timeout",
         );
       }
@@ -471,7 +483,7 @@ class Pompaydata extends Apicalls {
             ex.response?.statusCode ??
             500, // Default to HTTP 500 if no status code
         statusMessage: ex.message,
-        data: ex.response?.data, 
+        data: ex.response?.data,
       );
     }
   }
@@ -519,6 +531,114 @@ class Pompaydata extends Apicalls {
     try {
       final result = await dioclient.post(
         url.busLiveLocUrl,
+        data: value.toJson(),
+        options: dio.Options(
+          responseType: dio.ResponseType.plain,
+          headers: {
+            "Authorization": "Bearer $token",
+            "Accept": "application/json",
+          },
+        ),
+      );
+      return result;
+    } on dio.DioException catch (ex) {
+      if (ex.type == DioExceptionType.connectionTimeout) {
+        return dio.Response(
+          requestOptions: ex.requestOptions,
+          statusCode: 408, // HTTP 408 Request Timeout
+          statusMessage: "Connection Timeout",
+        );
+      }
+      return dio.Response(
+        requestOptions: ex.requestOptions,
+        statusCode:
+            ex.response?.statusCode ??
+            500, // Default to HTTP 500 if no status code
+        statusMessage: ex.message,
+        data: ex.response?.data, // Include error data if available
+      );
+    }
+  }
+
+  @override
+  Future<dio.Response?> ticketStatus(Farereq value) async {
+    final sharedValue = await SharedPrefManager.instance.getSharedData();
+    final token = sharedValue!.accessTkn;
+    try {
+      final result = await dioclient.post(
+        url.ticketStatusUrl,
+        data: value.toJson(),
+        options: dio.Options(
+          responseType: dio.ResponseType.plain,
+          headers: {
+            "Authorization": "Bearer $token",
+            "Accept": "application/json",
+          },
+        ),
+      );
+      return result;
+    } on dio.DioException catch (ex) {
+      if (ex.type == DioExceptionType.connectionTimeout) {
+        return dio.Response(
+          requestOptions: ex.requestOptions,
+          statusCode: 408, // HTTP 408 Request Timeout
+          statusMessage: "Connection Timeout",
+        );
+      }
+      return dio.Response(
+        requestOptions: ex.requestOptions,
+        statusCode:
+            ex.response?.statusCode ??
+            500, // Default to HTTP 500 if no status code
+        statusMessage: ex.message,
+        data: ex.response?.data, // Include error data if available
+      );
+    }
+  }
+  
+  @override
+  Future<dio.Response?> checkPayStatus(Farereq value) async{
+    final sharedValue = await SharedPrefManager.instance.getSharedData();
+    final token = sharedValue!.accessTkn;
+    try {
+      final result = await dioclient.post(
+        url.checkPayStsUrl,
+        data: value.toJson(),
+        options: dio.Options(
+          responseType: dio.ResponseType.plain,
+          headers: {
+            "Authorization": "Bearer $token",
+            "Accept": "application/json",
+          },
+        ),
+      );
+      return result;
+    } on dio.DioException catch (ex) {
+      if (ex.type == DioExceptionType.connectionTimeout) {
+        return dio.Response(
+          requestOptions: ex.requestOptions,
+          statusCode: 408, // HTTP 408 Request Timeout
+          statusMessage: "Connection Timeout",
+        );
+      }
+      return dio.Response(
+        requestOptions: ex.requestOptions,
+        statusCode:
+            ex.response?.statusCode ??
+            500, // Default to HTTP 500 if no status code
+        statusMessage: ex.message,
+        data: ex.response?.data, // Include error data if available
+      );
+    }
+  }
+  
+  @override
+  Future<dio.Response?> paymntUpdate(TicketsaveReq value) async{
+   final sharedValue = await SharedPrefManager.instance.getSharedData();
+    final token = sharedValue!.accessTkn;
+    try {
+      final result = await dioclient.post(
+        url.payStsUpdtUrl,
         data: value.toJson(),
         options: dio.Options(
           responseType: dio.ResponseType.plain,

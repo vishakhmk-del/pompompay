@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:intl/intl.dart';
 import 'package:pompompay/core/hook/hooks.dart';
+import 'package:pompompay/core/security/security_check.dart';
 import 'package:sizer/sizer.dart';
 
 class ScreenHome extends StatefulWidget {
@@ -34,28 +35,44 @@ class _ScreenHomeState extends State<ScreenHome> {
   @override
   void initState() {
     super.initState();
-     WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async{
+      // await SecurityCheck.checkAndExitIfCompromised(context);
+        if(!mounted)return;
+        setState(() {
+          final DateFormat timeFormat = DateFormat('hh:mm a');
+
+            // Current time
+            final DateTime now = DateTime.now();
+            _fromtimeController.text = timeFormat.format(now);
+
+            // To Time → 11:59 PM
+            final DateTime endOfDay = DateTime(now.year, now.month, now.day, 23, 59);
+            _totimeController.text = timeFormat.format(endOfDay);
+        });
       Livelocationfun.instance.startTracking(
-          context: context,
-          onLocationUpdate: (position) {
-           // if (!mounted) return;
-            setState(() {
-              doublelat = position.latitude;
-              doublelong = position.longitude;
-              locationMessage =
-                  'Latitude: ${position.latitude}, Longitude: ${position.longitude}';
-              log("homescreen init:$locationMessage");
-            });
+        context: context,
+        onLocationUpdate: (position) {
+          if (!mounted) return;
+          setState(() {
+            
+
+            doublelat = position.latitude;
+            doublelong = position.longitude;
+            locationMessage =
+                'Latitude: ${position.latitude}, Longitude: ${position.longitude}';
+            log("homescreen init:$locationMessage");
           });
-          
-          });
-    fetchstop(context);
-    userdet();
-    recentValue();
+        },
+      );
+      fetchstop(context);
+      userdet();
+      recentValue();
+    });
   }
 
   Future fetchstop(BuildContext context) async {
     cpayMoblst = await SearchFun.instance.fetchStage(context);
+    if (!mounted) return;
     setState(() {
       filteredFromPlace = cpayMoblst;
       filteredToPlace = cpayMoblst;
@@ -98,10 +115,9 @@ class _ScreenHomeState extends State<ScreenHome> {
     });
   }
 
-
-
   void userdet() async {
     final val = await SharedPrefManager.instance.getSharedData();
+    if (!mounted) return;
 
     setState(() {
       usrNm = val!.name;
@@ -113,20 +129,22 @@ class _ScreenHomeState extends State<ScreenHome> {
     context: context,
     builder:
         (context) => AlertDialog(
-          backgroundColor: Theme.of(context).colorScheme.secondary,
+          backgroundColor: Colors.white,
           title: Center(
             child: Text(
               "Exit App?",
-              style: Theme.of(
-                context,
-              ).textTheme.titleSmall?.copyWith(fontSize: 18.sp,color:Colors.white),
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontSize: 18.sp,
+                color: Colors.black,
+              ),
             ),
           ),
           content: Text(
             "Are you sure you want to exit?",
-            style: Theme.of(
-              context,
-            ).textTheme.titleSmall?.copyWith(fontSize: 18.sp,color:Colors.white),
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              fontSize: 18.sp,
+              color: Colors.black,
+            ),
           ),
           actions: [
             ElevatedButton(
@@ -136,7 +154,9 @@ class _ScreenHomeState extends State<ScreenHome> {
               onPressed: () => Navigator.pop(context, false),
               child: Text(
                 'NO',
-                style: Theme.of(context).textTheme.displayMedium?.copyWith(color:Colors.white),
+                style: Theme.of(
+                  context,
+                ).textTheme.displayMedium?.copyWith(color: Colors.white),
               ),
             ),
             ElevatedButton(
@@ -149,24 +169,30 @@ class _ScreenHomeState extends State<ScreenHome> {
               },
               child: Text(
                 'YES',
-                style: Theme.of(context).textTheme.displayMedium?.copyWith(color:Colors.white),
+                style: Theme.of(
+                  context,
+                ).textTheme.displayMedium?.copyWith(color: Colors.white),
               ),
             ),
           ],
         ),
   );
 
-Future<void> recentValue() async {
-      final val = await SharedPrefManager.instance.loadRecentSearches();
-  setState(() {
-    recentSearches = val;
-    isLoadingRecent = false;
-  });
-}
+  Future<void> recentValue() async {
+    final val = await SharedPrefManager.instance.loadRecentSearches();
+    if (!mounted) return;
+
+    setState(() {
+      recentSearches = val;
+      isLoadingRecent = false;
+    });
+  }
 
   @override
   void dispose() {
-    //Livelocationfun.instance.stopTracking();
+    Livelocationfun.instance.stopTracking();
+    _fromtimeController.dispose();
+    _totimeController.dispose();
     super.dispose();
   }
 
@@ -221,11 +247,10 @@ Future<void> recentValue() async {
                         ),
                       ],
                     ),
-            
+
                     Positioned(
                       top:
-                          MediaQuery.of(context).size.height /
-                          9.8, // Adjust position
+                          MediaQuery.of(context).size.height /12.2,
                       left: MediaQuery.of(context).size.width / 20,
                       right: MediaQuery.of(context).size.width / 20,
                       child: Card(
@@ -281,13 +306,13 @@ Future<void> recentValue() async {
                                   },
                                   onTap: () {
                                     setState(() {
-                                        showFromDropdown = !showFromDropdown;
-                                        if (showFromDropdown) {
-                                          showToDropdown = false;
-                                        }
-                                      });
+                                      showFromDropdown = !showFromDropdown;
+                                      if (showFromDropdown) {
+                                        showToDropdown = false;
+                                      }
+                                    });
                                   },
-            
+
                                   validator: (value) {
                                     if (value!.isEmpty) {
                                       CommonFun.instance.showApierror(
@@ -300,7 +325,7 @@ Future<void> recentValue() async {
                                   },
                                 ),
                                 SizedBox(height: 1.5.h),
-            
+
                                 // TO TextFormField
                                 TextFormField(
                                   controller: tocontroller,
@@ -331,14 +356,14 @@ Future<void> recentValue() async {
                                     showToDropdown = true;
                                   },
                                   onTap: () {
-                                     setState(() {
-                                        showToDropdown = !showToDropdown;
-                                        if (showToDropdown) {
-                                          showFromDropdown = false;
-                                        }
-                                      });
+                                    setState(() {
+                                      showToDropdown = !showToDropdown;
+                                      if (showToDropdown) {
+                                        showFromDropdown = false;
+                                      }
+                                    });
                                   },
-            
+
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       CommonFun.instance.showApierror(
@@ -350,7 +375,7 @@ Future<void> recentValue() async {
                                     return null;
                                   },
                                 ),
-            
+
                                 SizedBox(height: .5.h),
                                 Row(
                                   children: [
@@ -421,7 +446,7 @@ Future<void> recentValue() async {
                                               color: Colors.grey,
                                             ),
                                           ),
-                                          border: InputBorder.none,
+                                         border: InputBorder.none,
                                           errorStyle: const TextStyle(
                                             height: 0,
                                             fontSize: 0,
@@ -447,51 +472,57 @@ Future<void> recentValue() async {
                                     ),
                                   ],
                                 ),
-            
+
                                 SizedBox(height: 1.5.h),
-                                Container(
-                                  height: 5.h,
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Theme.of(context).colorScheme.secondary,
-                                        Theme.of(context).colorScheme.primary,
-                                      ],
-                                    ),
-                                  ),
-                                  child: Theme(
-                                    data: MyTheme.buttonStyleTheme,
-                                    child: ElevatedButton(
-                                      onPressed: () async {
-                                        final String from = fromcontroller.text;
-                                        final String to = tocontroller.text;
-                                        final String frmTime =_fromtimeController.text;
-                                        final String toTime =_totimeController.text;
-            
-                                        final DateFormat inputFormat = DateFormat('hh:mm a');
-                                        final DateTime datefrmTime = inputFormat.parse(frmTime);
-                                        final DateTime datetoTime = inputFormat.parse(toTime);
-            
-                                        final DateFormat outputFormat = DateFormat('hh:mm:ss a');
-                                        final frmtm= outputFormat.format(datefrmTime);
-                                        final totm= outputFormat.format(datetoTime);
-                                        log("fromtime:$frmtm,totime:$totm");
-                                        final now = DateTime.now();
-                                        final date = DateFormat('dd-MM-yyyy').format(now);
-                                        final time = DateFormat('hh:mm a').format(now); 
-                                        if (_formkey.currentState!.validate()) {
+                                GestureDetector(
+                                  onTap: () async{
+                                    if (_formkey.currentState!.validate()) {
+                                          final String from =
+                                              fromcontroller.text;
+                                          final String to = tocontroller.text;
+                                          final String frmTime =
+                                              _fromtimeController.text;
+                                          final String toTime =
+                                              _totimeController.text;
+
+                                          final DateFormat inputFormat =
+                                              DateFormat('hh:mm a');
+                                          final DateTime datefrmTime =
+                                              inputFormat.parse(frmTime);
+                                          final DateTime datetoTime =
+                                              inputFormat.parse(toTime);
+
+                                          final DateFormat outputFormat =
+                                              DateFormat('hh:mm:ss a');
+                                          final frmtm = outputFormat.format(
+                                            datefrmTime,
+                                          );
+                                          final totm = outputFormat.format(
+                                            datetoTime,
+                                          );
+                                          log("fromtime:$frmtm,totime:$totm");
+                                          final now = DateTime.now();
+                                          final date = DateFormat(
+                                            'dd-MM-yyyy',
+                                          ).format(now);
+                                          final time = DateFormat(
+                                            'hh:mm a',
+                                          ).format(now);
                                           final farereq = Farereq(
                                             fromPlace: from,
                                             toPlace: to,
                                             startTime: frmtm,
                                             endTime: totm,
                                             crntDt: date,
-                                            crntTm: time
+                                            crntTm: time,
                                           );
-                                          await SharedPrefManager.instance.saveRecentSearch(farereq);
+                                          await SharedPrefManager.instance
+                                              .saveRecentSearch(farereq);
                                           if (!context.mounted) return;
-                                          await SearchFun.instance.searchBus(farereq,context);
+                                          await SearchFun.instance.searchBus(
+                                            farereq,
+                                            context,
+                                          );
                                           if (!context.mounted) return;
                                           Navigator.of(context).pushReplacement(
                                             MaterialPageRoute(
@@ -502,10 +533,33 @@ Future<void> recentValue() async {
                                             ),
                                           );
                                         }
-                                      },
+                                  },
+                                  child: Container(
+                                    height: 7.h,
+                                    //margin: EdgeInsets.only(left: 50,right: 50),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.secondary,
+                                          Theme.of(context).colorScheme.primary,
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.primary,
+                                      ),
+                                    ),
+                                    child: Center(
                                       child: Text(
                                         'Search For Bus',
-                                        style: Theme.of(context)
+                                        style:  Theme.of(context)
                                             .textTheme
                                             .titleMedium
                                             ?.copyWith(fontSize: 18),
@@ -513,6 +567,91 @@ Future<void> recentValue() async {
                                     ),
                                   ),
                                 ),
+                                // Container(
+                                //   height: 5.h,
+                                //   width: double.infinity,
+                                //   decoration: BoxDecoration(
+                                //     gradient: LinearGradient(
+                                //       begin: Alignment.topLeft,
+                                //         end: Alignment.bottomCenter,
+                                //       colors: [
+                                //         Theme.of(context).colorScheme.secondary,
+                                //         Theme.of(context).colorScheme.primary,
+                                //       ],
+                                //     ),
+                                //   ),
+                                //   child: Theme(
+                                //     data: MyTheme.buttonStyleTheme,
+                                //     child: ElevatedButton(
+                                //       onPressed: () async {
+                                //         if (_formkey.currentState!.validate()) {
+                                //           final String from =
+                                //               fromcontroller.text;
+                                //           final String to = tocontroller.text;
+                                //           final String frmTime =
+                                //               _fromtimeController.text;
+                                //           final String toTime =
+                                //               _totimeController.text;
+
+                                //           final DateFormat inputFormat =
+                                //               DateFormat('hh:mm a');
+                                //           final DateTime datefrmTime =
+                                //               inputFormat.parse(frmTime);
+                                //           final DateTime datetoTime =
+                                //               inputFormat.parse(toTime);
+
+                                //           final DateFormat outputFormat =
+                                //               DateFormat('hh:mm:ss a');
+                                //           final frmtm = outputFormat.format(
+                                //             datefrmTime,
+                                //           );
+                                //           final totm = outputFormat.format(
+                                //             datetoTime,
+                                //           );
+                                //           log("fromtime:$frmtm,totime:$totm");
+                                //           final now = DateTime.now();
+                                //           final date = DateFormat(
+                                //             'dd-MM-yyyy',
+                                //           ).format(now);
+                                //           final time = DateFormat(
+                                //             'hh:mm a',
+                                //           ).format(now);
+                                //           final farereq = Farereq(
+                                //             fromPlace: from,
+                                //             toPlace: to,
+                                //             startTime: frmtm,
+                                //             endTime: totm,
+                                //             crntDt: date,
+                                //             crntTm: time,
+                                //           );
+                                //           await SharedPrefManager.instance
+                                //               .saveRecentSearch(farereq);
+                                //           if (!context.mounted) return;
+                                //           await SearchFun.instance.searchBus(
+                                //             farereq,
+                                //             context,
+                                //           );
+                                //           if (!context.mounted) return;
+                                //           Navigator.of(context).pushReplacement(
+                                //             MaterialPageRoute(
+                                //               builder:
+                                //                   (context) => ScreenSearchList(
+                                //                     req: farereq,
+                                //                   ),
+                                //             ),
+                                //           );
+                                //         }
+                                //       },
+                                //       child: Text(
+                                //         'Search For Bus',
+                                //         style: Theme.of(context)
+                                //             .textTheme
+                                //             .titleMedium
+                                //             ?.copyWith(fontSize: 18),
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),
@@ -521,8 +660,7 @@ Future<void> recentValue() async {
                     ),
                     Positioned(
                       top:
-                          MediaQuery.of(context).size.height /
-                          6.5, // Adjust position
+                          MediaQuery.of(context).size.height /7.3, // Adjust position
                       left: MediaQuery.of(context).size.width / 28,
                       right: MediaQuery.of(context).size.width / 28,
                       child: Padding(
@@ -563,7 +701,7 @@ Future<void> recentValue() async {
                         ),
                       ),
                     ),
-            
+
                     Positioned(
                       top: MediaQuery.of(context).size.height / 2.3,
                       left: MediaQuery.of(context).size.width / 28,
@@ -587,7 +725,7 @@ Future<void> recentValue() async {
                                     margin: EdgeInsets.only(right: 8),
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
-                                        begin: Alignment.topCenter,
+                                        begin: Alignment.topLeft,
                                         end: Alignment.bottomCenter,
                                         colors: [
                                           Theme.of(context).colorScheme.secondary,
@@ -597,15 +735,17 @@ Future<void> recentValue() async {
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
                                         color:
-                                            Theme.of(context).colorScheme.primary,
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.primary,
                                       ),
                                     ),
-            
+
                                     child: Center(
                                       child: Row(
                                         children: [
                                           Container(
-                                            height: 5.5.h,
+                                            height: 4.8.h,
                                             decoration: BoxDecoration(
                                               color: Colors.white,
                                               shape: BoxShape.circle,
@@ -626,13 +766,11 @@ Future<void> recentValue() async {
                                             ),
                                           ),
                                           Text(
-                                            'Scan and Pay',
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.titleMedium?.copyWith(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                            'Get Ticket',
+                                            style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(fontSize: 16),
                                             textAlign: TextAlign.center,
                                           ),
                                         ],
@@ -654,24 +792,28 @@ Future<void> recentValue() async {
                                     margin: EdgeInsets.only(left: 8),
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
-                                        begin: Alignment.topCenter,
+                                        begin: Alignment.topLeft,
                                         end: Alignment.bottomCenter,
                                         colors: [
-                                          Theme.of(context).colorScheme.secondary,
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.secondary,
                                           Theme.of(context).colorScheme.primary,
                                         ],
                                       ),
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
                                         color:
-                                            Theme.of(context).colorScheme.primary,
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.primary,
                                       ),
                                     ),
                                     child: Center(
                                       child: Row(
                                         children: [
                                           Container(
-                                            height: 5.5.h,
+                                            height: 4.8.h,
                                             decoration: BoxDecoration(
                                               color: Colors.white,
                                               shape: BoxShape.circle,
@@ -691,15 +833,13 @@ Future<void> recentValue() async {
                                               onPressed: () {},
                                             ),
                                           ),
-                                          SizedBox(width: 3.w),
+                                          //SizedBox(width: 3.w),
                                           Text(
-                                            'Tickets',
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.titleMedium?.copyWith(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                            'Show Ticket',
+                                            style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(fontSize: 16),
                                             textAlign: TextAlign.center,
                                           ),
                                         ],
@@ -718,11 +858,12 @@ Future<void> recentValue() async {
                         filteredFromPlace!.isNotEmpty) ...[
                       Positioned(
                         top:
-                            MediaQuery.of(context).size.height /5.8, // Adjust position
+                            MediaQuery.of(context).size.height /
+                            5.8, // Adjust position
                         left: MediaQuery.of(context).size.width / 28,
                         right: MediaQuery.of(context).size.width / 28,
                         child: Container(
-                          height: 150,
+                          height: 130,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             border: Border.all(color: Colors.grey.shade300),
@@ -760,7 +901,7 @@ Future<void> recentValue() async {
                         left: MediaQuery.of(context).size.width / 28,
                         right: MediaQuery.of(context).size.width / 28,
                         child: Container(
-                          height: 150,
+                          height: 130,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             border: Border.all(color: Colors.grey.shade300),
@@ -791,7 +932,7 @@ Future<void> recentValue() async {
                         left: MediaQuery.of(context).size.width / 28,
                         right: MediaQuery.of(context).size.width / 28,
                         child: Container(
-                          height: 150,
+                          height: 130,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             border: Border.all(color: Colors.grey.shade300),
@@ -829,7 +970,7 @@ Future<void> recentValue() async {
                         left: MediaQuery.of(context).size.width / 28,
                         right: MediaQuery.of(context).size.width / 28,
                         child: Container(
-                          height: 150,
+                          height: 130,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             border: Border.all(color: Colors.grey.shade300),
@@ -850,98 +991,120 @@ Future<void> recentValue() async {
                         ),
                       ),
                     ],
-                    
+
                     Positioned(
-                    top: MediaQuery.of(context).size.height / 1.9,
-                    left: MediaQuery.of(context).size.width / 28,
-                    right: MediaQuery.of(context).size.width / 28,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Recent Search',
-                          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                        SizedBox(height: 1.h),
-                        if (isLoadingRecent)
-                          Center(child: CircularProgressIndicator())
-                        else if (recentSearches.isEmpty)
-                          Center(
-                            child: Row(
-                              children: [
-                                Text(
+                      top: MediaQuery.of(context).size.height / 1.9,
+                      left: MediaQuery.of(context).size.width / 28,
+                      right: MediaQuery.of(context).size.width / 28,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Recent Search',
+                              style: Theme.of(
+                                context,
+                              ).textTheme.headlineLarge?.copyWith(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                            SizedBox(height: 1.h),
+                            if (isLoadingRecent)
+                              Center(child: CircularProgressIndicator())
+                            else if (recentSearches.isEmpty)
+                              Center(
+                                child: Text(
                                   'No recent searches',
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: Colors.grey,
                                   ),
                                 ),
-                                TextButton(onPressed: (){}, child: Text("more>>"))
-                              ],
-                            ),
-                          )
-                        else
-                          ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: recentSearches.length > 3 ? 3 : recentSearches.length,
-                            itemBuilder: (context, index) {
-                              final item = recentSearches[index];
-                              return Card(
-                                margin: EdgeInsets.symmetric(vertical: 2),
-                                child:Container(
-                                    decoration: BoxDecoration(
-                                      color:Colors.white,
-                                      // gradient: LinearGradient(
-                                      //   begin: Alignment.topCenter,
-                                      //   end: Alignment.bottomCenter,
-                                      //   colors: [
-                                      //     Theme.of(context).colorScheme.secondary,
-                                      //     Theme.of(context).colorScheme.primary,
-                                      //   ],
-                                      // ),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color:
-                                            Theme.of(context).colorScheme.primary,
+                              )
+                            else
+                              ListView.builder(
+                                shrinkWrap: true,
+                                itemCount:
+                                    recentSearches.length > 3
+                                        ? 3
+                                        : recentSearches.length,
+                                itemBuilder: (context, index) {
+                                  final item = recentSearches[index];
+                                  return Card(
+                                    margin: EdgeInsets.symmetric(vertical: 2),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        // gradient: LinearGradient(
+                                        //   begin: Alignment.topCenter,
+                                        //   end: Alignment.bottomCenter,
+                                        //   colors: [
+                                        //     Theme.of(context).colorScheme.secondary,
+                                        //     Theme.of(context).colorScheme.primary,
+                                        //   ],
+                                        // ),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.primary,
+                                        ),
                                       ),
-                                    ),
-                                  child: ListTile(
-                                    leading: Icon(Icons.history,color:Colors.black),
-                                    title: Text('${item.fromPlace} → ${item.toPlace}',style:Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.copyWith(fontSize: 18,fontWeight: FontWeight.w800),),
-                                    subtitle: Text('Date: ${item.crntDt} | Time: ${item.crntTm}',style:Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.copyWith(fontSize: 14),),
-                                    onTap: () async{
-                                      // setState(() {
-                                      //   fromcontroller.text = item.fromPlace ?? '';
-                                      //   tocontroller.text = item.toPlace ?? '';
-                                      // _fromtimeController.text=item.startTime;
-                                      // _totimeController.text=item.endTime;
-                                        
-                                      // });
-                                      final now = DateTime.now();
-                                        final date = DateFormat('dd-MM-yyyy').format(now);
-                                        final time = DateFormat('hh:mm a').format(now); 
-                                        
-                                      final farereq = Farereq(
+                                      child: ListTile(
+                                        leading: Icon(
+                                          Icons.history,
+                                          color: Colors.black,
+                                        ),
+                                        title: Text(
+                                          '${item.fromPlace} → ${item.toPlace}',
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.bodySmall?.copyWith(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                        subtitle: Text(
+                                          'Date: ${item.crntDt} | Time: ${item.crntTm}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.copyWith(fontSize: 12),
+                                        ),
+                                        onTap: () async {
+                                          // setState(() {
+                                          //   fromcontroller.text = item.fromPlace ?? '';
+                                          //   tocontroller.text = item.toPlace ?? '';
+                                          // _fromtimeController.text=item.startTime;
+                                          // _totimeController.text=item.endTime;
+
+                                          // });
+                                          final now = DateTime.now();
+                                          final date = DateFormat(
+                                            'dd-MM-yyyy',
+                                          ).format(now);
+                                          final time = DateFormat(
+                                            'hh:mm a',
+                                          ).format(now);
+
+                                          final farereq = Farereq(
                                             fromPlace: item.fromPlace ?? '',
                                             toPlace: item.toPlace ?? '',
                                             startTime: item.startTime,
                                             endTime: item.endTime,
                                             crntDt: date,
-                                            crntTm: time
+                                            crntTm: time,
                                           );
-                                          await SharedPrefManager.instance.saveRecentSearch(farereq);
+                                          await SharedPrefManager.instance
+                                              .saveRecentSearch(farereq);
                                           if (!context.mounted) return;
-                                          await SearchFun.instance.searchBus(farereq,context);
+                                          await SearchFun.instance.searchBus(
+                                            farereq,
+                                            context,
+                                          );
                                           if (!context.mounted) return;
                                           Navigator.of(context).pushReplacement(
                                             MaterialPageRoute(
@@ -951,16 +1114,17 @@ Future<void> recentValue() async {
                                                   ),
                                             ),
                                           );
-                                    },
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                      ],
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                  Positioned(
+                    Positioned(
                       top: MediaQuery.of(context).size.height * 0.02,
                       left: MediaQuery.of(context).size.width * 0.017,
                       right: MediaQuery.of(context).size.width * 0.017,
@@ -989,7 +1153,7 @@ Future<void> recentValue() async {
                                       "$usrNm".toUpperCase(),
                                       style: TextStyle(
                                         fontFamily: 'Poppins-Medium',
-                                        fontSize: 20.sp,
+                                        fontSize: 18.sp,
                                         fontWeight: FontWeight.w600,
                                         color:
                                             Theme.of(

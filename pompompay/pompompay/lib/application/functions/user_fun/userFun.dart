@@ -12,14 +12,14 @@ class UserFun {
   Future<String?> resndotp(UserCmnReq val, BuildContext context) async {
     try {
       final loadingProvider = context.read<LoadingProvider>();
-      loadingProvider.toggleLoading();
+      loadingProvider.show();
       final chngresp = await Pompaydata().resndOtp(val);
       final resultAsjson = jsonDecode(chngresp.toString());
       final changeval = UserCmnResp.fromJson(
         resultAsjson as Map<String, dynamic>,
       );
 
-      loadingProvider.toggleLoading();
+      loadingProvider.resetAll();
       if (chngresp == null) {
         if (!context.mounted) return '';
         CommonFun.instance.showApierror(context, "Something went wrong");
@@ -68,7 +68,7 @@ class UserFun {
       final loadingProvider = context.read<LoadingProvider>();
       //FirebaseMessaging messaging=FirebaseMessaging.instance;
       //String? deviceTkn;
-      loadingProvider.toggleLoading();
+      loadingProvider.show();
       final value = await SharedPrefManager.instance.getdeviceinfo();
       // final val = await SharedPrefManager.instance.getdeviceTkn();
       // final tkn=val.devicetoken;
@@ -98,7 +98,7 @@ class UserFun {
         resultAsjson as Map<String, dynamic>,
       );
 
-      loadingProvider.toggleLoading();
+      loadingProvider.resetAll();
       if (loginResponse == null) {
         if (!context.mounted) return;
 
@@ -170,10 +170,11 @@ class UserFun {
   Future registerFn(UserCmnReq req, BuildContext context) async {
     try {
       final loadingProvider = context.read<LoadingProvider>();
+      // final loader = Provider.of<LoadingProvider>(context, listen: false);
       //FirebaseMessaging messaging=FirebaseMessaging.instance;
       //String? deviceTkn;
-      loadingProvider.toggleLoading();
-      // final value = await SharedPrefManager.instance.getdeviceinfo();
+      loadingProvider.show();
+      final value = await SharedPrefManager.instance.getdeviceinfo();
       // final val = await SharedPrefManager.instance.getdeviceTkn();
       // final tkn=val.devicetoken;
       // if((tkn??"").isEmpty){
@@ -182,14 +183,26 @@ class UserFun {
       // }else{
       //   deviceTkn=val.devicetoken;
       // }
-
-      final loginResponse = await Pompaydata().registration(req);
+      final regReq = UserCmnReq(
+        pw: req.pw,
+        userName: req.userName,
+        mobno: req.mobno,
+        deviceid: value.deviceid,
+        device: value.phone,
+        screenresolution: value.screenresolution,
+        phoneos: value.phoneos,
+        androidid: value.androidid,
+        appversion: value.appversion,
+        osversion: value.osversion,
+        buildnumber: value.buildnumber,
+      );
+      final loginResponse = await Pompaydata().registration(regReq);
       final resultAsjson = jsonDecode(loginResponse.toString());
       final loginval = UserCmnResp.fromJson(
         resultAsjson as Map<String, dynamic>,
       );
 
-      loadingProvider.toggleLoading();
+      loadingProvider.resetAll();
       if (loginResponse == null) {
         if (!context.mounted) return;
 

@@ -1,10 +1,10 @@
-import 'dart:developer';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pompompay/core/hook/hooks.dart';
 import 'package:sizer/sizer.dart';
 
 class ScreenMenu extends StatefulWidget {
-  const ScreenMenu({super.key,required this.screen});
-final int screen;
+  const ScreenMenu({super.key, required this.screen});
+  final int screen;
   @override
   State<ScreenMenu> createState() => _ScreenMenuState();
 }
@@ -33,17 +33,78 @@ class _ScreenMenuState extends State<ScreenMenu> {
     return true;
   }
 
+  Future<bool?> showWarning(BuildContext context) async => showDialog<bool>(
+    barrierDismissible: false,
+    context: context,
+    builder:
+        (context) => AlertDialog(
+          backgroundColor: Colors.white,
+          title: Center(
+            child: Text(
+              "Exit App?",
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontSize: 18.sp,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          content: Text(
+            "Are you sure you want to exit?",
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              fontSize: 18.sp,
+              color: Colors.black,
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+              ),
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(
+                'NO',
+                style: Theme.of(
+                  context,
+                ).textTheme.displayMedium?.copyWith(color: Colors.white),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+              ),
+              onPressed: () {
+                Navigator.pop(context, true);
+                // Livelocationfun.instance.stopTracking();
+              },
+              child: Text(
+                'YES',
+                style: Theme.of(
+                  context,
+                ).textTheme.displayMedium?.copyWith(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+  );
   @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (bool didPop, Object? result) async {
-        if (didPop) {
-          log('Screen was popped with result: $result');
-          return;
+        if (!didPop) {
+          if (widget.screen == menu) {
+            //   log('Screen was popped with result: $result');
+            // return;
+            await popscreen(context);
+          } else {
+            final confirmExit = await showWarning(context);
+            if (confirmExit == true) {
+              SystemNavigator.pop();
+            }
+            // Exit the app
+          }
         }
         //log('BackButton pressed! Navigating to login screen.');
-        await popscreen(context);
       },
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -63,7 +124,10 @@ class _ScreenMenuState extends State<ScreenMenu> {
                   children: [
                     Container(
                       width: MediaQuery.of(context).size.width,
-                      height: widget.screen==menu?MediaQuery.of(context).size.height / 1.3:MediaQuery.of(context).size.height / 1.3,
+                      height:
+                          widget.screen == menu
+                              ? MediaQuery.of(context).size.height / 1.3
+                              : MediaQuery.of(context).size.height / 1.3,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
@@ -83,7 +147,10 @@ class _ScreenMenuState extends State<ScreenMenu> {
                   ],
                 ),
                 Positioned(
-                  top: widget.screen==menu?MediaQuery.of(context).size.height * .14:MediaQuery.of(context).size.height * .14,
+                  top:
+                      widget.screen == menu
+                          ? MediaQuery.of(context).size.height * .14
+                          : MediaQuery.of(context).size.height * .14,
                   left: MediaQuery.of(context).size.width * 0.05,
                   right: MediaQuery.of(context).size.width * 0.19,
                   child: Row(
@@ -164,7 +231,10 @@ class _ScreenMenuState extends State<ScreenMenu> {
                   alignment: Alignment.bottomCenter,
                   child: Container(
                     width: MediaQuery.of(context).size.width,
-                    height:widget.screen==menu? MediaQuery.of(context).size.height / 1.42:MediaQuery.of(context).size.height / 1.65,
+                    height:
+                        widget.screen == menu
+                            ? MediaQuery.of(context).size.height / 1.42
+                            : MediaQuery.of(context).size.height / 1.65,
                     //padding: const EdgeInsets.only(top: 10, bottom: 10),
                     decoration: const BoxDecoration(color: Colors.white),
                     child: ListView(
@@ -259,38 +329,42 @@ class _ScreenMenuState extends State<ScreenMenu> {
                   ),
                 ),
 
-               widget.screen==menu? Positioned(
-                  top: 40,
-                  left: 10,
-                  right: 10,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Builder(
-                        builder:
-                            (context) => Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.arrow_back,
-                                    color:
-                                        Theme.of(context).colorScheme.onPrimary,
-                                    size: 25,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      Approutes().mainScreen,
-                                    );
-                                  },
+                widget.screen == menu
+                    ? Positioned(
+                      top: 40,
+                      left: 10,
+                      right: 10,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Builder(
+                            builder:
+                                (context) => Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.arrow_back,
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimary,
+                                        size: 25,
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pushReplacement(
+                                          context,
+                                          Approutes().mainScreen,
+                                        );
+                                      },
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ):SizedBox.shrink()
+                    )
+                    : SizedBox.shrink(),
               ],
             ),
           ),
@@ -304,20 +378,22 @@ class _ScreenMenuState extends State<ScreenMenu> {
     context: context,
     builder:
         (context) => AlertDialog(
-          backgroundColor: Theme.of(context).colorScheme.primaryFixed,
+          backgroundColor: Colors.white,
           title: Center(
             child: Text(
               "Sign Out?",
-              style: Theme.of(
-                context,
-              ).textTheme.titleSmall?.copyWith(fontSize: 18.sp),
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontSize: 18.sp,
+                color: Colors.black,
+              ),
             ),
           ),
           content: Text(
             "Are you sure you want to Sign Out?",
-            style: Theme.of(
-              context,
-            ).textTheme.titleSmall?.copyWith(fontSize: 18.sp),
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              fontSize: 18.sp,
+              color: Colors.black,
+            ),
           ),
 
           actions: [
@@ -349,8 +425,18 @@ class _ScreenMenuState extends State<ScreenMenu> {
 
   void signout(BuildContext context) async {
     final sharedprf = await SharedPreferences.getInstance();
-    await sharedprf.remove(savekeyname);
+    // await sharedprf.remove(savekeyname);
+    // await sharedprf.clear();
+    const secureStorage = FlutterSecureStorage();
 
+  // Remove only the login-related keys
+  await sharedprf.remove('NAME');
+  await sharedprf.remove('MOBNO');
+  await sharedprf.remove('savekeyname'); // <- your login flag key
+
+  // Remove secure storage keys
+  await secureStorage.delete(key: 'USERID');
+  await secureStorage.delete(key: 'ACCESSTOKEN');
     if (!context.mounted) return;
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (ctx) => const Screenlogin()),

@@ -35,13 +35,21 @@ class TransResponse {
   @JsonKey(name: 'payment_datetime')
   String? paymentDatetime;
   @JsonKey(name: 'response_code')
-  int? responseCode;
+  dynamic responseCode;
   @JsonKey(name: 'response_message')
   String? responseMessage;
   @JsonKey(name: 'error_desc')
   String? errorDesc;
   String? cardmasked;
   String? hash;
+  @JsonKey(name: 'customer_phone')
+  String? custphone;
+  @JsonKey(name: 'customer_name')
+  String? customerName;
+  @JsonKey(name: 'customer_email')
+  String? custmail;
+  @JsonKey(name: 'bank_ref_id')
+  String? bankRefId;
 
   TransResponse({
     this.orderId,
@@ -71,6 +79,10 @@ class TransResponse {
     this.errorDesc,
     this.cardmasked,
     this.hash,
+    this.custphone,
+    this.customerName,
+    this.custmail,
+    this.bankRefId
   });
 
   factory TransResponse.fromJson(Map<String, dynamic> json) {

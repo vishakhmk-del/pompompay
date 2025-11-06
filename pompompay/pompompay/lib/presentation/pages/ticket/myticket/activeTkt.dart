@@ -1,8 +1,16 @@
 import 'package:pompompay/core/hook/hooks.dart';
 
 class TicketListWidget extends StatefulWidget {
-  const TicketListWidget({super.key, required this.ticketStatus});
+  const TicketListWidget({
+    super.key,
+    required this.ticketStatus,
+    this.status1,
+    this.status2,
+  });
   final int ticketStatus;
+  final int? status1;
+  final int? status2;
+
   @override
   State<TicketListWidget> createState() => _TicketListWidgetState();
 }
@@ -13,21 +21,50 @@ class _TicketListWidgetState extends State<TicketListWidget> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      TicketFun.instance.getActiveTktListNotifier.value = [];
-      TicketFun.instance.getDeactiveTktListNotifier.value = [];
+      // TicketFun.instance.getActiveTktListNotifier.value = [];
+      // TicketFun.instance.getDeactiveTktListNotifier.value = [];
 
-      fetchtkt(context);
+      //fetchtkt(context);
     });
   }
 
-  Future fetchtkt(BuildContext context) async {
-    final val = await SharedPrefManager.instance.getSharedData();
-    setState(() {
-      usrid = val?.userId ?? '';
-    });
-    final tktreq = Farereq(userId: usrid, ticketstatus: widget.ticketStatus);
-    if (!context.mounted) return;
-    await TicketFun.instance.fetchTket(tktreq, context, widget.ticketStatus);
+  // Future fetchtkt(BuildContext context) async {
+  //   final val = await SharedPrefManager.instance.getSharedData();
+  //   setState(() {
+  //     usrid = val?.userId ?? '';
+  //   });
+  //   final tktreq = Farereq(userId: usrid, ticketstatus: widget.ticketStatus);
+  //   if (!context.mounted) return;
+  //   await TicketFun.instance.fetchTket(tktreq, context, widget.ticketStatus);
+  // }
+  Color _getCardColor(String status) {
+    switch (status) {
+      case "0": // Active
+        return Colors.white;
+      case "2": // Processing
+        return const Color(0xFFFFF9C4); // Light Yellow
+      case "3": // Failed
+        return const Color(0xFFFFCCBC); // Light Orange
+      case "4": // Cancelled
+        return const Color(0xFFFFCDD2); // Light Red
+      default:
+        return Colors.white;
+    }
+  }
+
+  Icon _getStatusIcon(String status) {
+    switch (status) {
+      case "0": // Success
+        return const Icon(Icons.check_circle, color: Colors.green, size: 28);
+      case "2": // Processing
+        return const Icon(Icons.history, color: Colors.amber, size: 28);
+      case "3": // Failed
+        return const Icon(Icons.cancel, color: Colors.redAccent, size: 28);
+      case "4": // Cancelled
+        return const Icon(Icons.block, color: Colors.red, size: 28);
+      default:
+        return const Icon(Icons.help_outline, color: Colors.grey, size: 28);
+    }
   }
 
   @override
@@ -63,7 +100,10 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                                         widget.ticketStatus == activetkt
                                             ? "Active Ticket"
                                             : "Inactive Ticket",
-                                    initialTab: widget.ticketStatus == activetkt? 0:1,
+                                    initialTab:
+                                        widget.ticketStatus == activetkt
+                                            ? 0
+                                            : 1,
                                   ),
                             ),
                           );
@@ -79,7 +119,7 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                               horizontal: 14,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: _getCardColor(ticket.status ?? 0),
                               borderRadius: BorderRadius.circular(15),
                             ),
                             child: Column(
@@ -87,6 +127,14 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                                 /// Header info
                                 Column(
                                   children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        _getStatusIcon(ticket.status ?? 0),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
@@ -161,8 +209,6 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                                     const SizedBox(height: 10),
                                   ],
                                 ),
-
-                                /// Route section
                                 Row(
                                   children: [
                                     /// FROM
@@ -192,8 +238,6 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                                         ],
                                       ),
                                     ),
-
-                                    /// Dotted line + bus
                                     Column(
                                       children: [
                                         Row(
@@ -263,8 +307,6 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                                 ),
 
                                 const SizedBox(height: 14),
-
-                                /// Separator line (simulated dotted separator)
                                 CustomPaint(
                                   painter: DottedSeparatorLine(
                                     yOffsetFactor: 0,

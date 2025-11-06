@@ -16,15 +16,13 @@ Datalive _$DataliveFromJson(Map<String, dynamic> json) => Datalive(
   longitude: json['longitude'] as String?,
   createdAt: json['created_at'] as String?,
   modifyBy: json['modify_by'] as String?,
-   
 );
 
 Map<String, dynamic> _$DataliveToJson(Datalive instance) => <String, dynamic>{
-  'bus_location':instance.busLocation,
+  'bus_location': instance.busLocation,
   'bus_id': instance.busId,
   'latitude': instance.latitude,
   'longitude': instance.longitude,
   'created_at': instance.createdAt,
   'modify_by': instance.modifyBy,
-  
 };
