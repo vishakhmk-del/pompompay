@@ -100,8 +100,6 @@ export 'package:pompompay/presentation/pages/menu/screenmenu.dart';
 
 export 'package:pompompay/presentation/pages/forgotpswrd/forgotpswrdScreen.dart';
 
-export 'package:pompompay/presentation/pages/main_page/screen_MainPage.dart';
-
 export 'package:pompompay/presentation/pages/qrpay/qrscan/screenqrcode.dart';
 
 export 'package:pompompay/presentation/pages/qrpay/onlinePay/screenScanPay.dart';

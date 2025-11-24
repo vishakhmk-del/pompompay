@@ -62,24 +62,19 @@ class _ScreenForgotPswrdState extends State<ScreenForgotPswrd> {
           child: Scaffold(
             key: _scafoldkey,
             backgroundColor: Colors.transparent,
-            // appBar: AppBar(
-            //   backgroundColor: Theme.of(context).colorScheme.primary,
-            //   leading: IconButton(
-            //     icon: const Icon(Icons.arrow_back),
-            //     onPressed: () {
-            //       Navigator.pushReplacement(context, Approutes().loginscreen);
-            //       context.read<ElevatedBtnProvider>().changeSelectedVal(false);
-            //       context.read<LoadingProvider>().resetAll();
+            appBar: AppBar(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  Navigator.pushReplacement(context, Approutes().loginscreen);
+                  context.read<ElevatedBtnProvider>().changeSelectedVal(false);
+                  context.read<LoadingProvider>().resetAll();
 
-            //     },
-            //   ),
-            //   title: Text(
-            //     "",
-            //     style: TextStyle(
-            //       color: Theme.of(context).colorScheme.onSecondary,
-            //     ),
-            //   ),
-            // ),
+                },
+              ),
+             
+            ),
             body: Center(
               child: ListView(
                 children: [
@@ -367,7 +362,7 @@ class _ScreenForgotPswrdState extends State<ScreenForgotPswrd> {
 
         CommonFun.instance.showApierror(
           context,
-          "Mobile number is Not Registered",
+          changeval.message,
         );
       } else if (chngresp.statusCode == 500) {
         if (!context.mounted) return;

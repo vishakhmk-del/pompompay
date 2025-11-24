@@ -1374,57 +1374,24 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
       val = await SharedPrefManager.instance.getSharedData();
 
       //*_____________________LIVE_________________________*
-      // final paymentData = {
-      //   "api_key": busdet?.upid ?? '',
-      //   "salt_key": busdet?.saltKey ?? '',
-      //   "payment_url": "https://pgbiz.omniware.in",
-      //   "name": val?.name ?? '',
-      //   "email": busdet?.emailId ?? '',
-      //   "phone": busdet?.mobileNo ?? '',
-      //   "amount": calcFare?.totalFare??'',
-      //   // "amount": '2',
-      //   "description": "bus ticket payment",
-      //   "address_line_1": "test",
-      //   "address_line_2": "text",
-      //   "city": busdet?.city ?? '',
-      //   "state": busdet?.state ?? '',
-      //   "country": busdet?.country ?? '',
-      //   "zip_code": busdet?.zip ?? '',
-      //   "currency": "INR",
-      //   "mode": "LIVE",
-      //   "order_id": "TKT${DateTime.now().millisecondsSinceEpoch}",
-      //   "return_url": "https://pgbiz.omniware.in/tnpv2/return_page.php",
-      //   //"merchant_id": busdet?.mercntCode??'',
-      //   "enable_auto_refund": "n",
-      //   "udf1": "",
-      //   "udf2": "",
-      //   "udf3": "",
-      //   "udf4": "",
-      //   "udf5": "",
-      //   // Optional: Use real phone number if available
-      // };
-
-      //*_____________________***_________________________*
-
-      //*_____________________TEST_________________________*
-
       final paymentData = {
-        "api_key": 'fb6bca86-b429-4abf-a42f-824bdd29022e',
-        // "salt_key": busdet?.saltKey??'',
+        "api_key": busdet?.upid ?? '',
+        "salt_key": busdet?.saltKey ?? '',
         "payment_url": "https://pgbiz.omniware.in",
-        "name":'Rohith Test',
-        "email":'rsn7rohith@gmail.com',
-        "phone":'9745528173',
+        "name": val?.name ?? '',
+        "email": busdet?.emailId ?? '',
+        "phone": busdet?.mobileNo ?? '',
         "amount": calcFare?.totalFare??'',
+        // "amount": '2',
         "description": "bus ticket payment",
         "address_line_1": "test",
         "address_line_2": "text",
-        "city": busdet?.city??'',
-        "state": busdet?.state??'',
-        "country": busdet?.country??'',
-        "zip_code": busdet?.zip??'',
+        "city": busdet?.city ?? '',
+        "state": busdet?.state ?? '',
+        "country": busdet?.country ?? '',
+        "zip_code": busdet?.zip ?? '',
         "currency": "INR",
-        "mode": "TEST",
+        "mode": "LIVE",
         "order_id": "TKT${DateTime.now().millisecondsSinceEpoch}",
         "return_url": "https://pgbiz.omniware.in/tnpv2/return_page.php",
         //"merchant_id": busdet?.mercntCode??'',
@@ -1436,6 +1403,39 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
         "udf5": "",
         // Optional: Use real phone number if available
       };
+
+      //*_____________________***_________________________*
+
+      //*_____________________TEST_________________________*
+
+      // final paymentData = {
+      //   "api_key": 'fb6bca86-b429-4abf-a42f-824bdd29022e',
+      //   // "salt_key": busdet?.saltKey??'',
+      //   "payment_url": "https://pgbiz.omniware.in",
+      //   "name":'Rohith Test',
+      //   "email":'rsn7rohith@gmail.com',
+      //   "phone":'9745528173',
+      //   "amount": calcFare?.totalFare??'',
+      //   "description": "bus ticket payment",
+      //   "address_line_1": "test",
+      //   "address_line_2": "text",
+      //   "city": busdet?.city??'',
+      //   "state": busdet?.state??'',
+      //   "country": busdet?.country??'',
+      //   "zip_code": busdet?.zip??'',
+      //   "currency": "INR",
+      //   "mode": "TEST",
+      //   "order_id": "TKT${DateTime.now().millisecondsSinceEpoch}",
+      //   "return_url": "https://pgbiz.omniware.in/tnpv2/return_page.php",
+      //   //"merchant_id": busdet?.mercntCode??'',
+      //   "enable_auto_refund": "n",
+      //   "udf1": "",
+      //   "udf2": "",
+      //   "udf3": "",
+      //   "udf4": "",
+      //   "udf5": "",
+      //   // Optional: Use real phone number if available
+      // };
 
       //*_____________________***_________________________*
 

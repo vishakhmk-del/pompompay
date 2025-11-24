@@ -141,4 +141,15 @@ final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
       return Farereq.fromJson(jsonMap);
     }).toList();
   }
+  
+Future<bool> hasUserAcceptedDisclosure() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getBool("location_disclosure_accepted") ?? false;
+}
+
+Future<void> saveUserAcceptedDisclosure() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setBool("location_disclosure_accepted", true);
+}
+
 }

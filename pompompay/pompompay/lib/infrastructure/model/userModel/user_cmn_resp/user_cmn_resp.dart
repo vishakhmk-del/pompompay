@@ -8,9 +8,13 @@ part 'user_cmn_resp.g.dart';
 class UserCmnResp {
   String? status;
   String? message;
+  @JsonKey(name: 'error_code')
+  String? errorCode;
+  bool? mandatory;
+
   Data? data;
 
-  UserCmnResp({this.status, this.message, this.data});
+  UserCmnResp({this.status, this.message,this.errorCode,this.mandatory, this.data});
 
   factory UserCmnResp.fromJson(Map<String, dynamic> json) {
     return _$UserCmnRespFromJson(json);

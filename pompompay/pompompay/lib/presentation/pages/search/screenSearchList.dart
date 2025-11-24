@@ -339,6 +339,7 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                                   userId: val?.userId ?? '',
                                                   from: ticket.fromStop,
                                                   to: ticket.toStop,
+                                                  status: ticket.status
                                                 );
                                                 if (!context.mounted) return;
                                                 Navigator.of(context).push(

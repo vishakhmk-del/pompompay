@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'package:pompompay/core/hook/hooks.dart';
-import 'package:sizer/sizer.dart';
 
 class ScreenTransaction extends StatefulWidget {
   const ScreenTransaction({super.key, this.initialTabIndex = 0});
@@ -17,6 +16,7 @@ class _ScreenTransactionState extends State<ScreenTransaction>
   @override
   void initState() {
     super.initState();
+    TicketFun.instance.getHistoryTktListNotifier.value=[];
     fetchtkt(context);
 
     _tabController = TabController(
@@ -84,59 +84,7 @@ class _ScreenTransactionState extends State<ScreenTransaction>
         return const Icon(Icons.help_outline, color: Colors.grey, size: 28);
     }
   }
-  Future<bool?> showWarning(BuildContext context) async => showDialog<bool>(
-    barrierDismissible: false,
-    context: context,
-    builder:
-        (context) => AlertDialog(
-          backgroundColor: Colors.white,
-          title: Center(
-            child: Text(
-              "Exit App?",
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontSize: 18.sp,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          content: Text(
-            "Are you sure you want to exit?",
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              fontSize: 18.sp,
-              color: Colors.black,
-            ),
-          ),
-          actions: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-              ),
-              onPressed: () => Navigator.pop(context, false),
-              child: Text(
-                'NO',
-                style: Theme.of(
-                  context,
-                ).textTheme.displayMedium?.copyWith(color: Colors.white),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-              ),
-              onPressed: () {
-                Navigator.pop(context, true);
-                // Livelocationfun.instance.stopTracking();
-              },
-              child: Text(
-                'YES',
-                style: Theme.of(
-                  context,
-                ).textTheme.displayMedium?.copyWith(color: Colors.white),
-              ),
-            ),
-          ],
-        ),
-  );
+
   @override
   void dispose() {
     _tabController.dispose(); // Always dispose controllers
@@ -148,144 +96,248 @@ class _ScreenTransactionState extends State<ScreenTransaction>
     return Stack(
       children: [
         BackgroundColorGradient(),
-        PopScope(
-          canPop: false,
-          onPopInvokedWithResult: (bool didPop, dynamic result) async {
-            if (!didPop) {
-              final confirmExit = await showWarning(context);
-              if (confirmExit == true) {
-                SystemNavigator.pop(); // Exit the app
-              }
-            }
-          },
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).size.height * 0.05,
-                    left: MediaQuery.of(context).size.width * 0.017,
-                    right: MediaQuery.of(context).size.width * 0.017,
-                  ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Align(
-                      //   alignment: Alignment.centerLeft,
-                      //   child: IconButton(
-                      //     icon: const Icon(
-                      //       Icons.chevron_left,
-                      //       size: 30,
-                      //       color: Colors.white,
-                      //     ),
-                      //     onPressed: () {
-                      //       TicketFun.instance.getHistoryTktListNotifier.value = [];
-
-                      //       Navigator.pushReplacement(
-                      //         context,
-                      //         Approutes().mainScreen,
-                      //       );
-                      //     },
-                      //   ),
-                      // ),
-                      Center(
-                        child: Text(
-                          'History',
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.05,
+                  left: MediaQuery.of(context).size.width * 0.017,
+                  right: MediaQuery.of(context).size.width * 0.017,
                 ),
-                const SizedBox(height: 10),
-                Expanded(
-                  child: ValueListenableBuilder(
-                    valueListenable:
-                        TicketFun.instance.getHistoryTktListNotifier,
-
-                    builder: (
-                      BuildContext context,
-                      List<Ticketview> newList,
-                      Widget? _,
-                    ) {
-                      if (newList.isNotEmpty) {
-                        return ListView.builder(
-                          padding: const EdgeInsets.all(6),
-                          itemCount: newList.length,
-                          itemBuilder: (context, index) {
-                            final ticket = newList[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 6.0),
-                              child: Center(
-                                child: ClipPath(
-                                  clipper: TicketClipper(),
-                                  child: SizedBox(
-                                    width: double.infinity,
-                                    //height: 330,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        // Navigator.of(context).push(
-                                        //   MaterialPageRoute(
-                                        //     builder:
-                                        //         (originalContext) => ScreenLiveTicket(
-                                        //           tktvw: ticket,
-                                        //           title:
-                                        //               widget.ticketStatus == activetkt
-                                        //                   ? "Active Ticket"
-                                        //                   : "Inactive Ticket",
-                                        //           initialTab: widget.ticketStatus == activetkt? 0:1,
-                                        //         ),
-                                        //   ),
-                                        // );
-                                      },
-                                      child: Card(
-                                        elevation: 8,
-                                        shape: RoundedRectangleBorder(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Align(
+                    //   alignment: Alignment.centerLeft,
+                    //   child: IconButton(
+                    //     icon: const Icon(
+                    //       Icons.chevron_left,
+                    //       size: 30,
+                    //       color: Colors.white,
+                    //     ),
+                    //     onPressed: () {
+                    //       TicketFun.instance.getHistoryTktListNotifier.value = [];
+        
+                    //       Navigator.pushReplacement(
+                    //         context,
+                    //         Approutes().mainScreen,
+                    //       );
+                    //     },
+                    //   ),
+                    // ),
+                    Center(
+                      child: Text(
+                        'History',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              Expanded(
+                child: ValueListenableBuilder(
+                  valueListenable:
+                      TicketFun.instance.getHistoryTktListNotifier,
+        
+                  builder: (
+                    BuildContext context,
+                    List<Ticketview> newList,
+                    Widget? _,
+                  ) {
+                    if (newList.isNotEmpty) {
+                      return ListView.builder(
+                        padding: const EdgeInsets.all(6),
+                        itemCount: newList.length,
+                        itemBuilder: (context, index) {
+                          final ticket = newList[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 6.0),
+                            child: Center(
+                              child: ClipPath(
+                                clipper: TicketClipper(),
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  //height: 330,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      // Navigator.of(context).push(
+                                      //   MaterialPageRoute(
+                                      //     builder:
+                                      //         (originalContext) => ScreenLiveTicket(
+                                      //           tktvw: ticket,
+                                      //           title:
+                                      //               widget.ticketStatus == activetkt
+                                      //                   ? "Active Ticket"
+                                      //                   : "Inactive Ticket",
+                                      //           initialTab: widget.ticketStatus == activetkt? 0:1,
+                                      //         ),
+                                      //   ),
+                                      // );
+                                    },
+                                    child: Card(
+                                      elevation: 8,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          15,
+                                        ),
+                                      ),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 10,
+                                          horizontal: 14,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: _getCardColor(
+                                            ticket.status ?? 0,
+                                          ),
                                           borderRadius: BorderRadius.circular(
                                             15,
                                           ),
                                         ),
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 10,
-                                            horizontal: 14,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: _getCardColor(
-                                              ticket.status ?? 0,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              15,
-                                            ),
-                                          ),
-                                          child: Column(
-                                            children: [
-                                              /// Header info
-                                              Column(
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.end,
-                                                    children: [
-                                                      _getStatusIcon(
-                                                        ticket.status ?? 0,
+                                        child: Column(
+                                          children: [
+                                            /// Header info
+                                            Column(
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    _getStatusIcon(
+                                                      ticket.status ?? 0,
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 8),
+        
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .center,
+                                                  children: [
+                                                    Text(
+                                                      ticket.busName
+                                                              ?.toUpperCase() ??
+                                                          '',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodySmall
+                                                          ?.copyWith(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500,
+                                                          ),
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Text(
+                                                      ticket.registrationNo ??
+                                                          '',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodySmall
+                                                          ?.copyWith(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500,
+                                                          ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 2),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .center,
+                                                  children: [
+                                                    Text(
+                                                      ticket.travelDate ?? '',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodySmall
+                                                          ?.copyWith(
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500,
+                                                          ),
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Text(
+                                                      ticket.travelTime ?? '',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodySmall
+                                                          ?.copyWith(
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500,
+                                                          ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  ticket.routename ?? '',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall
+                                                      ?.copyWith(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
                                                       ),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(height: 8),
-
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
+                                                ),
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  ticket.tiketNo ?? '',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall
+                                                      ?.copyWith(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                ),
+                                                const SizedBox(height: 10),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                /// FROM
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
                                                       Text(
-                                                        ticket.busName
-                                                                ?.toUpperCase() ??
+                                                        "FROM STOP",
+                                                        style: Theme.of(
+                                                              context,
+                                                            )
+                                                            .textTheme
+                                                            .bodySmall
+                                                            ?.copyWith(
+                                                              fontSize: 10,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
+                                                      ),
+                                                      Text(
+                                                        ticket.fromPlace ??
                                                             '',
-                                                        style: Theme.of(context)
+                                                        style: Theme.of(
+                                                              context,
+                                                            )
                                                             .textTheme
                                                             .bodySmall
                                                             ?.copyWith(
@@ -295,402 +347,287 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                                                       .w500,
                                                             ),
                                                       ),
-                                                      const SizedBox(width: 8),
-                                                      Text(
-                                                        ticket.registrationNo ??
-                                                            '',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .bodySmall
-                                                            ?.copyWith(
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                            ),
-                                                      ),
                                                     ],
                                                   ),
-                                                  const SizedBox(height: 2),
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Text(
-                                                        ticket.travelDate ?? '',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .bodySmall
-                                                            ?.copyWith(
-                                                              fontSize: 12,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                            ),
-                                                      ),
-                                                      const SizedBox(width: 8),
-                                                      Text(
-                                                        ticket.travelTime ?? '',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .bodySmall
-                                                            ?.copyWith(
-                                                              fontSize: 12,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                            ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(height: 2),
-                                                  Text(
-                                                    ticket.routename ?? '',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .bodySmall
-                                                        ?.copyWith(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                        ),
-                                                  ),
-                                                  const SizedBox(height: 2),
-                                                  Text(
-                                                    ticket.tiketNo ?? '',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .bodySmall
-                                                        ?.copyWith(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                  ),
-                                                  const SizedBox(height: 10),
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  /// FROM
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
+                                                ),
+                                                Column(
+                                                  children: [
+                                                    Row(
                                                       children: [
-                                                        Text(
-                                                          "FROM STOP",
-                                                          style: Theme.of(
-                                                                context,
-                                                              )
-                                                              .textTheme
-                                                              .bodySmall
-                                                              ?.copyWith(
-                                                                fontSize: 10,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                              ),
+                                                        DottedLine(
+                                                          dashLength: 4,
+                                                          dashGapLength: 3,
+                                                          lineThickness: 2,
+                                                          dashColor:
+                                                              Theme.of(
+                                                                    context,
+                                                                  )
+                                                                  .colorScheme
+                                                                  .primary,
+                                                          direction:
+                                                              Axis.horizontal,
+                                                          lineLength: 30,
                                                         ),
-                                                        Text(
-                                                          ticket.fromPlace ??
-                                                              '',
-                                                          style: Theme.of(
-                                                                context,
-                                                              )
-                                                              .textTheme
-                                                              .bodySmall
-                                                              ?.copyWith(
-                                                                fontSize: 14,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                              ),
+                                                        const SizedBox(
+                                                          width: 4,
+                                                        ),
+                                                        const Icon(
+                                                          Icons
+                                                              .directions_bus,
+                                                          color: Colors.blue,
+                                                          size: 25,
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 4,
+                                                        ),
+                                                        DottedLine(
+                                                          dashLength: 4,
+                                                          dashGapLength: 3,
+                                                          lineThickness: 2,
+                                                          dashColor:
+                                                              Theme.of(
+                                                                    context,
+                                                                  )
+                                                                  .colorScheme
+                                                                  .primary,
+                                                          direction:
+                                                              Axis.horizontal,
+                                                          lineLength: 30,
                                                         ),
                                                       ],
                                                     ),
-                                                  ),
-                                                  Column(
+                                                  ],
+                                                ),
+        
+                                                /// TO
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .end,
                                                     children: [
-                                                      Row(
+                                                      Text(
+                                                        "TO STOP",
+                                                        style: Theme.of(
+                                                              context,
+                                                            )
+                                                            .textTheme
+                                                            .bodySmall
+                                                            ?.copyWith(
+                                                              fontSize: 10,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
+                                                      ),
+                                                      Text(
+                                                        ticket.toPlace ?? '',
+                                                        style: Theme.of(
+                                                              context,
+                                                            )
+                                                            .textTheme
+                                                            .bodySmall
+                                                            ?.copyWith(
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+        
+                                            const SizedBox(height: 14),
+                                            CustomPaint(
+                                              painter: DottedSeparatorLine(
+                                                yOffsetFactor: 0,
+                                                color: Colors.grey,
+                                              ),
+                                              child: SizedBox(
+                                                width: double.infinity,
+                                                height: 1,
+                                              ),
+                                            ),
+        
+                                            const SizedBox(height: 14),
+        
+                                            /// Fare breakdown
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Table(
+                                                  columnWidths: const {
+                                                    0: FlexColumnWidth(4),
+                                                    1: FlexColumnWidth(1),
+                                                    2: FlexColumnWidth(1),
+                                                    3: FlexColumnWidth(2),
+                                                    4: FlexColumnWidth(1.5),
+                                                    5: FlexColumnWidth(2),
+                                                  },
+                                                  children: [
+                                                    if (int.tryParse(
+                                                          ticket.adults ??
+                                                              "0",
+                                                        ) !=
+                                                        0)
+                                                      TableRow(
                                                         children: [
-                                                          DottedLine(
-                                                            dashLength: 4,
-                                                            dashGapLength: 3,
-                                                            lineThickness: 2,
-                                                            dashColor:
-                                                                Theme.of(
-                                                                      context,
-                                                                    )
-                                                                    .colorScheme
-                                                                    .primary,
-                                                            direction:
-                                                                Axis.horizontal,
-                                                            lineLength: 30,
+                                                          _buildFareCell(
+                                                            context,
+                                                            "Full :",
                                                           ),
-                                                          const SizedBox(
-                                                            width: 4,
+                                                          _buildFareCell(
+                                                            context,
+                                                            ticket.adults ??
+                                                                '',
                                                           ),
-                                                          const Icon(
-                                                            Icons
-                                                                .directions_bus,
-                                                            color: Colors.blue,
-                                                            size: 25,
+                                                          _buildFareCell(
+                                                            context,
+                                                            "x",
                                                           ),
-                                                          const SizedBox(
-                                                            width: 4,
+                                                          _buildFareCell(
+                                                            context,
+                                                            ticket.singleadult ??
+                                                                '',
                                                           ),
-                                                          DottedLine(
-                                                            dashLength: 4,
-                                                            dashGapLength: 3,
-                                                            lineThickness: 2,
-                                                            dashColor:
-                                                                Theme.of(
-                                                                      context,
-                                                                    )
-                                                                    .colorScheme
-                                                                    .primary,
-                                                            direction:
-                                                                Axis.horizontal,
-                                                            lineLength: 30,
+                                                          _buildFareCell(
+                                                            context,
+                                                            "=",
+                                                          ),
+                                                          _buildFareCell(
+                                                            context,
+                                                            ticket.adultfare ??
+                                                                '',
                                                           ),
                                                         ],
                                                       ),
-                                                    ],
-                                                  ),
-
-                                                  /// TO
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .end,
-                                                      children: [
-                                                        Text(
-                                                          "TO STOP",
-                                                          style: Theme.of(
-                                                                context,
-                                                              )
-                                                              .textTheme
-                                                              .bodySmall
-                                                              ?.copyWith(
-                                                                fontSize: 10,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                              ),
-                                                        ),
-                                                        Text(
-                                                          ticket.toPlace ?? '',
-                                                          style: Theme.of(
-                                                                context,
-                                                              )
-                                                              .textTheme
-                                                              .bodySmall
-                                                              ?.copyWith(
-                                                                fontSize: 14,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                              ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-
-                                              const SizedBox(height: 14),
-                                              CustomPaint(
-                                                painter: DottedSeparatorLine(
-                                                  yOffsetFactor: 0,
-                                                  color: Colors.grey,
-                                                ),
-                                                child: SizedBox(
-                                                  width: double.infinity,
-                                                  height: 1,
-                                                ),
-                                              ),
-
-                                              const SizedBox(height: 14),
-
-                                              /// Fare breakdown
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  Table(
-                                                    columnWidths: const {
-                                                      0: FlexColumnWidth(4),
-                                                      1: FlexColumnWidth(1),
-                                                      2: FlexColumnWidth(1),
-                                                      3: FlexColumnWidth(2),
-                                                      4: FlexColumnWidth(1.5),
-                                                      5: FlexColumnWidth(2),
-                                                    },
-                                                    children: [
-                                                      if (int.tryParse(
-                                                            ticket.adults ??
-                                                                "0",
-                                                          ) !=
-                                                          0)
-                                                        TableRow(
-                                                          children: [
-                                                            _buildFareCell(
-                                                              context,
-                                                              "Full :",
-                                                            ),
-                                                            _buildFareCell(
-                                                              context,
-                                                              ticket.adults ??
-                                                                  '',
-                                                            ),
-                                                            _buildFareCell(
-                                                              context,
-                                                              "x",
-                                                            ),
-                                                            _buildFareCell(
-                                                              context,
-                                                              ticket.singleadult ??
-                                                                  '',
-                                                            ),
-                                                            _buildFareCell(
-                                                              context,
-                                                              "=",
-                                                            ),
-                                                            _buildFareCell(
-                                                              context,
-                                                              ticket.adultfare ??
-                                                                  '',
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      if (int.tryParse(
-                                                            ticket.kids ?? "0",
-                                                          ) !=
-                                                          0)
-                                                        TableRow(
-                                                          children: [
-                                                            _buildFareCell(
-                                                              context,
-                                                              "Kids :",
-                                                            ),
-                                                            _buildFareCell(
-                                                              context,
-                                                              ticket.kids ?? '',
-                                                            ),
-                                                            _buildFareCell(
-                                                              context,
-                                                              "x",
-                                                            ),
-                                                            _buildFareCell(
-                                                              context,
-                                                              ticket.singlekids ??
-                                                                  '',
-                                                            ),
-                                                            _buildFareCell(
-                                                              context,
-                                                              "=",
-                                                            ),
-                                                            _buildFareCell(
-                                                              context,
-                                                              ticket.kidsfare ??
-                                                                  '',
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      if (int.tryParse(
+                                                    if (int.tryParse(
+                                                          ticket.kids ?? "0",
+                                                        ) !=
+                                                        0)
+                                                      TableRow(
+                                                        children: [
+                                                          _buildFareCell(
+                                                            context,
+                                                            "Kids :",
+                                                          ),
+                                                          _buildFareCell(
+                                                            context,
+                                                            ticket.kids ?? '',
+                                                          ),
+                                                          _buildFareCell(
+                                                            context,
+                                                            "x",
+                                                          ),
+                                                          _buildFareCell(
+                                                            context,
+                                                            ticket.singlekids ??
+                                                                '',
+                                                          ),
+                                                          _buildFareCell(
+                                                            context,
+                                                            "=",
+                                                          ),
+                                                          _buildFareCell(
+                                                            context,
+                                                            ticket.kidsfare ??
+                                                                '',
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    if (int.tryParse(
+                                                          ticket.student ??
+                                                              "0",
+                                                        ) !=
+                                                        0)
+                                                      TableRow(
+                                                        children: [
+                                                          _buildFareCell(
+                                                            context,
+                                                            "Students :",
+                                                          ),
+                                                          _buildFareCell(
+                                                            context,
                                                             ticket.student ??
-                                                                "0",
-                                                          ) !=
-                                                          0)
-                                                        TableRow(
-                                                          children: [
-                                                            _buildFareCell(
-                                                              context,
-                                                              "Students :",
-                                                            ),
-                                                            _buildFareCell(
-                                                              context,
-                                                              ticket.student ??
-                                                                  '',
-                                                            ),
-                                                            _buildFareCell(
-                                                              context,
-                                                              "x",
-                                                            ),
-                                                            _buildFareCell(
-                                                              context,
-                                                              ticket.singlestudent ??
-                                                                  '',
-                                                            ),
-                                                            _buildFareCell(
-                                                              context,
-                                                              "=",
-                                                            ),
-                                                            _buildFareCell(
-                                                              context,
-                                                              ticket.studentfare ??
-                                                                  '',
-                                                            ),
-                                                          ],
-                                                        ),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(height: 8),
-                                                  Text(
-                                                    "Rs ${ticket.totalfare}.0",
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .bodySmall
-                                                        ?.copyWith(
-                                                          fontSize: 22,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
+                                                                '',
+                                                          ),
+                                                          _buildFareCell(
+                                                            context,
+                                                            "x",
+                                                          ),
+                                                          _buildFareCell(
+                                                            context,
+                                                            ticket.singlestudent ??
+                                                                '',
+                                                          ),
+                                                          _buildFareCell(
+                                                            context,
+                                                            "=",
+                                                          ),
+                                                          _buildFareCell(
+                                                            context,
+                                                            ticket.studentfare ??
+                                                                '',
+                                                          ),
+                                                        ],
+                                                      ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 8),
+                                                Text(
+                                                  "Rs ${ticket.totalfare}.0",
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall
+                                                      ?.copyWith(
+                                                        fontSize: 22,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
+                            ),
+                          );
+                        },
+                      );
+                    } else {
+                      return FutureBuilder(
+                        future: Future.delayed(const Duration(seconds: 3)),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: const CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
                             );
-                          },
-                        );
-                      } else {
-                        return FutureBuilder(
-                          future: Future.delayed(const Duration(seconds: 3)),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(
-                                child: const CircularProgressIndicator(
-                                  color: Colors.white,
-                                ),
-                              );
-                            } else {
-                              return Center(
-                                child: Text(
-                                  'No Ticket Found',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              );
-                            }
-                          },
-                        );
-                      }
-                    },
-                  ),
+                          } else {
+                            return Center(
+                              child: Text(
+                                'No Ticket Found',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            );
+                          }
+                        },
+                      );
+                    }
+                  },
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ],

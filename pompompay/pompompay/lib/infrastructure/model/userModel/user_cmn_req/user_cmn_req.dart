@@ -6,6 +6,8 @@ part 'user_cmn_req.g.dart';
 class UserCmnReq {
   @JsonKey(name: 'user_name')
   String? userName;
+  @JsonKey(name: 'user_id')
+  String? userId;
   String? mobno;
   String? pw;
   String? otp;
@@ -23,6 +25,7 @@ class UserCmnReq {
 
   UserCmnReq({
     this.userName,
+    this.userId,
     this.mobno,
     this.pw,
     this.otp,

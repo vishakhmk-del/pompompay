@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pompompay/core/hook/hooks.dart';
 
 class UserFun {
@@ -223,6 +224,86 @@ class UserFun {
         CommonFun.instance.showApierror(context, loginval.message);
 
         // showLoginerror(context, 2);
+      } else if (loginResponse.statusCode == 500) {
+        if (!context.mounted) return;
+        CommonFun.instance.showApierror(context, "Sever Not Reachable");
+
+        // showLoginerror(context, 3);
+      } else if (loginResponse.statusCode == 408) {
+        if (!context.mounted) return;
+        CommonFun.instance.showApierror(context, "Connection time out");
+
+        //showLoginerror(context, 4);
+      } else {
+        if (!context.mounted) return;
+        CommonFun.instance.showApierror(context, "Something went wrong");
+        //showLoginerror(context, 5);
+      }
+    } catch (e) {
+      if (!context.mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('An unexpected error occurred')),
+      );
+    }
+  }
+  Future deleteuser(BuildContext context) async {
+    try {
+      final loadingProvider = context.read<LoadingProvider>();
+      loadingProvider.show();
+      final value = await SharedPrefManager.instance.getSharedData();
+      
+
+      final logreq = UserCmnReq(
+        userId: value?.userId??''
+      );
+
+      final loginResponse = await Pompaydata().deleteUser(logreq);
+      final resultAsjson = jsonDecode(loginResponse.toString());
+      final loginval = UserCmnResp.fromJson(
+        resultAsjson as Map<String, dynamic>,
+      );
+
+      loadingProvider.resetAll();
+      if (loginResponse == null) {
+        if (!context.mounted) return;
+
+        CommonFun.instance.showApierror(context, "Something went wrong");
+      } else if (loginResponse.statusCode == 200 && loginval.status == 'success') {
+                        if (!context.mounted) return;
+                                
+                                  CommonFun.instance.showApierror(
+                                    context,
+                                    loginval.message,
+                                  );
+                                        final sharedprf = await SharedPreferences.getInstance();
+                                         
+                                          const secureStorage = FlutterSecureStorage();
+
+                                        // Remove only the login-related keys
+                                        await sharedprf.remove('NAME');
+                                        await sharedprf.remove('MOBNO');
+                                        await sharedprf.remove('savekeyname'); // <- your login flag key
+                                        await sharedprf.remove('recent_searches');
+                                        // Remove secure storage keys
+                                        await secureStorage.delete(key: 'USERID');
+                                        await secureStorage.delete(key: 'ACCESSTOKEN');
+                                          if (!context.mounted) return;
+                                          
+                                          Navigator.of(context).pushAndRemoveUntil(
+                                            MaterialPageRoute(builder: (ctx) => const Screenlogin()),
+                                            (Route<dynamic> route) => false,
+                                          );
+                                           return;
+                                        
+      } else if (loginval.status == 'failed') {
+        if (!context.mounted) return;
+        
+          CommonFun.instance.showApierror(
+            context,
+            loginval.message,
+          );
+
       } else if (loginResponse.statusCode == 500) {
         if (!context.mounted) return;
         CommonFun.instance.showApierror(context, "Sever Not Reachable");

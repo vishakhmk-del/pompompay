@@ -5,6 +5,8 @@ part 'deviceinfo.g.dart';
 @JsonSerializable()
 class Deviceinfo {
   dynamic userId;
+  @JsonKey(name: 'user_id')
+  String? userid;
   String? phone;
   String? devicetoken;
   String? deviceid;
@@ -18,6 +20,7 @@ class Deviceinfo {
 
   Deviceinfo({
     this.userId,
+    this.userid,
     this.phone,
     this.devicetoken,
     this.deviceid,

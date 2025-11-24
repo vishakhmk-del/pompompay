@@ -70,18 +70,20 @@ class _ScreenMapTrackState extends State<ScreenMapTrack> {
 
   bool isLoading = true;
   bool _isMapReady = false;
-  bool _isUserInteracting = false;
+  // bool _isUserInteracting = false;
   bool _showRecenter = false;
   LatLng? _lastBusPos;
-
+  bool isStopFetch = false;
+// bool _hasAutoCenteredOnce = false;
   List<LatLng> _routePoints = [];
   LatLng? _starting;
   List<Stop> stops = [];
   List<fmap.Marker> _popupMarkers = [];
   BusLocation? busLocation;
   BusValue? bus;
-
+DataList? stopValue;
   Timer? _busLocationTimer;
+bool _showStartButton = true;
 
   @override
   void initState() {
@@ -96,12 +98,10 @@ class _ScreenMapTrackState extends State<ScreenMapTrack> {
         if (position.latitude != 0 && position.longitude != 0) {
           if (!mounted) return;
           setState(() => isLoading = false);
-
-          final stopValue = await SearchFun.instance.fetchStopLoc(
-            widget.stoploc,
-            context,
-          );
-          stops = stopValue?.stops ?? [];
+        if (!isStopFetch) {
+            isStopFetch = true; // Set the flag to true after the first call
+             stopValue = await SearchFun.instance.fetchStopLoc(widget.stoploc,context);
+             stops = stopValue?.stops ?? [];
           busLocation = stopValue?.busLocation;
           bus=stopValue?.bus;
           List<LatLng> points =
@@ -122,13 +122,47 @@ class _ScreenMapTrackState extends State<ScreenMapTrack> {
 
           _buildMarkers();
 
-          if (!mounted) return;
-          setState(() {});
+          // --- Show nearest stop popup initially ---
+          if (busLocation != null && _popupMarkers.isNotEmpty) {
+            final Distance hv = const Distance();
+            LatLng busPos = LatLng(
+              double.parse(busLocation!.latitude!),
+              double.parse(busLocation!.longitude!),
+            );
 
-          _busLocationTimer = Timer.periodic(const Duration(seconds: 3), (_) {
-            _fetchBusLiveLocation(context);
-          });
+            int? nearestDist;
+            _StopMarker? nearestStopMarker;
+
+            for (final m in _popupMarkers) {
+              if (m is _StopMarker) {
+                final d = hv(m.point, busPos).round();
+                if (nearestDist == null || d < nearestDist) {
+                  nearestDist = d;
+                  nearestStopMarker = m;
+                }
+              }
+            }
+
+            if (nearestStopMarker != null) {
+              // Show popup for the nearest stop
+              _popupLayerController.showPopupsOnlyFor([nearestStopMarker]);
+            }
+          }
+
+            if(widget.stoploc.status=="0"){
+              if(!context.mounted)return;
+                alertTracking(context);
+            }else if(widget.stoploc.status=="1"){
+              if (!mounted) return;
+              setState(() {});
+              _busLocationTimer = Timer.periodic(const Duration(seconds:3), (_) {
+                _fetchBusLiveLocation(context);
+              });
+            }
+          }
+   
         }
+
       },
     );
   }
@@ -199,10 +233,36 @@ class _ScreenMapTrackState extends State<ScreenMapTrack> {
     if (busLocation != null) {
       _popupMarkers.add(_BusMarker(bus: busLocation!,busdet: bus!, stoploc: widget.stoploc));
     }
+      final Distance hv = const Distance();
+      int? nearestDist;
+      _StopMarker? nearestStopMarker;
 
-    if (!_isUserInteracting) {
-      _mapController.move(_lastBusPos!, 15);
-    }
+      for (final m in _popupMarkers) {
+        if (m is _StopMarker) {
+          final d = hv(m.point, _lastBusPos!).round(); // metres
+          if (nearestDist == null || d < nearestDist) {
+            nearestDist = d;
+            nearestStopMarker = m;
+          }
+        }
+      }
+
+      // threshold ≈ 200 m
+      if (nearestStopMarker != null && nearestDist! < 200) {
+        // Show ONLY that stop’s popup
+        _popupLayerController.showPopupsOnlyFor([nearestStopMarker]);
+      } else {
+        _popupLayerController.hideAllPopups();
+      }
+
+    // if (!_isUserInteracting) {
+    //   _mapController.move(_lastBusPos!, 15);
+    // }
+    // if (!_isUserInteracting && !_hasAutoCenteredOnce) {
+    //     _mapController.move(_lastBusPos!, 15);
+    //     _hasAutoCenteredOnce = true;
+    //   }
+
 
     if (mounted) setState(() {});
   }
@@ -216,7 +276,8 @@ class _ScreenMapTrackState extends State<ScreenMapTrack> {
         double.parse(busLocation!.longitude!),
       );
       _mapController.move(position, 15);
-      _isUserInteracting = false;
+      // _isUserInteracting = false;
+      // _hasAutoCenteredOnce = true; 
       setState(() => _showRecenter = false);
     }
   }
@@ -274,7 +335,7 @@ class _ScreenMapTrackState extends State<ScreenMapTrack> {
                       onTap: (_, __) => _popupLayerController.hideAllPopups(),
                       onPositionChanged: (position, hasGesture) {
                         if (hasGesture) {
-                          _isUserInteracting = true;
+                          // _isUserInteracting = true;
                           if (!_showRecenter) {
                             setState(() => _showRecenter = true);
                           }
@@ -392,6 +453,50 @@ class _ScreenMapTrackState extends State<ScreenMapTrack> {
                         child: const Icon(Icons.center_focus_strong,color: Colors.white,),
                       ),
                     ),
+                    if (_showStartButton && widget.stoploc.status=="1")
+                        Positioned(
+                          bottom: 30,
+                          left: 0,
+                          right: 0,
+                          child: Center(
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 4,
+                              ),
+                              icon: const Icon(Icons.play_arrow, color: Colors.white),
+                              label: const Text(
+                                'Start Tracking',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              onPressed: () {
+                                
+                               setState(() {
+                                  _showStartButton = false;
+                                });
+                                if (busLocation != null &&
+                                    busLocation!.latitude != null &&
+                                    busLocation!.longitude != null) {
+                                  final position = LatLng(
+                                    double.parse(busLocation!.latitude!),
+                                    double.parse(busLocation!.longitude!),
+                                  );
+                                  _mapController.move(position, 15);
+                                  _lastBusPos = position;
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+
                 ],
               ),
       floatingActionButton: FloatingActionButton(
@@ -407,7 +512,102 @@ class _ScreenMapTrackState extends State<ScreenMapTrack> {
     );
   }
 }
+ Future<void> alertTracking(
+    BuildContext originalContext,
+  ) async {
+    if (!originalContext.mounted) return;
 
+    showDialog(
+      context: originalContext,
+      barrierDismissible: false,
+      builder: (context) {
+        return PopScope(
+          canPop: false,
+          child: StatefulBuilder(
+            builder: (context, setState) {
+              return Center(
+                child: Material(
+                  color: Colors.transparent,
+                  child: Container(
+                    margin: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10,
+                          offset: Offset(0, -4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Icon(
+                              Icons.warning,
+                              color: Colors.amber,
+                              size: 35,
+                            ),
+                        const SizedBox(width: 8),
+                        Text(
+                          "Alert",
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleMedium?.copyWith(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "Tracking unavailable: The selected trip is either not started or has been completed",
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleMedium?.copyWith(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                elevation: 2,
+                                backgroundColor: const Color(0xffffa600),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              onPressed:() async {
+                                        Navigator.pop(context);
+                                       
+                                      },
+                              child: Text(
+                                "Ok",
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.titleMedium?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                       
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
 // import 'dart:convert';
 // import 'dart:developer';
 // import 'package:flutter_map/flutter_map.dart' as fmap;

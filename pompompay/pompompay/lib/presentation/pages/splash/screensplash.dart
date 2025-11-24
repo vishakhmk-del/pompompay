@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:pompompay/core/hook/hooks.dart';
+import 'package:pompompay/presentation/pages/main_page/screen_MainPage.dart';
 
 class ScreenSplash extends StatefulWidget {
   const ScreenSplash({super.key});
@@ -27,6 +29,8 @@ class _ScreenSplashState extends State<ScreenSplash> {
 
       gotoLogin(context);
     } else {
+        getdeviceinform();
+
       final sharevalue = await SharedPrefManager.instance.getSharedData();
 
       if (sharevalue?.userId != null && sharevalue!.userId!.isNotEmpty) {
@@ -34,9 +38,105 @@ class _ScreenSplashState extends State<ScreenSplash> {
 
         if (!context.mounted) return;
 
-        // Navigator.pushReplacement(context, Approutes().splasharcPicture);
+        final value = await SharedPrefManager.instance.getdeviceinfo();
+        // final val = await SharedPrefManager.instance.getdeviceTkn();
+        // final tkn=val.devicetoken;
+        // if((tkn??"").isEmpty){
+        // // String? token=await messaging.getToken();
+        //     // deviceTokn=token;
+        // }else{
+        //   deviceTokn=val.devicetoken;
+        // }
+        final shareddevice = Deviceinfo(
+          userid: sharevalue.userId??'',
+          phone: value.phone,
+          deviceid: value.deviceid,
+          // devicetoken: deviceTokn??'',
+          phoneos: value.phoneos,
+          androidid: value.androidid??'',
+          osversion: value.osversion,
+          appversion: value.appversion,
+          buildnumber: value.buildnumber,
+          // buildtime: value.buildtime
+          );
+          try{
+      // final api = await Ciadata.getInstance();
 
-        Navigator.pushReplacement(context, Approutes().mainScreen);
+          final deviceinforesp=await Pompaydata().checkUpdate(shareddevice);
+          final resultAsjson = jsonDecode(deviceinforesp.toString());
+          final deviceinfoval = UserCmnResp.fromJson(resultAsjson as Map<String, dynamic>);
+              if (deviceinforesp == null) {
+                log("deviceinfo response null");
+              } 
+              else if (deviceinforesp.statusCode == 200) {
+              if(deviceinfoval.status=='success'){
+                log("device details added");
+                if (!context.mounted) return;
+
+                Navigator.pushReplacement(
+                  context,
+                  Approutes().mainScreen,
+                );
+              }else if(deviceinfoval.status=='failed'){
+                if(deviceinfoval.errorCode==null){
+                  if (!context.mounted) return;
+                  Navigator.pushReplacement(
+                  context,
+                  Approutes().mainScreen,
+                );
+              }else if(deviceinfoval.errorCode=='VERSION_UPDATE'){
+                  if (!context.mounted) return;
+                
+                Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) => ScreenMainpage(
+                              version: deviceinfoval,
+                            ),
+                          ),
+                        );
+              }else{
+                if (!context.mounted) return;
+                         Navigator.pushReplacement(context, Approutes().mainScreen);
+
+              }
+                
+              }
+   
+            log("device details ${deviceinforesp.statusCode}");
+          }
+           else if (deviceinforesp.statusCode  == 500) {
+        if (!context.mounted) return;
+        CommonFun.instance.showApierror(context, "Sever Not Reachable");
+
+        // showLoginerror(context, 3);
+      } else if (deviceinforesp.statusCode  == 408) {
+        if (!context.mounted) return;
+        CommonFun.instance.showApierror(context, "Connection time out");
+
+        //showLoginerror(context, 4);
+      }else{
+            log("device details ${deviceinforesp.statusCode}");
+
+              
+              if (!context.mounted) return;
+
+                    Navigator.pushReplacement(context, Approutes().mainScreen);
+
+          }
+          
+          }catch(e){
+           if (!context.mounted) return;
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('An unexpected error occurred')),
+            );
+              // if (!context.mounted) return;
+
+                  Navigator.pushReplacement(context, Approutes().mainScreen);
+
+        
+          }
+
       } else {
         if (!context.mounted) return;
 

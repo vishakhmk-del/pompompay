@@ -62,7 +62,7 @@ class Datumlist {
   @JsonKey(name: 'to_arrival')
   String? toArrival;
   String? duration;
-
+  dynamic status;
   Datumlist({
     this.busId,
     this.shortName,
@@ -94,6 +94,7 @@ class Datumlist {
     this.fromArrival,
     this.toArrival,
     this.duration,
+    this.status
   });
 
   factory Datumlist.fromJson(Map<String, dynamic> json) =>

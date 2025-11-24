@@ -24,6 +24,8 @@ abstract class Apicalls {
   Future<dio.Response<dynamic>?> ticketStatus(Farereq value);
   Future<dio.Response<dynamic>?> checkPayStatus(Farereq value);
   Future<dio.Response<dynamic>?> paymntUpdate(TicketsaveReq value);
+  Future<dio.Response<dynamic>?> deleteUser(UserCmnReq value);
+  Future<dio.Response<dynamic>?> checkUpdate(Deviceinfo value);
 
 
 }
@@ -657,6 +659,70 @@ class Pompaydata extends Apicalls {
           statusMessage: "Connection Timeout",
         );
       }
+      return dio.Response(
+        requestOptions: ex.requestOptions,
+        statusCode:
+            ex.response?.statusCode ??
+            500, // Default to HTTP 500 if no status code
+        statusMessage: ex.message,
+        data: ex.response?.data, // Include error data if available
+      );
+    }
+  }
+  
+  @override
+  Future<dio.Response?> deleteUser(UserCmnReq value) async{
+    final sharedValue = await SharedPrefManager.instance.getSharedData();
+    final token = sharedValue!.accessTkn;
+    try {
+      final result = await dioclient.post(
+        url.deleteUrl,
+        data: value.toJson(),
+        options: dio.Options(
+          responseType: dio.ResponseType.plain,
+          headers: {
+            "Authorization": "Bearer $token",
+            "Accept": "application/json",
+          },
+        ),
+      );
+      return result;
+    } on dio.DioException catch (ex) {
+      if (ex.type == DioExceptionType.connectionTimeout) {
+        return dio.Response(
+          requestOptions: ex.requestOptions,
+          statusCode: 408, // HTTP 408 Request Timeout
+          statusMessage: "Connection Timeout",
+        );
+      }
+      return dio.Response(
+        requestOptions: ex.requestOptions,
+        statusCode:
+            ex.response?.statusCode ??
+            500, // Default to HTTP 500 if no status code
+        statusMessage: ex.message,
+        data: ex.response?.data, // Include error data if available
+      );
+    }
+  }
+  
+  @override
+  Future<dio.Response?> checkUpdate(Deviceinfo value) async{
+     try {
+      final result = await dioclient.post(
+        url.checkUpdtUrl, data: value.toJson());
+      return result;
+    } on DioException catch (ex) {
+      // Check for timeout or other errors
+      if (ex.type == DioExceptionType.connectionTimeout) {
+        // Return a custom response or throw an exception with more details
+        return dio.Response(
+          requestOptions: ex.requestOptions,
+          statusCode: 408, // HTTP 408 Request Timeout
+          statusMessage: "Connection Timeout",
+        );
+      }
+      // Return the error response from DioException
       return dio.Response(
         requestOptions: ex.requestOptions,
         statusCode:

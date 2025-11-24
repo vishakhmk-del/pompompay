@@ -6,7 +6,6 @@ class Url {
 
   // String baseUrl = 'http://117.221.68.183:81/Qrpaylive_test/index.php';
 
-  // String baseUrl = 'http://117.221.68.183:8001/Qrpaylive_test/index.php';
   // String baseUrl = 'http://10.160.100.53/Qrpay/index.php';
 
   String registerUrl = '/Home_C/register_user';
@@ -27,5 +26,6 @@ class Url {
   String ticketStatusUrl = '/Ticket_save_C/ticket_status';
   String checkPayStsUrl ='/Ticket_save_C/check_payment_status';
   String payStsUpdtUrl ='/Ticket_save_C/payment_status_update';
-
+  String deleteUrl = '/Home_C/delete_user';
+  String checkUpdtUrl ='/Home_C/create_device_Info';
 }
