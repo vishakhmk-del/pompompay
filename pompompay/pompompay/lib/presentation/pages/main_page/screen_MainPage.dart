@@ -261,7 +261,7 @@ Future<void> versionWarning(BuildContext originalContext) async {
   }
   static Future<void> _openStore() async {
   final Uri androidUrl = Uri.parse(
-      "https://play.google.com/store/apps/details?id=your.package");
+      "https://play.google.com/store/apps/details?id=com.pompaykerala.pompompay");
 
   final Uri iosUrl = Uri.parse(
       "https://apps.apple.com/app/idXXXXXXXXX");

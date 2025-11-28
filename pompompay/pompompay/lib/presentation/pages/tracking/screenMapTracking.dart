@@ -3,7 +3,9 @@ import 'dart:developer';
 import 'package:flutter_map/flutter_map.dart' as fmap;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:marquee/marquee.dart';
 import 'package:pompompay/core/hook/hooks.dart';
 import 'package:pompompay/infrastructure/model/search/stoploc_resp/bus.dart';
 import 'package:sizer/sizer.dart';
@@ -84,7 +86,7 @@ class _ScreenMapTrackState extends State<ScreenMapTrack> {
 DataList? stopValue;
   Timer? _busLocationTimer;
 bool _showStartButton = true;
-
+String lastupdt='';
   @override
   void initState() {
     super.initState();
@@ -104,6 +106,7 @@ bool _showStartButton = true;
              stops = stopValue?.stops ?? [];
           busLocation = stopValue?.busLocation;
           bus=stopValue?.bus;
+
           List<LatLng> points =
               stops
                   .map(
@@ -152,13 +155,14 @@ bool _showStartButton = true;
             if(widget.stoploc.status=="0"){
               if(!context.mounted)return;
                 alertTracking(context);
-            }else if(widget.stoploc.status=="1"){
-              if (!mounted) return;
-              setState(() {});
-              _busLocationTimer = Timer.periodic(const Duration(seconds:3), (_) {
-                _fetchBusLiveLocation(context);
-              });
             }
+            // else if(widget.stoploc.status=="1"){
+            //   if (!mounted) return;
+            //   setState(() {});
+            //   _busLocationTimer = Timer.periodic(const Duration(seconds:3), (_) {
+            //     _fetchBusLiveLocation(context);
+            //   });
+            // }
           }
    
         }
@@ -178,6 +182,7 @@ bool _showStartButton = true;
         ),
       for (int i = 0; i < stops.length; i++)
         _StopMarker(stop: stops[i], stoploc: widget.stoploc),
+      if(widget.stoploc.status=="1")
       if (busLocation?.latitude != null && busLocation?.longitude != null)
         _BusMarker(bus: busLocation!,busdet: bus!, stoploc: widget.stoploc),
     ];
@@ -186,7 +191,7 @@ bool _showStartButton = true;
   Future<void> _fetchRoute(List<LatLng> points) async {
     final coords = points.map((e) => '${e.longitude},${e.latitude}').join(';');
     final url = Uri.parse(
-      'http://117.221.68.183:5000/route/v1/driving/$coords?overview=full&geometries=geojson',
+      'http://pompay.in:5000/route/v1/driving/$coords?overview=full&geometries=geojson',
     );
 
     final response = await http.get(url);
@@ -221,6 +226,12 @@ bool _showStartButton = true;
       busLocation = updated;
       busLat = double.parse(updated.latitude!);
       busLng = double.parse(updated.longitude!);
+      setState(() {
+        final lastdt=updated.date;
+      DateTime dt = DateTime.parse(lastdt??'');
+      
+       lastupdt=DateFormat("dd-MM-yyyy hh:mm:ss a").format(dt);
+      });    
     } else if (_starting != null) {
       busLat = _starting!.latitude;
       busLng = _starting!.longitude;
@@ -308,16 +319,56 @@ bool _showStartButton = true;
 
     return Scaffold(
       appBar: AppBar(
+        leading:  IconButton(
+        icon: Icon(
+                                        Icons.arrow_back,
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimary,
+                                        size: 25,
+                                      ),
+        onPressed: (){
+          Navigator.pop(context);
+        },
+      ),
         backgroundColor: Theme.of(context).colorScheme.primary,
-        title: Text(
-          'Tracking',
-          style: TextStyle(
-            fontFamily: 'Poppins-Medium',
-            fontSize: 20.sp,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onPrimary,
-          ),
-          textScaler: TextScaler.noScaling,
+        title: Column(
+          // crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Tracking',
+              style: TextStyle(
+                fontFamily: 'Poppins-Medium',
+                fontSize: 20.sp,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+              textScaler: TextScaler.noScaling,
+            ),
+            (widget.stoploc.status == "1" && lastupdt.isNotEmpty)
+            ? SizedBox(
+                height: 20, // required height for marquee
+                width: MediaQuery.of(context).size.width * 0.7, // adjust width
+                child: Marquee(
+                  text:"Last Updated at $lastupdt" ,
+                  style: TextStyle(
+                    fontFamily: 'Poppins-Medium',
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                  scrollAxis: Axis.horizontal,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  blankSpace: 50.0,
+                  velocity: 40.0, // speed
+                  pauseAfterRound: Duration(seconds: 1),
+                  startPadding: 10.0,
+                ),
+              )
+            : SizedBox.shrink(),
+      
+          ],
         ),
       ),
       body:
@@ -345,7 +396,7 @@ bool _showStartButton = true;
                     children: [
                       fmap.TileLayer(
                         urlTemplate:
-                            'http://117.221.68.183:7001/tile/{z}/{x}/{y}.png',
+                            'http://pompay.in:7001/tile/{z}/{x}/{y}.png',
                         tileProvider: NetworkTileProvider(),
                         errorTileCallback: (tile, error, stackTrace) {
                           debugPrint('Tile load error: $error │ $tile');
@@ -482,6 +533,13 @@ bool _showStartButton = true;
                                setState(() {
                                   _showStartButton = false;
                                 });
+
+                                if (!mounted) return;
+                                setState(() {});
+                                _busLocationTimer = Timer.periodic(const Duration(seconds:3), (_) {
+                                  _fetchBusLiveLocation(context);
+                                });
+
                                 if (busLocation != null &&
                                     busLocation!.latitude != null &&
                                     busLocation!.longitude != null) {
@@ -489,7 +547,7 @@ bool _showStartButton = true;
                                     double.parse(busLocation!.latitude!),
                                     double.parse(busLocation!.longitude!),
                                   );
-                                  _mapController.move(position, 15);
+                                  _mapController.move(position, 12);
                                   _lastBusPos = position;
                                 }
                               },

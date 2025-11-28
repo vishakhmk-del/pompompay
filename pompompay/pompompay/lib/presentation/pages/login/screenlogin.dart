@@ -98,6 +98,10 @@ if(!mounted)return;
                                   child: const Icon(Icons.account_box_rounded),
                                 ),
                               ),
+                              inputFormatters: [
+                                    LengthLimitingTextInputFormatter(10),
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
                               validator: (value) {
                                 if (value!.isEmpty) {
                                   return "Mobile Number";
@@ -106,6 +110,9 @@ if(!mounted)return;
                                     value.contains(" ") ||
                                     value.contains(",")) {
                                   return "Enter valid Mobile Number";
+                                }else if (_usercontroller.text.length < 10 ||
+                                        _usercontroller.text.length > 10) {
+                                      return "Enter valid Mobile number";
                                 }
                                 return null;
                               },

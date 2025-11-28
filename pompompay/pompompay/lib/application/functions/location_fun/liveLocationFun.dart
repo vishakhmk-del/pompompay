@@ -159,16 +159,32 @@ void startTracking({
     _positionSubscription = null;
   }
 
-  Future<void> requestLocationPermission(BuildContext context) async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      permission = await Geolocator.requestPermission();
-    }
-    if (permission == LocationPermission.deniedForever) {
-      if (context.mounted) _showPermissionPermanentlyDeniedDialog(context);
-    }
+  // Future<void> requestLocationPermission(BuildContext context) async {
+  //   LocationPermission permission = await Geolocator.checkPermission();
+  //   if (permission == LocationPermission.denied ||
+  //       permission == LocationPermission.deniedForever) {
+  //     permission = await Geolocator.requestPermission();
+  //   }
+  //   if (permission == LocationPermission.deniedForever) {
+  //     if (context.mounted) _showPermissionPermanentlyDeniedDialog(context);
+  //   }
+  // }
+Future<void> requestLocationPermission(BuildContext context) async {
+  LocationPermission permission = await Geolocator.checkPermission();
+
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
   }
+
+  // After “While in Use” is granted → request Always
+  if (permission == LocationPermission.whileInUse) {
+    permission = await Geolocator.requestPermission();
+  }
+
+  if (permission == LocationPermission.deniedForever) {
+    if (context.mounted) _showPermissionPermanentlyDeniedDialog(context);
+  }
+}
 
   Future<void> _showLocationSettingsDialog(BuildContext context) async {
     await showDialog(

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:pompompay/core/hook/hooks.dart';
 import 'package:sizer/sizer.dart';
@@ -41,6 +42,8 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
   Sharedpref? val;
   TransResponse? ticketStatus;
   Map<String, dynamic>? params;
+  Map<String, String>? paymentData;
+  List<String> hashColumns=[];
   @override
   void initState() {
     super.initState();
@@ -1326,120 +1329,228 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
 
   Map<String, dynamic> generatePaymentParams(Map<String, dynamic> data) {
     // Concatenate data to generate hash
-
-    final hashColumns = [
-      'api_key',
-      'salt_key',
-      'payment_url',
-      'name',
-      'email',
-      'phone',
-      'amount',
-      'description',
-      'address_line_1',
-      'address_line_2',
-      'city',
-      'state',
-      'country',
-      'zip_code',
-      'currency',
-      'mode',
-      'return_url',
-      "enable_auto_refund",
-      'order_id',
-      'udf1',
-      'udf2',
-      'udf3',
-      'udf4',
-      'udf5',
-    ];
+    if (Platform.isAndroid) {
+          hashColumns = [
+          'salt_key',
+          'address_line_1',
+          'address_line_2',
+          'amount',
+          'api_key',
+          'city',
+          'country',
+          'currency',
+          'description',
+          'email',
+          "enable_auto_refund",
+          'mode',
+          'name',
+          'order_id',
+          'phone',
+          'return_url',
+          'state',
+          'udf1',
+          'udf2',
+          'udf3',
+          'udf4',
+          'udf5',
+          'zip_code', 
+        ];
+        } else if (Platform.isIOS) {
+          hashColumns = [
+          'salt_key',
+          'address_line_1',
+          'address_line_2',
+          'amount',
+          'api_key',
+          'city',
+          'country',
+          'currency',
+          'description',
+          'email',
+          "enable_auto_refund",
+          'interface_type',
+          'mode',
+          'name',
+          'order_id',
+          'phone',
+          'return_url',
+          'state',
+          'udf1',
+          'udf2',
+          'udf3',
+          'udf4',
+          'udf5',
+          'zip_code', 
+        ];
+        }
+    
 
     // hashColumns.sort();
-    String hashData = '';
+    // String hashData = '';
 
-    for (final column in hashColumns) {
-      final value = data[column];
-      if (value != null && value.toString().trim().isNotEmpty) {
-        hashData += '|${value.toString().trim()}';
+    // for (final column in hashColumns) {
+    //   final value = data[column];
+    //   if (value != null && value.toString().trim().isNotEmpty) {
+    //     hashData += '|${value.toString().trim()}';
+    //   }
+    // }
+    // log("🔍 iOS HASH DATA => $hashData");
+      String hashData = data['salt_key'].toString().trim(); // START WITH SALT
+
+      for (final column in hashColumns) {
+        if (column == 'salt_key') continue; // skip salt, already added
+
+        final value = data[column];
+        if (value != null && value.toString().trim().isNotEmpty) {
+          hashData += '|${value.toString().trim()}';
+        }
       }
-    }
-    final bytes = utf8.encode(hashData);
-    hash = sha512.convert(bytes).toString();
 
-    return {...data, 'hash': hash};
+      log("iOS HASH DATA => $hashData");
+
+    final bytes = utf8.encode(hashData);
+    hash = sha512.convert(bytes).toString().toUpperCase();
+    log("FINAL iOS HASH => $hash");  
+    
+    return {...data, 'hash':hash};
   }
 
   Future<void> initiateOmniwarePayment(BuildContext context) async {
     try {
       val = await SharedPrefManager.instance.getSharedData();
+      if (Platform.isAndroid) {
+          //*_____________________LIVE_________________________*
+        paymentData = {
+          "salt_key": busdet?.saltKey ?? '',
+          "address_line_1": "test",
+          "address_line_2": "text",
+          "amount": calcFare?.totalFare??'',
+          // "amount": "2",
+          "api_key": busdet?.upid?.trim() ?? '',
+          "city": busdet?.city ?? '',
+          "country": busdet?.country ?? '',
+          "currency": "INR",
+          "description": "bus ticket payment",
+          "email": busdet?.emailId ?? '',
+          "enable_auto_refund": "n",
+          // "interface_type":"ios_sdk",
+          "mode": "LIVE",
+          "name": val?.name ?? '',
+          "order_id": "TKT${DateTime.now().millisecondsSinceEpoch}",
+          "phone": busdet?.mobileNo ?? '',
+          // "payment_url": "https://pgbiz.omniware.in",
+          "return_url": "https://pgbiz.omniware.in/tnpv2/return_page.php",
+          "state": busdet?.state ?? '',
+          "udf1": "",
+          "udf2": "",
+          "udf3": "",
+          "udf4": "",
+          "udf5": "",
+          "zip_code": busdet?.zip ?? '',
+        };
 
-      //*_____________________LIVE_________________________*
-      final paymentData = {
-        "api_key": busdet?.upid ?? '',
-        "salt_key": busdet?.saltKey ?? '',
-        "payment_url": "https://pgbiz.omniware.in",
-        "name": val?.name ?? '',
-        "email": busdet?.emailId ?? '',
-        "phone": busdet?.mobileNo ?? '',
-        "amount": calcFare?.totalFare??'',
-        // "amount": '2',
-        "description": "bus ticket payment",
-        "address_line_1": "test",
-        "address_line_2": "text",
-        "city": busdet?.city ?? '',
-        "state": busdet?.state ?? '',
-        "country": busdet?.country ?? '',
-        "zip_code": busdet?.zip ?? '',
-        "currency": "INR",
-        "mode": "LIVE",
-        "order_id": "TKT${DateTime.now().millisecondsSinceEpoch}",
-        "return_url": "https://pgbiz.omniware.in/tnpv2/return_page.php",
-        //"merchant_id": busdet?.mercntCode??'',
-        "enable_auto_refund": "n",
-        "udf1": "",
-        "udf2": "",
-        "udf3": "",
-        "udf4": "",
-        "udf5": "",
-        // Optional: Use real phone number if available
-      };
+        //*_____________________***_________________________*
 
-      //*_____________________***_________________________*
+        //*_____________________TEST_________________________*
 
-      //*_____________________TEST_________________________*
+        //  paymentData = {
+        //   // "salt_key": "80c67bfdf027da08de88ab5ba903fecafaab8f6d",
+        //   "address_line_1": "test",
+        //   "address_line_2": "text",
+        //   "amount": calcFare?.totalFare??'',
+        //   "api_key": 'fb6bca86-b429-4abf-a42f-824bdd29022e',
+        //   "city": busdet?.city??'',
+        //   "country": busdet?.country??'',
+        //   "currency": "INR",
+        //   "description": "bus ticket payment",
+        //   "email":'rsn7rohith@gmail.com',
+        //   "enable_auto_refund": "n",
+        //   "mode": "TEST",
+        //   "name":'Rohith Test',
+        //   "order_id": "TKT${DateTime.now().millisecondsSinceEpoch}",
+        //   "phone":'9745528173',
+        //   "return_url": "https://pgbiz.omniware.in/tnpv2/return_page.php",
+        //   "state": busdet?.state??'',
+        //   //"merchant_id": busdet?.mercntCode??'',
+        //   "udf1": "",
+        //   "udf2": "",
+        //   "udf3": "",
+        //   "udf4": "",
+        //   "udf5": "",
+        //   "zip_code": busdet?.zip??'',
+        //   // Optional: Use real phone number if available
+        // };
 
-      // final paymentData = {
-      //   "api_key": 'fb6bca86-b429-4abf-a42f-824bdd29022e',
-      //   // "salt_key": busdet?.saltKey??'',
-      //   "payment_url": "https://pgbiz.omniware.in",
-      //   "name":'Rohith Test',
-      //   "email":'rsn7rohith@gmail.com',
-      //   "phone":'9745528173',
-      //   "amount": calcFare?.totalFare??'',
-      //   "description": "bus ticket payment",
-      //   "address_line_1": "test",
-      //   "address_line_2": "text",
-      //   "city": busdet?.city??'',
-      //   "state": busdet?.state??'',
-      //   "country": busdet?.country??'',
-      //   "zip_code": busdet?.zip??'',
-      //   "currency": "INR",
-      //   "mode": "TEST",
-      //   "order_id": "TKT${DateTime.now().millisecondsSinceEpoch}",
-      //   "return_url": "https://pgbiz.omniware.in/tnpv2/return_page.php",
-      //   //"merchant_id": busdet?.mercntCode??'',
-      //   "enable_auto_refund": "n",
-      //   "udf1": "",
-      //   "udf2": "",
-      //   "udf3": "",
-      //   "udf4": "",
-      //   "udf5": "",
-      //   // Optional: Use real phone number if available
-      // };
+        //*_____________________***_________________________*
 
-      //*_____________________***_________________________*
+        } else if (Platform.isIOS) {
+          //*_____________________LIVE_________________________*
+        paymentData = {
+          "salt_key": busdet?.saltKey ?? '',
+          "address_line_1": "test",
+          "address_line_2": "text",
+          "amount": calcFare?.totalFare??'',
+          // "amount": "2",
+          "api_key": busdet?.upid?.trim() ?? '',
+          "city": busdet?.city ?? '',
+          "country": busdet?.country ?? '',
+          "currency": "INR",
+          "description": "bus ticket payment",
+          "email": busdet?.emailId ?? '',
+          "enable_auto_refund": "n",
+          "interface_type":"ios_sdk",
+          "mode": "LIVE",
+          "name": val?.name ?? '',
+          "order_id": "TKT${DateTime.now().millisecondsSinceEpoch}",
+          "phone": busdet?.mobileNo ?? '',
+          // "payment_url": "https://pgbiz.omniware.in",
+          "return_url": "https://pgbiz.omniware.in/tnpv2/return_page.php",
+          "state": busdet?.state ?? '',
+          "udf1": "",
+          "udf2": "",
+          "udf3": "",
+          "udf4": "",
+          "udf5": "",
+          "zip_code": busdet?.zip ?? '',
+        };
 
-      params = generatePaymentParams(paymentData);
+        //*_____________________***_________________________*
+
+        //*_____________________TEST_________________________*
+
+        // paymentData = {
+        //   "salt_key":"80c67bfdf027da08de88ab5ba903fecafaab8f6d",
+        //   "address_line_1": "test",
+        //   "address_line_2": "text",
+        //   "amount": calcFare?.totalFare??'',
+        //   "api_key": 'fb6bca86-b429-4abf-a42f-824bdd29022e',
+        //   "city": busdet?.city??'',
+        //   "country": busdet?.country??'',
+        //   "currency": "INR",
+        //   "description": "bus ticket payment",
+        //   "email":'rsn7rohith@gmail.com',
+        //   "enable_auto_refund": "n",
+        //   "interface_type":"ios_sdk",
+        //   "mode": "TEST",
+        //   "name":'Rohith Test',
+        //   "order_id": "TKT${DateTime.now().millisecondsSinceEpoch}",
+        //   "phone":'9745528173',
+        //   "return_url": "https://pgbiz.omniware.in/tnpv2/return_page.php",
+        //   "state": busdet?.state??'',
+        //   //"merchant_id": busdet?.mercntCode??'',
+        //   "udf1": "",
+        //   "udf2": "",
+        //   "udf3": "",
+        //   "udf4": "",
+        //   "udf5": "",
+        //   "zip_code": busdet?.zip??'',
+        //   // Optional: Use real phone number if available
+        // };
+
+        //*_____________________***_________________________*
+        }
+      
+      params = generatePaymentParams(paymentData!);
       //final value = await SharedPrefManager.instance.getSharedData();
       final tktreq = TicketsaveReq(
         tripId: busdet?.tripId ?? '',
@@ -1455,11 +1566,11 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
         userName: val?.name ?? '',
         phoneNo: val?.mobno ?? "",
         merchantCode: busdet?.mercntCode ?? "",
-        amount: calcFare?.totalFare ?? "",
-        adultFare: calcFare?.adultFare ?? "",
-        kidsFare: calcFare?.kidsFare ?? "",
-        studentSingleFare: calcFare?.singlestud ?? "",
-        handiSingleFare: calcFare?.handicappedFare ?? "",
+        amount: calcFare?.totalFare ?? "0",
+        adultFare: calcFare?.adultFare ?? "0",
+        kidsFare: calcFare?.kidsFare ?? "0",
+        studentSingleFare: calcFare?.singlestud ?? "0",
+        handiSingleFare: calcFare?.handicappedFare ?? "0",
         orderId: params?["order_id"] ?? '',
         paymentMode: transRespVal?.paymentMode ?? '',
         paymentChannel: transRespVal?.paymentChannel ?? '',
@@ -1499,13 +1610,28 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
           if (!context.mounted) return;
           transCncl(context, request, 0);
         } else {
-          final resp = "${response['response']}";
+         // final resp = "${response['response']}";
           //final code="${response['code']}";
+          dynamic rawResp = response['response'];
 
-          final resultAsJson = jsonDecode(resp.toString());
-          transRespVal = TransResponse.fromJson(
-            resultAsJson as Map<String, dynamic>,
-          );
+            Map<String, dynamic> resultAsJson;
+
+            // ANDROID → response is JSON string
+            if (rawResp is String) {
+              resultAsJson = jsonDecode(rawResp);
+            }
+            // IOS → response is already a Map
+            else if (rawResp is Map) {
+              resultAsJson = Map<String, dynamic>.from(rawResp);
+            } else {
+              throw Exception("Unexpected response format");
+            }
+
+            transRespVal = TransResponse.fromJson(resultAsJson);
+         // final resultAsJson = jsonDecode(resp.toString());
+          // transRespVal = TransResponse.fromJson(
+          //   resultAsJson as Map<String, dynamic>,
+          // );
           final dttime = transRespVal?.paymentDatetime;
           DateTime parsed = DateTime.parse(dttime ?? '');
 
@@ -1522,7 +1648,7 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
             transtime = '';
           }
           //final validHash = hash == transRespVal?.hash ? "Yes" : "No";
-          final respcode = transRespVal?.responseCode;
+          final respcode = int.tryParse(transRespVal?.responseCode.toString() ?? '') ?? 0;
           final respmsg = transRespVal?.responseMessage ?? '';
           final status =
               (respcode == 0)
@@ -1533,6 +1659,8 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
                   ? "WAITING-BANK-RESPONSE"
                   : (respcode == 1015)
                   ? "INSUFFICIENT-FUND"
+                  : (respcode == 1030)
+                  ? "TRANSACTION-INCOMPLETE"
                   : "unknown";
           if (status == "success") {
             log("success resp");
@@ -1548,7 +1676,7 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
               paymentMode: transRespVal?.paymentMode??'',
               paymentChannel: transRespVal?.paymentChannel??'',
               paymentDatetime: transRespVal?.paymentDatetime??'',
-              responseCode: transRespVal?.responseCode,
+              responseCode: int.tryParse(transRespVal?.responseCode.toString() ?? '') ?? 0,
               responseMessage: transRespVal?.responseMessage??'',
               errorDesc: transRespVal?.errorDesc??'',
               cardMasked: transRespVal?.cardmasked??'',
@@ -1572,7 +1700,7 @@ class _ScreenScanPayState extends State<ScreenScanPay> {
               paymentMode: transRespVal?.paymentMode??'',
               paymentChannel: transRespVal?.paymentChannel??'',
               paymentDatetime: transRespVal?.paymentDatetime??'',
-              responseCode: transRespVal?.responseCode,
+              responseCode: int.tryParse(transRespVal?.responseCode.toString() ?? '') ?? 0,
               responseMessage: transRespVal?.responseMessage??'',
               errorDesc: transRespVal?.errorDesc??'',
               cardMasked: transRespVal?.cardmasked??'',

@@ -107,8 +107,7 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                   color: Colors.white,
                                 ),
                                 onPressed: () {
-                                  SearchFun.instance.getBusListNotifier.value =
-                                      [];
+                                  SearchFun.instance.getBusListNotifier.value =[];
 
                                   Navigator.pushReplacement(
                                     context,
@@ -383,70 +382,51 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                                       /// Header info
                                                       Column(
                                                         children: [
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Text(
-                                                                ticket.busName
-                                                                        ?.toUpperCase() ??
-                                                                    '',
-                                                                style: Theme.of(
-                                                                      context,
-                                                                    )
-                                                                    .textTheme
-                                                                    .bodySmall
-                                                                    ?.copyWith(
-                                                                      fontSize:
-                                                                          14,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                    ),
+                                                          Stack(
+                                                          alignment: Alignment.center,
+                                                          children: [
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                              children: [
+                                                                Text(
+                                                                  ticket.busName?.toUpperCase() ?? '',
+                                                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                                                        fontSize: 14,
+                                                                        fontWeight: FontWeight.bold,
+                                                                      ),
+                                                                ),
+                                                                const SizedBox(width: 8),
+                                                                Text(
+                                                                  ticket.registrationNo?.toUpperCase() ?? '',
+                                                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                                                        fontSize: 14,
+                                                                        fontWeight: FontWeight.bold,
+                                                                      ),
+                                                                ),
+                                                                const SizedBox(width: 8),
+                                                                Text(
+                                                                  ticket.busType?.toUpperCase() ?? '',
+                                                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                                                        fontSize: 16,
+                                                                        fontWeight: FontWeight.bold,
+                                                                      ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Positioned(
+                                                              right: 0,
+                                                              child: Container(
+                                                                width: 12,
+                                                                height: 12,
+                                                                decoration: BoxDecoration(
+                                                                  color: ticket.status == "1" ? Colors.green : Colors.red,
+                                                                  shape: BoxShape.circle,
+                                                                ),
                                                               ),
-                                                              const SizedBox(
-                                                                width: 8,
-                                                              ),
-                                                              Text(
-                                                                ticket.registrationNo
-                                                                        ?.toUpperCase() ??
-                                                                    '',
-                                                                style: Theme.of(
-                                                                      context,
-                                                                    )
-                                                                    .textTheme
-                                                                    .bodySmall
-                                                                    ?.copyWith(
-                                                                      fontSize:
-                                                                          14,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                    ),
-                                                              ),
-                                                              const SizedBox(
-                                                                width: 8,
-                                                              ),
-                                                              Text(
-                                                                ticket.busType
-                                                                        ?.toUpperCase() ??
-                                                                    '',
-                                                                style: Theme.of(
-                                                                      context,
-                                                                    )
-                                                                    .textTheme
-                                                                    .bodySmall
-                                                                    ?.copyWith(
-                                                                      fontSize:
-                                                                          16,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                    ),
-                                                              ),
-                                                            ],
-                                                          ),
+                                                            ),
+                                                          ],
+                                                        ),
+
                                                           Row(
                                                             mainAxisAlignment:
                                                                 MainAxisAlignment
@@ -601,19 +581,19 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                                       ),
 
                                                       /// Separator line (simulated dotted separator)
-                                                      CustomPaint(
-                                                        painter:
-                                                            DottedSeparatorLine(
-                                                              yOffsetFactor: 0,
-                                                              color:
-                                                                  Colors.grey,
-                                                            ),
-                                                        child: SizedBox(
-                                                          width:
-                                                              double.infinity,
-                                                          height: 1,
-                                                        ),
-                                                      ),
+                                                      // CustomPaint(
+                                                      //   painter:
+                                                      //       DottedSeparatorLine(
+                                                      //         yOffsetFactor: 0,
+                                                      //         color:
+                                                      //             Colors.grey,
+                                                      //       ),
+                                                      //   child: SizedBox(
+                                                      //     width:
+                                                      //         double.infinity,
+                                                      //     height: 1,
+                                                      //   ),
+                                                      // ),
                                                     ],
                                                   ),
                                                 ),
