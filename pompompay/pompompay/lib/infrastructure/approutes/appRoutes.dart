@@ -1,6 +1,4 @@
 import 'package:pompompay/core/hook/hooks.dart';
-import 'package:pompompay/presentation/pages/main_page/screen_MainPage.dart';
-import 'package:pompompay/presentation/pages/ticket/myticket/screenMyTicket.dart';
 
 class Approutes {
   PageTransition splasharcPicture = PageTransition(
@@ -61,6 +59,20 @@ class Approutes {
   );
   PageTransition menuScreen = PageTransition(
     child: ScreenMenu(screen: menu),
+    type: PageTransitionType.fade,
+    alignment: Alignment.center,
+    curve: Curves.easeInOutBack,
+    duration: const Duration(microseconds: 500),
+  );
+  PageTransition aboutScreen = PageTransition(
+    child: ScreenAbout(),
+    type: PageTransitionType.fade,
+    alignment: Alignment.center,
+    curve: Curves.easeInOutBack,
+    duration: const Duration(microseconds: 500),
+  );
+  PageTransition privacyScreen = PageTransition(
+    child: ScreenPrivacySec(),
     type: PageTransitionType.fade,
     alignment: Alignment.center,
     curve: Curves.easeInOutBack,

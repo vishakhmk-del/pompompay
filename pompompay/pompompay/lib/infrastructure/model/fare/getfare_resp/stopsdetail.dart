@@ -6,8 +6,10 @@ part 'stopsdetail.g.dart';
 class Stopsdetail {
   @JsonKey(name: 'stop_name')
   String? stopName;
+  @JsonKey(name: 'stop_id')
+  dynamic stopId;
 
-  Stopsdetail({this.stopName});
+  Stopsdetail({this.stopName, this.stopId});
 
   factory Stopsdetail.fromJson(Map<String, dynamic> json) {
     return _$StopsdetailFromJson(json);

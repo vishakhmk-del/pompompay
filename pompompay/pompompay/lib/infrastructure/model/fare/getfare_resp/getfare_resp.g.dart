@@ -9,10 +9,9 @@ part of 'getfare_resp.dart';
 GetfareResp _$GetfareRespFromJson(Map<String, dynamic> json) => GetfareResp(
   status: json['status'] as String?,
   message: json['message'] as String?,
-  data:
-      json['data'] == null
-          ? null
-          : DataVal.fromJson(json['data'] as Map<String, dynamic>),
+  data: json['data'] == null
+      ? null
+      : DataVal.fromJson(json['data'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$GetfareRespToJson(GetfareResp instance) =>

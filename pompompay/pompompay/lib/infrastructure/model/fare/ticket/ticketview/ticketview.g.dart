@@ -8,6 +8,7 @@ part of 'ticketview.dart';
 
 Ticketview _$TicketviewFromJson(Map<String, dynamic> json) => Ticketview(
   tiketNo: json['tiket_no'] as String?,
+  ticketNo: json['ticket_no'] as String?,
   busId: json['bus_id'] as String?,
   tripId: json['trip_id'] as String?,
   seatno: json['seatno'] as String?,
@@ -49,6 +50,7 @@ Ticketview _$TicketviewFromJson(Map<String, dynamic> json) => Ticketview(
 Map<String, dynamic> _$TicketviewToJson(Ticketview instance) =>
     <String, dynamic>{
       'tiket_no': instance.tiketNo,
+      'ticket_no': instance.ticketNo,
       'bus_id': instance.busId,
       'trip_id': instance.tripId,
       'seatno': instance.seatno,

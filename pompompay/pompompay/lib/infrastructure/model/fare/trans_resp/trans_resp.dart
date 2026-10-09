@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:pompompay/infrastructure/model/fare/transactionresp/transactionresp.dart';
 
 import 'response.dart';
 
@@ -10,7 +11,8 @@ class TransResp {
   String? code;
   String? message;
   TransResponse? response;
-  TransResponse? data;
+  // TransResponse? data;
+  Transactionresp? data;
 
   TransResp({this.status, this.code, this.message, this.response, this.data});
 

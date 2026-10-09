@@ -1,5 +1,5 @@
 const String regType = 'REGISTRATION';
-const String frgtpswrdType = 'FORGOTPASSWORD';
+const String frgtpswrdType = 'FORGOT_PASSWORD';
 const int activetkt = 1;
 const int deactivetkt = 0;
 const int menu = 1;
@@ -7,3 +7,4 @@ const int profile = 0;
 const String duration = 'DURATION';
 const String start = 'START';
 const String end = 'END';
+const int users = 4;

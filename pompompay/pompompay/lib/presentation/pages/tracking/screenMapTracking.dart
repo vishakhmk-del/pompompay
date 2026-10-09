@@ -23,14 +23,13 @@ class _StopMarker extends fmap.Marker {
         ),
         width: 40,
         height: 40,
-        child:
-            stop.stopName == stoploc.to
-                ? Image.asset(
-                  'assets/image/tracking/Untitled_design__7_-removebg-preview.png',
-                  width: 40,
-                  height: 40,
-                )
-                : const Icon(Icons.my_location, color: Colors.red, size: 25),
+        child: stop.stopName == stoploc.to
+            ? Image.asset(
+                'assets/image/tracking/Untitled_design__7_-removebg-preview.png',
+                width: 40,
+                height: 40,
+              )
+            : const Icon(Icons.my_location, color: Colors.red, size: 25),
       );
 }
 
@@ -40,7 +39,7 @@ class _BusMarker extends fmap.Marker {
   final BusValue busdet;
   final Farereq stoploc;
 
-  _BusMarker({required this.bus,required this.busdet,required this.stoploc})
+  _BusMarker({required this.bus, required this.busdet, required this.stoploc})
     : super(
         key: const ValueKey('bus_marker'),
         point: LatLng(
@@ -76,99 +75,241 @@ class _ScreenMapTrackState extends State<ScreenMapTrack> {
   bool _showRecenter = false;
   LatLng? _lastBusPos;
   bool isStopFetch = false;
-// bool _hasAutoCenteredOnce = false;
+  // bool _hasAutoCenteredOnce = false;
   List<LatLng> _routePoints = [];
   LatLng? _starting;
   List<Stop> stops = [];
   List<fmap.Marker> _popupMarkers = [];
   BusLocation? busLocation;
   BusValue? bus;
-DataList? stopValue;
+  DataList? stopValue;
   Timer? _busLocationTimer;
-bool _showStartButton = true;
-String lastupdt='';
+  bool _showStartButton = true;
+  String lastupdt = '';
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   WidgetsBinding.instance.addPostFrameCallback((_) async{await _initialize(context);} );
+  // }
+
+  // Future<void> _initialize(BuildContext context) async {
+  //   Livelocationfun.instance.startTracking(
+  //     context: context,
+  //     onLocationUpdate: (position) async {
+  //       if (position.latitude != 0 && position.longitude != 0) {
+  //         if (!mounted) return;
+  //         setState(() => isLoading = false);
+  //         if (!isStopFetch) {
+  //           isStopFetch = true;
+  //           stopValue = await SearchFun.instance.fetchStopLoc(
+  //             widget.stoploc,
+  //             context,
+  //           );
+  //           stops = stopValue?.stops ?? [];
+  //           busLocation = stopValue?.busLocation;
+
+  //             log(
+  //               'busLocation: lat=${busLocation?.latitude}, '
+  //               'lng=${busLocation?.longitude}',
+  //             );
+
+  //           bus = stopValue?.bus;
+
+  //           List<LatLng> points = stops
+  //               .map(
+  //                 (s) => LatLng(
+  //                   double.parse(s.latitude!),
+  //                   double.parse(s.longitude!),
+  //                 ),
+  //               )
+  //               .toList();
+
+  //           if (points.isNotEmpty) {
+  //             _starting = points.first;
+  //             _routePoints = points;
+  //             await _fetchRoute(points);
+  //           }
+
+  //           _buildMarkers();
+
+  //           // --- Show nearest stop popup initially ---
+  //           if (busLocation != null && _popupMarkers.isNotEmpty) {
+  //             final Distance hv = const Distance();
+  //             LatLng busPos = LatLng(
+  //               double.parse(busLocation!.latitude!),
+  //               double.parse(busLocation!.longitude!),
+  //             );
+
+  //             int? nearestDist;
+  //             _StopMarker? nearestStopMarker;
+
+  //             for (final m in _popupMarkers) {
+  //               if (m is _StopMarker) {
+  //                 final d = hv(m.point, busPos).round();
+  //                 if (nearestDist == null || d < nearestDist) {
+  //                   nearestDist = d;
+  //                   nearestStopMarker = m;
+  //                 }
+  //               }
+  //             }
+
+  //             if (nearestStopMarker != null) {
+  //               // Show popup for the nearest stop
+  //               _popupLayerController.showPopupsOnlyFor([nearestStopMarker]);
+  //             }
+  //           }
+
+  //           if (widget.stoploc.status == 0) {
+  //             if (!context.mounted) return;
+  //             alertTracking(context);
+  //           }
+  //           // else if(widget.stoploc.status=="1"){
+  //           //   if (!mounted) return;
+  //           //   setState(() {});
+  //           //   _busLocationTimer = Timer.periodic(const Duration(seconds:3), (_) {
+  //           //     _fetchBusLiveLocation(context);
+  //           //   });
+  //           // }
+  //         }
+  //       }
+  //     },
+  //   );
+  // }
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _initialize(context));
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initialize(context);
+    });
   }
 
   Future<void> _initialize(BuildContext context) async {
-    Livelocationfun.instance.startTracking(
-      context: context,
-      onLocationUpdate: (position) async {
-        if (position.latitude != 0 && position.longitude != 0) {
-          if (!mounted) return;
-          setState(() => isLoading = false);
-        if (!isStopFetch) {
-            isStopFetch = true; // Set the flag to true after the first call
-             stopValue = await SearchFun.instance.fetchStopLoc(widget.stoploc,context);
-             stops = stopValue?.stops ?? [];
-          busLocation = stopValue?.busLocation;
-          bus=stopValue?.bus;
+    try {
+      // 1. FIRST fetch stop information
+      stopValue = await SearchFun.instance.fetchStopLoc(
+        widget.stoploc,
+        context,
+      );
 
-          List<LatLng> points =
-              stops
-                  .map(
-                    (s) => LatLng(
-                      double.parse(s.latitude!),
-                      double.parse(s.longitude!),
-                    ),
-                  )
-                  .toList();
+      if (!mounted) return;
 
-          if (points.isNotEmpty) {
-            _starting = points.first;
-            _routePoints = points;
-            await _fetchRoute(points);
-          }
+      // 2. Assign fetched data
+      stops = stopValue?.stops ?? [];
+      busLocation = stopValue?.busLocation;
+      bus = stopValue?.bus;
 
-          _buildMarkers();
+      log(
+        'busLocation: lat=${busLocation?.latitude}, '
+        'lng=${busLocation?.longitude}',
+      );
 
-          // --- Show nearest stop popup initially ---
-          if (busLocation != null && _popupMarkers.isNotEmpty) {
-            final Distance hv = const Distance();
-            LatLng busPos = LatLng(
-              double.parse(busLocation!.latitude!),
-              double.parse(busLocation!.longitude!),
-            );
+      // 3. Create route points
+      final List<LatLng> points = stops
+          .where(
+            (s) =>
+                s.latitude != null &&
+                s.longitude != null &&
+                s.latitude!.isNotEmpty &&
+                s.longitude!.isNotEmpty,
+          )
+          .map(
+            (s) =>
+                LatLng(double.parse(s.latitude!), double.parse(s.longitude!)),
+          )
+          .toList();
 
-            int? nearestDist;
-            _StopMarker? nearestStopMarker;
+      // 4. Fetch route
+      if (points.isNotEmpty) {
+        _starting = points.first;
+        _routePoints = points;
 
-            for (final m in _popupMarkers) {
-              if (m is _StopMarker) {
-                final d = hv(m.point, busPos).round();
-                if (nearestDist == null || d < nearestDist) {
-                  nearestDist = d;
-                  nearestStopMarker = m;
-                }
+        await _fetchRoute(points);
+      }
+
+      if (!mounted) return;
+
+      // 5. Build markers
+      _buildMarkers();
+
+      // 6. Show popup for nearest stop
+      if (busLocation != null && _popupMarkers.isNotEmpty) {
+        final Distance distance = const Distance();
+
+        if (busLocation!.latitude != null && busLocation!.longitude != null) {
+          final LatLng busPos = LatLng(
+            double.parse(busLocation!.latitude!),
+            double.parse(busLocation!.longitude!),
+          );
+
+          int? nearestDist;
+          _StopMarker? nearestStopMarker;
+
+          for (final marker in _popupMarkers) {
+            if (marker is _StopMarker) {
+              final int currentDistance = distance(
+                marker.point,
+                busPos,
+              ).round();
+
+              if (nearestDist == null || currentDistance < nearestDist) {
+                nearestDist = currentDistance;
+                nearestStopMarker = marker;
               }
             }
-
-            if (nearestStopMarker != null) {
-              // Show popup for the nearest stop
-              _popupLayerController.showPopupsOnlyFor([nearestStopMarker]);
-            }
           }
 
-            if(widget.stoploc.status=="0"){
-              if(!context.mounted)return;
-                alertTracking(context);
-            }
-            // else if(widget.stoploc.status=="1"){
-            //   if (!mounted) return;
-            //   setState(() {});
-            //   _busLocationTimer = Timer.periodic(const Duration(seconds:3), (_) {
-            //     _fetchBusLiveLocation(context);
-            //   });
-            // }
+          if (nearestStopMarker != null) {
+            _popupLayerController.showPopupsOnlyFor([nearestStopMarker]);
           }
-   
         }
+      }
 
-      },
-    );
+      // 7. Stop fetching/loading
+      setState(() {
+        isLoading = false;
+      });
+
+      // 8. Show tracking alert
+      if (widget.stoploc.status == 0) {
+        if (!context.mounted) return;
+
+        alertTracking(context);
+      }
+      if (!context.mounted) return;
+
+      // 9. FINALLY start live location tracking
+      Livelocationfun.instance.startTracking(
+        context: context,
+        onLocationUpdate: (position) async {
+          if (position.latitude == 0 || position.longitude == 0) {
+            return;
+          }
+
+          if (!mounted) return;
+
+          setState(() {
+            isLoading = false;
+          });
+
+          log(
+            'Live location: '
+            'lat=${position.latitude}, '
+            'lng=${position.longitude}',
+          );
+
+          // Handle live location here
+        },
+      );
+    } catch (e, stackTrace) {
+      log('Initialize error: $e', stackTrace: stackTrace);
+
+      if (!mounted) return;
+
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   void _buildMarkers() {
@@ -182,9 +323,9 @@ String lastupdt='';
         ),
       for (int i = 0; i < stops.length; i++)
         _StopMarker(stop: stops[i], stoploc: widget.stoploc),
-      if(widget.stoploc.status=="1")
-      if (busLocation?.latitude != null && busLocation?.longitude != null)
-        _BusMarker(bus: busLocation!,busdet: bus!, stoploc: widget.stoploc),
+      if (widget.stoploc.status == 1)
+        if (busLocation?.latitude != null && busLocation?.longitude != null)
+          _BusMarker(bus: busLocation!, busdet: bus!, stoploc: widget.stoploc),
     ];
   }
 
@@ -227,11 +368,12 @@ String lastupdt='';
       busLat = double.parse(updated.latitude!);
       busLng = double.parse(updated.longitude!);
       setState(() {
-        final lastdt=updated.date;
-      DateTime dt = DateTime.parse(lastdt??'');
-      
-       lastupdt=DateFormat("dd-MM-yyyy hh:mm:ss a").format(dt);
-      });    
+        final lastdt = updated.date;
+        DateTime dt = DateTime.parse(lastdt ?? '');
+
+        lastupdt = DateFormat("dd-MM-yyyy hh:mm:ss a").format(dt);
+        log(lastupdt);
+      });
     } else if (_starting != null) {
       busLat = _starting!.latitude;
       busLng = _starting!.longitude;
@@ -242,29 +384,31 @@ String lastupdt='';
 
     _popupMarkers.removeWhere((m) => m.key == const ValueKey('bus_marker'));
     if (busLocation != null) {
-      _popupMarkers.add(_BusMarker(bus: busLocation!,busdet: bus!, stoploc: widget.stoploc));
+      _popupMarkers.add(
+        _BusMarker(bus: busLocation!, busdet: bus!, stoploc: widget.stoploc),
+      );
     }
-      final Distance hv = const Distance();
-      int? nearestDist;
-      _StopMarker? nearestStopMarker;
+    final Distance hv = const Distance();
+    int? nearestDist;
+    _StopMarker? nearestStopMarker;
 
-      for (final m in _popupMarkers) {
-        if (m is _StopMarker) {
-          final d = hv(m.point, _lastBusPos!).round(); // metres
-          if (nearestDist == null || d < nearestDist) {
-            nearestDist = d;
-            nearestStopMarker = m;
-          }
+    for (final m in _popupMarkers) {
+      if (m is _StopMarker) {
+        final d = hv(m.point, _lastBusPos!).round(); // metres
+        if (nearestDist == null || d < nearestDist) {
+          nearestDist = d;
+          nearestStopMarker = m;
         }
       }
+    }
 
-      // threshold ≈ 200 m
-      if (nearestStopMarker != null && nearestDist! < 200) {
-        // Show ONLY that stop’s popup
-        _popupLayerController.showPopupsOnlyFor([nearestStopMarker]);
-      } else {
-        _popupLayerController.hideAllPopups();
-      }
+    // threshold ≈ 200 m
+    if (nearestStopMarker != null && nearestDist! < 200) {
+      // Show ONLY that stop’s popup
+      _popupLayerController.showPopupsOnlyFor([nearestStopMarker]);
+    } else {
+      _popupLayerController.hideAllPopups();
+    }
 
     // if (!_isUserInteracting) {
     //   _mapController.move(_lastBusPos!, 15);
@@ -273,7 +417,6 @@ String lastupdt='';
     //     _mapController.move(_lastBusPos!, 15);
     //     _hasAutoCenteredOnce = true;
     //   }
-
 
     if (mounted) setState(() {});
   }
@@ -288,7 +431,7 @@ String lastupdt='';
       );
       _mapController.move(position, 15);
       // _isUserInteracting = false;
-      // _hasAutoCenteredOnce = true; 
+      // _hasAutoCenteredOnce = true;
       setState(() => _showRecenter = false);
     }
   }
@@ -319,19 +462,16 @@ String lastupdt='';
 
     return Scaffold(
       appBar: AppBar(
-        leading:  IconButton(
-        icon: Icon(
-                                        Icons.arrow_back,
-                                        color:
-                                            Theme.of(
-                                              context,
-                                            ).colorScheme.onPrimary,
-                                        size: 25,
-                                      ),
-        onPressed: (){
-          Navigator.pop(context);
-        },
-      ),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).colorScheme.onPrimary,
+            size: 25,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Column(
           // crossAxisAlignment: CrossAxisAlignment.start,
@@ -346,326 +486,326 @@ String lastupdt='';
               ),
               textScaler: TextScaler.noScaling,
             ),
-            (widget.stoploc.status == "1" && lastupdt.isNotEmpty)
-            ? SizedBox(
-                height: 20, // required height for marquee
-                width: MediaQuery.of(context).size.width * 0.7, // adjust width
-                child: Marquee(
-                  text:"Last Updated at $lastupdt" ,
-                  style: TextStyle(
-                    fontFamily: 'Poppins-Medium',
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onPrimary,
-                  ),
-                  scrollAxis: Axis.horizontal,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  blankSpace: 50.0,
-                  velocity: 40.0, // speed
-                  pauseAfterRound: Duration(seconds: 1),
-                  startPadding: 10.0,
-                ),
-              )
-            : SizedBox.shrink(),
-      
+            (widget.stoploc.status == 1 && lastupdt.isNotEmpty)
+                ? SizedBox(
+                    height: 20, // required height for marquee
+                    width:
+                        MediaQuery.of(context).size.width * 0.7, // adjust width
+                    child: Marquee(
+                      text: "Last Updated at $lastupdt",
+                      style: TextStyle(
+                        fontFamily: 'Poppins-Medium',
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                      scrollAxis: Axis.horizontal,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      blankSpace: 50.0,
+                      velocity: 40.0, // speed
+                      pauseAfterRound: Duration(seconds: 1),
+                      startPadding: 10.0,
+                    ),
+                  )
+                : SizedBox.shrink(),
           ],
         ),
       ),
-      body:
-          isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : Stack(
-                children: [
-                  fmap.FlutterMap(
-                    mapController: _mapController,
-                    options: fmap.MapOptions(
-                      initialCenter: _starting ?? LatLng(0, 0),
-                      initialZoom: 15,
-                      minZoom: 5,
-                      maxZoom: 18,
-                      onTap: (_, __) => _popupLayerController.hideAllPopups(),
-                      onPositionChanged: (position, hasGesture) {
-                        if (hasGesture) {
-                          // _isUserInteracting = true;
-                          if (!_showRecenter) {
-                            setState(() => _showRecenter = true);
-                          }
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Stack(
+              children: [
+                fmap.FlutterMap(
+                  mapController: _mapController,
+                  options: fmap.MapOptions(
+                    initialCenter: _starting ?? LatLng(0, 0),
+                    initialZoom: 15,
+                    minZoom: 5,
+                    maxZoom: 18,
+                    onTap: (_, _) => _popupLayerController.hideAllPopups(),
+                    onPositionChanged: (position, hasGesture) {
+                      if (hasGesture) {
+                        // _isUserInteracting = true;
+                        if (!_showRecenter) {
+                          setState(() => _showRecenter = true);
                         }
+                      }
+                    },
+                  ),
+                  children: [
+                    fmap.TileLayer(
+                      urlTemplate: 'http://pompay.in:7001/tile/{z}/{x}/{y}.png',
+                      tileProvider: NetworkTileProvider(),
+                      errorTileCallback: (tile, error, stackTrace) {
+                        debugPrint('Tile load error: $error │ $tile');
+                        log('Tile load error: $error │ $tile');
                       },
                     ),
-                    children: [
-                      fmap.TileLayer(
-                        urlTemplate:
-                            'http://pompay.in:7001/tile/{z}/{x}/{y}.png',
-                        tileProvider: NetworkTileProvider(),
-                        errorTileCallback: (tile, error, stackTrace) {
-                          debugPrint('Tile load error: $error │ $tile');
-                          log('Tile load error: $error │ $tile');
-                        },
+                    if (_routePoints.isNotEmpty)
+                      fmap.PolylineLayer(
+                        polylines: [
+                          fmap.Polyline(
+                            points: _routePoints,
+                            color: Colors.blue,
+                            strokeWidth: 4,
+                          ),
+                        ],
                       ),
-                      if (_routePoints.isNotEmpty)
-                        fmap.PolylineLayer(
-                          polylines: [
-                            fmap.Polyline(
-                              points: _routePoints,
-                              color: Colors.blue,
-                              strokeWidth: 4,
-                            ),
-                          ],
-                        ),
-                      PopupMarkerLayer(
-                        options: PopupMarkerLayerOptions(
-                          markers: _popupMarkers,
-                          popupController: _popupLayerController,
-                          popupDisplayOptions: PopupDisplayOptions(
-                            builder: (
-                              BuildContext context,
-                              fmap.Marker marker,
-                            ) {
-                              // ----- STOP MARKER POPUP ----- //
-                              if (marker is _StopMarker) {
-                                int? dist;
-                                if (_lastBusPos != null) {
-                                  dist =
-                                      const Distance()
-                                          .call(marker.point, _lastBusPos!)
-                                          .round();
-                                }
-                                return Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(marker.stop.stopName ?? 'N/A'),
+                    PopupMarkerLayer(
+                      options: PopupMarkerLayerOptions(
+                        markers: _popupMarkers,
+                        popupController: _popupLayerController,
+                        popupDisplayOptions: PopupDisplayOptions(
+                          builder: (BuildContext context, fmap.Marker marker) {
+                            // ----- STOP MARKER POPUP ----- //
+                            if (marker is _StopMarker) {
+                              int? dist;
+                              if (_lastBusPos != null) {
+                                dist = const Distance()
+                                    .call(marker.point, _lastBusPos!)
+                                    .round();
+                              }
+                              return Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(marker.stop.stopName ?? 'N/A'),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Arriving: ${marker.stop.arrivingTime ?? 'N/A'}',
+                                      ),
+                                      if (dist != null) ...[
                                         const SizedBox(height: 4),
                                         Text(
-                                          'Arriving: ${marker.stop.arrivingTime ?? 'N/A'}',
-                                        ),
-                                        if (dist != null) ...[
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            'Distance ≈ $dist m away',
-                                            style: const TextStyle(
-                                              color: Colors.grey,
-                                            ),
+                                          'Distance ≈ $dist m away',
+                                          style: const TextStyle(
+                                            color: Colors.grey,
                                           ),
-                                        ],
+                                        ),
                                       ],
-                                    ),
+                                    ],
                                   ),
-                                );
-                              }
+                                ),
+                              );
+                            }
 
-                              // ----- BUS MARKER POPUP ----- //
-                              if (marker is _BusMarker) {
-                                return Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(marker.busdet.busName?.toUpperCase() ?? 'Bus',
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold)),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                            'Reg No: ${marker.busdet.registrationNo ?? 'N/A'}'),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                            '${marker.busdet.fromStation} → ${marker.busdet.toStation}'),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                            '(${marker.busdet.startTime ?? 'N/A'}-${marker.busdet.endTime ?? 'N/A'})'),
-                                      ],
-                                    ),
+                            // ----- BUS MARKER POPUP ----- //
+                            if (marker is _BusMarker) {
+                              return Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        marker.busdet.busName?.toUpperCase() ??
+                                            'Bus',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Reg No: ${marker.busdet.registrationNo ?? 'N/A'}',
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '${marker.busdet.fromStation} → ${marker.busdet.toStation}',
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '(${marker.busdet.startTime ?? 'N/A'}-${marker.busdet.endTime ?? 'N/A'})',
+                                      ),
+                                    ],
                                   ),
-                                );
-                              }
+                                ),
+                              );
+                            }
 
-                              return const SizedBox.shrink();
-                            },
-                          ),
+                            return const SizedBox.shrink();
+                          },
                         ),
                       ),
-                      const CurrentLocationLayer(),
-                    ],
+                    ),
+                    const CurrentLocationLayer(),
+                  ],
+                ),
+                if (_showRecenter)
+                  Positioned(
+                    bottom: 90,
+                    right: 16,
+                    child: FloatingActionButton(
+                      backgroundColor: Colors.blue,
+                      heroTag: 'recenter',
+                      mini: true,
+                      onPressed: _recenterMap,
+                      child: const Icon(
+                        Icons.center_focus_strong,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-                  if (_showRecenter)
-                    Positioned(
-                      bottom: 90,
-                      right: 16,
-                      child: FloatingActionButton(backgroundColor: Colors.blue,
-                        heroTag: 'recenter',
-                        mini: true,
-                        onPressed: _recenterMap,
-                        child: const Icon(Icons.center_focus_strong,color: Colors.white,),
-                      ),
-                    ),
-                    if (_showStartButton && widget.stoploc.status=="1")
-                        Positioned(
-                          bottom: 30,
-                          left: 0,
-                          right: 0,
-                          child: Center(
-                            child: ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue,
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: 4,
-                              ),
-                              icon: const Icon(Icons.play_arrow, color: Colors.white),
-                              label: const Text(
-                                'Start Tracking',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              onPressed: () {
-                                
-                               setState(() {
-                                  _showStartButton = false;
-                                });
-
-                                if (!mounted) return;
-                                setState(() {});
-                                _busLocationTimer = Timer.periodic(const Duration(seconds:3), (_) {
-                                  _fetchBusLiveLocation(context);
-                                });
-
-                                if (busLocation != null &&
-                                    busLocation!.latitude != null &&
-                                    busLocation!.longitude != null) {
-                                  final position = LatLng(
-                                    double.parse(busLocation!.latitude!),
-                                    double.parse(busLocation!.longitude!),
-                                  );
-                                  _mapController.move(position, 12);
-                                  _lastBusPos = position;
-                                }
-                              },
-                            ),
+                if (_showStartButton && widget.stoploc.status == 1)
+                  Positioned(
+                    bottom: 30,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
                           ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 4,
                         ),
-
-                ],
-              ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.blue,
-        heroTag: 'mylocation',
-        onPressed:
-            () => _mapController.move(
-              _routePoints.isNotEmpty ? _routePoints.first : LatLng(0, 0),
-              14,
-            ),
-        child: const Icon(Icons.my_location,color: Colors.white,),
-      ),
-    );
-  }
-}
- Future<void> alertTracking(
-    BuildContext originalContext,
-  ) async {
-    if (!originalContext.mounted) return;
-
-    showDialog(
-      context: originalContext,
-      barrierDismissible: false,
-      builder: (context) {
-        return PopScope(
-          canPop: false,
-          child: StatefulBuilder(
-            builder: (context, setState) {
-              return Center(
-                child: Material(
-                  color: Colors.transparent,
-                  child: Container(
-                    margin: const EdgeInsets.all(16),
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 10,
-                          offset: Offset(0, -4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Icon(
-                              Icons.warning,
-                              color: Colors.amber,
-                              size: 35,
-                            ),
-                        const SizedBox(width: 8),
-                        Text(
-                          "Alert",
-                          style: Theme.of(
-                            context,
-                          ).textTheme.titleMedium?.copyWith(
-                            color: Colors.black,
+                        icon: const Icon(Icons.play_arrow, color: Colors.white),
+                        label: const Text(
+                          'Start Tracking',
+                          style: TextStyle(
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          "Tracking unavailable: The selected trip is either not started or has been completed",
-                          style: Theme.of(
-                            context,
-                          ).textTheme.titleMedium?.copyWith(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                elevation: 2,
-                                backgroundColor: const Color(0xffffa600),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              onPressed:() async {
-                                        Navigator.pop(context);
-                                       
-                                      },
-                              child: Text(
-                                "Ok",
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.titleMedium?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                       
-                      ],
+                        onPressed: () {
+                          setState(() {
+                            _showStartButton = false;
+                          });
+
+                          if (!mounted) return;
+                          setState(() {});
+                          // _fetchBusLiveLocation(context);
+
+                          _busLocationTimer = Timer.periodic(
+                            const Duration(seconds: 3),
+                            (_) {
+                              _fetchBusLiveLocation(context);
+                            },
+                          );
+
+                          if (busLocation != null &&
+                              busLocation!.latitude != null &&
+                              busLocation!.longitude != null) {
+                            final position = LatLng(
+                              double.parse(busLocation!.latitude!),
+                              double.parse(busLocation!.longitude!),
+                            );
+                            _mapController.move(position, 12);
+                            _lastBusPos = position;
+                          }
+                        },
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
-          ),
-        );
-      },
+              ],
+            ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blue,
+        heroTag: 'mylocation',
+        onPressed: () => _mapController.move(
+          _routePoints.isNotEmpty ? _routePoints.first : LatLng(0, 0),
+          14,
+        ),
+        child: const Icon(Icons.my_location, color: Colors.white),
+      ),
     );
   }
+}
+
+Future<void> alertTracking(BuildContext originalContext) async {
+  if (!originalContext.mounted) return;
+
+  showDialog(
+    context: originalContext,
+    barrierDismissible: false,
+    builder: (context) {
+      return PopScope(
+        canPop: false,
+        child: StatefulBuilder(
+          builder: (context, setState) {
+            return Center(
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  margin: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 10,
+                        offset: Offset(0, -4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.warning, color: Colors.amber, size: 35),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Alert",
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Tracking unavailable: The selected trip is either not started or has been completed",
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
+                            ),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          elevation: 2,
+                          backgroundColor: const Color(0xffffa600),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: () async {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "Ok",
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    },
+  );
+}
 // import 'dart:convert';
 // import 'dart:developer';
 // import 'package:flutter_map/flutter_map.dart' as fmap;

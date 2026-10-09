@@ -6,8 +6,10 @@ part 'datum.g.dart';
 class Datum {
   @JsonKey(name: 'stop_name')
   String? stopName;
+  @JsonKey(name: 'stop_id')
+  int? stopId;
 
-  Datum({this.stopName});
+  Datum({this.stopName, this.stopId});
 
   factory Datum.fromJson(Map<String, dynamic> json) => _$DatumFromJson(json);
 

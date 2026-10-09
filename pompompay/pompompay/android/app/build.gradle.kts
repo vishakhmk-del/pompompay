@@ -3,8 +3,7 @@ import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
-    id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id("org.jetbrains.kotlin.android")
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -35,18 +34,17 @@ val versionPatch = versionProps.getProperty("versionPatch").toInt()
 
 android {
     namespace = "com.pompaykerala.pompompay"
-    compileSdk = 36
-    ndkVersion = "27.0.12077973"
+    compileSdk = 37
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-
+    
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        jvmTarget = "17"
     }
-
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
@@ -54,7 +52,7 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         versionCode = versionMajor * 10000 + versionMinor * 100 + versionPatch
         versionName = "${versionMajor}.${versionMinor}.${versionPatch}"
         ndk {
@@ -62,8 +60,15 @@ android {
         }
 
         vectorDrawables.useSupportLibrary = true
+        
     }
 
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+        }
+    }
+    
     packaging {
         jniLibs {
             // this lets the Gradle pipeline repackage native libs properly and avoids legacy caching

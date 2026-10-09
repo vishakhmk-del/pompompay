@@ -7,10 +7,9 @@ part of 'data.dart';
 // **************************************************************************
 
 TktData _$TktDataFromJson(Map<String, dynamic> json) => TktData(
-  tktlist:
-      (json['tktlist'] as List<dynamic>?)
-          ?.map((e) => Ticketview.fromJson(e as Map<String, dynamic>))
-          .toList(),
+  tktlist: (json['tktlist'] as List<dynamic>?)
+      ?.map((e) => Ticketview.fromJson(e as Map<String, dynamic>))
+      .toList(),
 );
 
 Map<String, dynamic> _$TktDataToJson(TktData instance) => <String, dynamic>{

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:pompompay/core/hook/hooks.dart';
 import 'package:pompompay/infrastructure/model/fare/trans_resp/trans_resp.dart';
+import 'package:pompompay/infrastructure/model/fare/transactionresp/transactionresp.dart';
 
 class TicketFun {
   TicketFun._internal();
@@ -10,7 +11,9 @@ class TicketFun {
   }
 
   ValueNotifier<List<Ticketview>> getActiveTktListNotifier = ValueNotifier([]);
-  ValueNotifier<List<Ticketview>> getDeactiveTktListNotifier = ValueNotifier([]);
+  ValueNotifier<List<Ticketview>> getDeactiveTktListNotifier = ValueNotifier(
+    [],
+  );
   ValueNotifier<List<Ticketview>> getHistoryTktListNotifier = ValueNotifier([]);
 
   Future<DataVal?> fetchFareDet(Farereq req, BuildContext context) async {
@@ -145,7 +148,7 @@ class TicketFun {
           //                   );
         } else if (bnklstVal.status == 'failed') {
           if (!context.mounted) return value;
-          CommonFun.instance.showApierror(context, "No Active tickets");
+          CommonFun.instance.showApierror(context, "Ticket generation failed. Something went wrong.");
           return value;
         }
       } else if (message == 'Unauthenticated' || bnkLstresp.statusCode == 401) {
@@ -174,7 +177,11 @@ class TicketFun {
     }
     return null;
   }
-Future<Datatkt?> paymentStatusUpdt(TicketsaveReq req, BuildContext context) async {
+
+  Future<Datatkt?> paymentStatusUpdt(
+    TicketsaveReq req,
+    BuildContext context,
+  ) async {
     Datatkt? value;
     try {
       final bnkLstresp = await Pompaydata().paymntUpdate(req);
@@ -253,17 +260,15 @@ Future<Datatkt?> paymentStatusUpdt(TicketsaveReq req, BuildContext context) asyn
             getHistoryTktListNotifier.value = [...allTickets];
             getHistoryTktListNotifier.notifyListeners();
           } else {
-            final activeTickets =
-                allTickets.where((t) {
-                  final s = int.tryParse(t.status.toString());
-                  return s == 0;
-                }).toList();
+            final activeTickets = allTickets.where((t) {
+              final s = int.tryParse(t.status.toString());
+              return s == 0;
+            }).toList();
 
-            final deactiveTickets =
-                allTickets.where((t) {
-                  final s = int.tryParse(t.status.toString());
-                  return s == 1 || s == 2 || s == 3 || s == 4;
-                }).toList();
+            final deactiveTickets = allTickets.where((t) {
+              final s = int.tryParse(t.status.toString());
+              return s == 1 || s == 2 || s == 3 || s == 4;
+            }).toList();
 
             getActiveTktListNotifier.value = [...activeTickets];
             getActiveTktListNotifier.notifyListeners();
@@ -302,54 +307,54 @@ Future<Datatkt?> paymentStatusUpdt(TicketsaveReq req, BuildContext context) asyn
     }
   }
 
-  Future<TransResponse?> ticketStatus(Farereq req, BuildContext context) async {
-    TransResponse? value;
-    try {
-      final bnkLstresp = await Pompaydata().ticketStatus(req);
-      String? message;
-      if (bnkLstresp == null) {
-        if (!context.mounted) return value;
-        CommonFun.instance.showApierror(context, "Something went wrong");
-      } else if (bnkLstresp.statusCode == 200) {
-        final resultAsJson = jsonDecode(bnkLstresp.toString());
-        final bnklstVal = TransResp.fromJson(
-          resultAsJson as Map<String, dynamic>,
-        );
+  // Future<TransResponse?> ticketStatus(Farereq req, BuildContext context) async {
+  //   TransResponse? value;
+  //   try {
+  //     final bnkLstresp = await Pompaydata().ticketStatus(req);
+  //     String? message;
+  //     if (bnkLstresp == null) {
+  //       if (!context.mounted) return value;
+  //       CommonFun.instance.showApierror(context, "Something went wrong");
+  //     } else if (bnkLstresp.statusCode == 200) {
+  //       final resultAsJson = jsonDecode(bnkLstresp.toString());
+  //       final bnklstVal = TransResp.fromJson(
+  //         resultAsJson as Map<String, dynamic>,
+  //       );
 
-        if (bnklstVal.status == 'success') {
-          final cpaymob = bnklstVal.data;
-          return cpaymob;
-        } else if (bnklstVal.status == 'failed') {
-          if (!context.mounted) return value;
-          CommonFun.instance.showApierror(context, "No tickets found");
-          return value;
-        }
-      } else if (message == 'Unauthenticated' || bnkLstresp.statusCode == 401) {
-        if (!context.mounted) return value;
-        CommonFun.instance.showApierror(context, "Unauthenticated");
-      } else if (bnkLstresp.statusCode == 500) {
-        if (!context.mounted) return value;
-        CommonFun.instance.showApierror(context, "Sever Not reached");
-        // showLoginerror(context, 3);
-      } else if (bnkLstresp.statusCode == 408) {
-        if (!context.mounted) return value;
-        CommonFun.instance.showApierror(context, "Connection time out");
+  //       if (bnklstVal.status == 'success') {
+  //         final cpaymob = bnklstVal.data;
+  //         return cpaymob;
+  //       } else if (bnklstVal.status == 'failed') {
+  //         if (!context.mounted) return value;
+  //         CommonFun.instance.showApierror(context, "No tickets found");
+  //         return value;
+  //       }
+  //     } else if (message == 'Unauthenticated' || bnkLstresp.statusCode == 401) {
+  //       if (!context.mounted) return value;
+  //       CommonFun.instance.showApierror(context, "Unauthenticated");
+  //     } else if (bnkLstresp.statusCode == 500) {
+  //       if (!context.mounted) return value;
+  //       CommonFun.instance.showApierror(context, "Sever Not reached");
+  //       // showLoginerror(context, 3);
+  //     } else if (bnkLstresp.statusCode == 408) {
+  //       if (!context.mounted) return value;
+  //       CommonFun.instance.showApierror(context, "Connection time out");
 
-        //showLoginerror(context, 4);
-      } else {
-        if (!context.mounted) return value;
+  //       //showLoginerror(context, 4);
+  //     } else {
+  //       if (!context.mounted) return value;
 
-        CommonFun.instance.showApierror(context, "Something went wrong");
-        //showLoginerror(context, 5);
-      }
-    } catch (e) {
-      if (!context.mounted) return value;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('An unexpected error occurred')),
-      );
-    }
-    return null;
-  }
+  //       CommonFun.instance.showApierror(context, "Something went wrong");
+  //       //showLoginerror(context, 5);
+  //     }
+  //   } catch (e) {
+  //     if (!context.mounted) return value;
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('An unexpected error occurred')),
+  //     );
+  //   }
+  //   return null;
+  // }
   // void _updateNotifier(int tktstat, List<Ticketview> data) {
   //   final notifier =
   //       tktstat == activetkt
@@ -359,8 +364,11 @@ Future<Datatkt?> paymentStatusUpdt(TicketsaveReq req, BuildContext context) asyn
   //   notifier.value = [...data];
   //   notifier.notifyListeners();
   // }
-  Future<TransResponse?> ckeckPayStatus(Farereq req, BuildContext context) async {
-    TransResponse? value;
+  Future<Transactionresp?> ckeckPayStatus(
+    Farereq req,
+    BuildContext context,
+  ) async {
+    Transactionresp? value;
     try {
       final bnkLstresp = await Pompaydata().checkPayStatus(req);
       String? message;
@@ -381,7 +389,6 @@ Future<Datatkt?> paymentStatusUpdt(TicketsaveReq req, BuildContext context) asyn
           return cpaymob;
           // if (!context.mounted) return value;
           // CommonFun.instance.showApierror(context, "No tickets found");
-          
         }
       } else if (message == 'Unauthenticated' || bnkLstresp.statusCode == 401) {
         if (!context.mounted) return value;

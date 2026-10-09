@@ -101,8 +101,13 @@ class _ScreenMyTicketsState extends State<ScreenMyTickets>
                             color: Colors.white,
                           ),
                           onPressed: () {
-                            TicketFun.instance.getActiveTktListNotifier.value =[];
-                            TicketFun.instance.getDeactiveTktListNotifier.value = [];
+                            TicketFun.instance.getActiveTktListNotifier.value =
+                                [];
+                            TicketFun
+                                    .instance
+                                    .getDeactiveTktListNotifier
+                                    .value =
+                                [];
 
                             Navigator.pushReplacement(
                               context,
@@ -144,7 +149,10 @@ class _ScreenMyTicketsState extends State<ScreenMyTickets>
                           border: Border.all(color: Colors.white),
                         ),
                         indicatorSize: TabBarIndicatorSize.tab,
-                        tabs: const [Tab(text: "Active"), Tab(text: "Pending")],
+                        tabs: const [
+                          Tab(text: "Active"),
+                          Tab(text: "Pending"),
+                        ],
                       ),
                       //   Container(
                       //   margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),

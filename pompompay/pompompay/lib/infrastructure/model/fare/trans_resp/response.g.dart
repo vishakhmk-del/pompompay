@@ -39,8 +39,6 @@ TransResponse _$TransResponseFromJson(Map<String, dynamic> json) =>
       customerName: json['customer_name'] as String?,
       custmail: json['customer_email'] as String?,
       bankRefId: json['bank_ref_id'] as String?,
-      
-
     );
 
 Map<String, dynamic> _$TransResponseToJson(TransResponse instance) =>

@@ -72,15 +72,17 @@ class _OtpFiledState extends State<OtpFiled> {
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 fontSize: 22,
+                color: Colors.white,
               ),
             ),
             const SizedBox(height: 10),
             Center(
               child: Text(
                 'Enter OTP code sent to your mobile \n+91-${widget.mob}',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(fontSize: 16),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -97,7 +99,9 @@ class _OtpFiledState extends State<OtpFiled> {
                 focusBorderColor: const Color(0xFFE1E1E1),
                 enabledBorderColor: const Color(0xFFE1E1E1),
               ),
-              style: Theme.of(context).textTheme.titleMedium!,
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium!.copyWith(color: Colors.white),
               textFieldAlignment: MainAxisAlignment.spaceAround,
               fieldStyle: FieldStyle.box,
               onChanged: (String? pin) {
@@ -115,6 +119,7 @@ class _OtpFiledState extends State<OtpFiled> {
                   final value = UserCmnReq(
                     mobno: widget.mob,
                     type: widget.type,
+                    userType: users,
                   );
                   final val = await UserFun.instance.resndotp(value, context);
                   if (val == 'failed') {
@@ -139,6 +144,7 @@ class _OtpFiledState extends State<OtpFiled> {
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   fontSize: 16,
                   decoration: TextDecoration.underline,
+                  color: Colors.white,
                 ),
               ),
             ),
@@ -148,12 +154,12 @@ class _OtpFiledState extends State<OtpFiled> {
               builder: (context, loadingProvider, child) {
                 return loadingProvider.isLoading
                     ? const Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Color.fromARGB(255, 2, 128, 6),
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Color.fromARGB(255, 2, 128, 6),
+                          ),
                         ),
-                      ),
-                    )
+                      )
                     : const SizedBox.shrink();
               },
             ),
@@ -187,28 +193,37 @@ class _OtpFiledState extends State<OtpFiled> {
                         fontSize: 16.0,
                       );
                     } else {
-                      if (widget.type == frgtpswrdType) {
-                        final otpreq = UserCmnReq(
-                          pw: widget.cnfrmpswrd,
-                          mobno: widget.mob,
-                          otp: otppin,
-                          type: widget.type,
-                        );
-                        buildotpvrf(otpreq, context);
-                      } else if (widget.type == regType) {
-                        final otpreq = UserCmnReq(
-                          mobno: widget.mob,
-                          type: widget.type,
-                          otp: otppin,
-                        );
-                        buildotpvrf(otpreq, context);
-                      }
+                      // if (widget.type == frgtpswrdType) {
+                      //   final otpreq = UserCmnReq(
+                      //     // pw: widget.cnfrmpswrd,
+                      //     mobno: widget.mob,
+                      //     otp: otppin,
+                      //     type: widget.type,
+                      //   );
+                      //   buildotpvrf(otpreq, context);
+                      // } else if (widget.type == regType) {
+                      //   final otpreq = UserCmnReq(
+                      //     mobno: widget.mob,
+                      //     type: widget.type,
+                      //     otp: otppin,
+                      //   );
+                      //   buildotpvrf(otpreq, context);
+                      // }
+                      final otpreq = UserCmnReq(
+                        mobno: widget.mob,
+                        type: widget.type,
+                        otp: otppin,
+                        userType: users,
+                      );
+                      buildotpvrf(otpreq, context);
                     }
                     // usrNameBox(context,0,'');
                   },
                   child: Text(
                     'VERIFY',
-                    style: Theme.of(context).textTheme.titleMedium,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.titleMedium?.copyWith(color: Colors.white),
                   ),
                 ),
               ),
@@ -244,7 +259,9 @@ class _OtpFiledState extends State<OtpFiled> {
       children: [
         Text(
           'This otp will expired in ',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 16),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(fontSize: 16, color: Colors.white),
         ),
         Obx(
           () => Center(
@@ -263,11 +280,13 @@ class _OtpFiledState extends State<OtpFiled> {
     loadingProvider.show();
     try {
       dio.Response<dynamic>? chngresp;
-      if (val.type == frgtpswrdType) {
-        chngresp = await Pompaydata().frgtpswrdvrfy(val);
-      } else if (val.type == regType) {
-        chngresp = await Pompaydata().regOtpvrf(val);
-      }
+      // if (val.type == frgtpswrdType) {
+      //   chngresp = await Pompaydata().otpvrfy(val);
+      // } else if (val.type == regType) {
+      //   chngresp = await Pompaydata().regOtpvrf(val);
+      // }
+      chngresp = await Pompaydata().regOtpvrf(val);
+
       // if (!context.mounted) return;
 
       //   context.read<ElevatedBtnProvider>().changeSelectedVal(false);
@@ -285,7 +304,19 @@ class _OtpFiledState extends State<OtpFiled> {
         // refid=changeval.data?.refId ?? 0;
         if (!context.mounted) return;
 
-        val.type == frgtpswrdType ? pswrdBox(context) : rgstrBox(context);
+        context.read<ElevatedBtnProvider>().changeSelectedVal(false);
+        if (!context.mounted) return;
+
+        context.read<ElevatedBtnProvider>().resetPasswrd(true);
+        if (!context.mounted) return;
+
+        if (val.type == regType) {
+          Navigator.pushReplacement(context, Approutes().loginscreen);
+        }
+
+        CommonFun.instance.showApierror(context, "mobile number verified");
+
+        // val.type == frgtpswrdType ? pswrdBox(context) : rgstrBox(context);
       } else if (changeval.status == 'failed') {
         if (!context.mounted) return;
 
@@ -312,31 +343,5 @@ class _OtpFiledState extends State<OtpFiled> {
         const SnackBar(content: Text('An unexpected error occurred')),
       );
     }
-  }
-
-  void pswrdBox(BuildContext context) {
-    Fluttertoast.showToast(
-      msg: "Password Changed Successfully",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.white,
-      textColor: Colors.black,
-      fontSize: 15.0,
-    );
-    Navigator.pushReplacement(context, Approutes().loginscreen);
-  }
-
-  void rgstrBox(BuildContext context) {
-    Fluttertoast.showToast(
-      msg: "Registration completed Successfully",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.white,
-      textColor: Colors.black,
-      fontSize: 15.0,
-    );
-    Navigator.pushReplacement(context, Approutes().loginscreen);
   }
 }

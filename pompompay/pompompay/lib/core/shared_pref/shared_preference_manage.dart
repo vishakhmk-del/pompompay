@@ -13,18 +13,21 @@ class SharedPrefManager {
   }
 
   //----end singleton
-final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   Future<void> addSharedData(Sharedpref value) async {
     final sharedprefes = await SharedPreferences.getInstance();
     await sharedprefes.setBool(savekeyname, true);
     // await sharedprefes.setString('USERID', value.userId ?? '');
     await _secureStorage.write(key: 'USERID', value: value.userId ?? '');
-    
+
     await sharedprefes.setString('NAME', value.name ?? '');
     // await sharedprefes.setString('ACCESSTOKEN', value.accessTkn ?? '');
     await sharedprefes.setString('MOBNO', value.mobno ?? '');
-        await _secureStorage.write(key: 'ACCESSTOKEN', value: value.accessTkn ?? '');
+    await _secureStorage.write(
+      key: 'ACCESSTOKEN',
+      value: value.accessTkn ?? '',
+    );
   }
 
   Future<Sharedpref?> getSharedData() async {
@@ -32,7 +35,7 @@ final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
     // final userid = sharedprefs.getString('USERID') ?? '';
     final userid = await _secureStorage.read(key: 'USERID') ?? '';
-    
+
     final name = sharedprefs.getString('NAME') ?? '';
 
     // final accesstkn = sharedprefs.getString('ACCESSTOKEN') ?? '';
@@ -141,15 +144,26 @@ final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
       return Farereq.fromJson(jsonMap);
     }).toList();
   }
-  
-Future<bool> hasUserAcceptedDisclosure() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getBool("location_disclosure_accepted") ?? false;
-}
 
-Future<void> saveUserAcceptedDisclosure() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setBool("location_disclosure_accepted", true);
-}
+  Future<bool> hasUserAcceptedDisclosure() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool("location_disclosure_accepted") ?? false;
+  }
 
+  Future<void> saveUserAcceptedDisclosure() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool("location_disclosure_accepted", true);
+  }
+
+  Future<bool> hasSeenOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    return prefs.getBool('ONBOARDING_SHOWN') ?? false;
+  }
+
+  Future<void> setOnboardingShown() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setBool('ONBOARDING_SHOWN', true);
+  }
 }

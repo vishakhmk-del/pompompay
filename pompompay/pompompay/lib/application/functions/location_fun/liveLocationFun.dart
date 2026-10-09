@@ -33,46 +33,44 @@ class Livelocationfun {
 
   //   _startLocationCheckTimer(context);
   // }
-void startTracking({
-  required BuildContext context,
-  required Function(Position) onLocationUpdate,
-}) async {
+  void startTracking({
+    required BuildContext context,
+    required Function(Position) onLocationUpdate,
+  }) async {
+    bool alreadyAccepted = await SharedPrefManager.instance
+        .hasUserAcceptedDisclosure();
 
+    if (!alreadyAccepted) {
+      if (!context.mounted) return;
 
-  bool alreadyAccepted = await SharedPrefManager.instance.hasUserAcceptedDisclosure();
+      bool accepted = await showLocationDisclosureDialog(context);
 
-  if (!alreadyAccepted) {
-  if (!context.mounted) return;
+      if (!accepted) return;
 
-    bool accepted = await showLocationDisclosureDialog(context);
+      await SharedPrefManager.instance.saveUserAcceptedDisclosure();
+    }
 
-    if (!accepted) return;
+    if (!context.mounted) return;
 
-    await SharedPrefManager.instance.saveUserAcceptedDisclosure();
+    // Now continue with normal permission + location flow
+    await requestLocationPermission(context);
+
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      if (context.mounted) await _showLocationSettingsDialog(context);
+      return;
+    }
+
+    if (!context.mounted) return;
+
+    await _getInitialLocation(context, onLocationUpdate);
+    if (!context.mounted) return;
+
+    _startLiveLocationStream(context, onLocationUpdate);
+    if (!context.mounted) return;
+
+    _startLocationCheckTimer(context);
   }
-
-  if (!context.mounted) return;
-
-  // Now continue with normal permission + location flow
-  await requestLocationPermission(context);
-
-  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    if (context.mounted) await _showLocationSettingsDialog(context);
-    return;
-  }
-
-  if (!context.mounted) return;
-
-  await _getInitialLocation(context, onLocationUpdate);
-  if (!context.mounted) return;
-
-  _startLiveLocationStream(context, onLocationUpdate);
-  if (!context.mounted) return;
-
-  _startLocationCheckTimer(context);
-}
-
 
   Future<void> _getInitialLocation(
     BuildContext context,
@@ -96,27 +94,28 @@ void startTracking({
         accuracy: LocationAccuracy.high,
         distanceFilter: 100,
       );
-      _positionSubscription = Geolocator.getPositionStream(
-        locationSettings: locationSettings,
-      ).listen(
-        (Position position) {
-          onLocationUpdate(position);
-        },
-        onError: (error) async {
-          log("Stream error: $error");
-          if (error is LocationServiceDisabledException) {
-            _positionSubscription?.cancel();
-            if (!_isServiceRestarting) {
-              _isServiceRestarting = true;
-              if (!context.mounted) return;
-              await _handleLocationDisabled(context);
-              _isServiceRestarting = false;
-            }
-          } else {
-            _showErrorToast("Location error occurred.");
-          }
-        },
-      );
+      _positionSubscription =
+          Geolocator.getPositionStream(
+            locationSettings: locationSettings,
+          ).listen(
+            (Position position) {
+              onLocationUpdate(position);
+            },
+            onError: (error) async {
+              log("Stream error: $error");
+              if (error is LocationServiceDisabledException) {
+                _positionSubscription?.cancel();
+                if (!_isServiceRestarting) {
+                  _isServiceRestarting = true;
+                  if (!context.mounted) return;
+                  await _handleLocationDisabled(context);
+                  _isServiceRestarting = false;
+                }
+              } else {
+                _showErrorToast("Location error occurred.");
+              }
+            },
+          );
     } catch (e) {
       _showErrorToast("Failed to start location tracking.");
     }
@@ -169,72 +168,76 @@ void startTracking({
   //     if (context.mounted) _showPermissionPermanentlyDeniedDialog(context);
   //   }
   // }
-Future<void> requestLocationPermission(BuildContext context) async {
-  LocationPermission permission = await Geolocator.checkPermission();
+  Future<void> requestLocationPermission(BuildContext context) async {
+    LocationPermission permission = await Geolocator.checkPermission();
 
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-  }
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
 
-  // After “While in Use” is granted → request Always
-  if (permission == LocationPermission.whileInUse) {
-    permission = await Geolocator.requestPermission();
-  }
+    // After “While in Use” is granted → request Always
+    if (permission == LocationPermission.whileInUse) {
+      permission = await Geolocator.requestPermission();
+    }
 
-  if (permission == LocationPermission.deniedForever) {
-    if (context.mounted) _showPermissionPermanentlyDeniedDialog(context);
+    if (permission == LocationPermission.deniedForever) {
+      if (context.mounted) _showPermissionPermanentlyDeniedDialog(context);
+    }
   }
-}
 
   Future<void> _showLocationSettingsDialog(BuildContext context) async {
     await showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: Theme.of(context).colorScheme.primaryFixed,
-            title: const Text("Enable Location Services",style: TextStyle(fontSize: 14),),
-            content: const Text("Location services need to be enabled."),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text("Cancel",style: TextStyle(fontSize: 14),),
-              ),
-              TextButton(
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await Geolocator.openLocationSettings();
-                },
-                child: const Text("Open Settings",style: TextStyle(fontSize: 14),),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.primaryFixed,
+        title: const Text(
+          "Enable Location Services",
+          style: TextStyle(fontSize: 14),
+        ),
+        content: const Text("Location services need to be enabled."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Cancel", style: TextStyle(fontSize: 14)),
           ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await Geolocator.openLocationSettings();
+            },
+            child: const Text("Open Settings", style: TextStyle(fontSize: 14)),
+          ),
+        ],
+      ),
     );
   }
 
   void _showPermissionPermanentlyDeniedDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: Theme.of(context).colorScheme.primaryFixed,
-            title: const Text("Permission Denied Forever",style: TextStyle(fontSize: 14),),
-            content: const Text(
-              "Location permission is permanently denied. Please enable it in settings.",
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text("Cancel",style: TextStyle(fontSize: 14),),
-              ),
-              TextButton(
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await openAppSettings();
-                },
-                child: const Text("Open Settings",style: TextStyle(fontSize: 14),),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.primaryFixed,
+        title: const Text(
+          "Permission Denied Forever",
+          style: TextStyle(fontSize: 14),
+        ),
+        content: const Text(
+          "Location permission is permanently denied. Please enable it in settings.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Cancel", style: TextStyle(fontSize: 14)),
           ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await openAppSettings();
+            },
+            child: const Text("Open Settings", style: TextStyle(fontSize: 14)),
+          ),
+        ],
+      ),
     );
   }
 
@@ -249,33 +252,59 @@ Future<void> requestLocationPermission(BuildContext context) async {
     );
   }
 
+  // Future<bool> showLocationDisclosureDialog(BuildContext context) async {
+  //   return await showDialog(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (_) {
+  //       return AlertDialog(
+  //         backgroundColor: Theme.of(context).colorScheme.primaryFixed,
+  //         title: const Text(
+  //           "Location Permission Required",
+  //           style: TextStyle(fontSize: 14),
+  //         ),
+  //         content: const Text(
+  //           "This app collects your precise location to track live bus positions, "
+  //           "show nearby routes, and improve your travel experience. "
+  //           "Your location is used only for these features and is not shared "
+  //           "with any third parties.",
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             child: const Text("Deny", style: TextStyle(fontSize: 14)),
+  //             onPressed: () => Navigator.pop(context, false),
+  //           ),
+  //           TextButton(
+  //             child: const Text("Allow", style: TextStyle(fontSize: 14)),
+  //             onPressed: () => Navigator.pop(context, true),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
   Future<bool> showLocationDisclosureDialog(BuildContext context) async {
-  return await showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) {
-      return AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.primaryFixed,
-        title: const Text("Location Permission Required",style: TextStyle(fontSize: 14),),
-        content: const Text(
-          "This app collects your precise location to track live bus positions, "
-          "show nearby routes, and improve your travel experience. "
-          "Your location is used only for these features and is not shared "
-          "with any third parties.",
-        ),
-        actions: [
-          TextButton(
-            child: const Text("Deny",style: TextStyle(fontSize: 14),),
-            onPressed: () => Navigator.pop(context, false),
+    return await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) {
+        return AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.primaryFixed,
+          title: const Text(
+            "Location Permission Required",
+            style: TextStyle(fontSize: 14),
           ),
-          TextButton(
-            child: const Text("Allow",style: TextStyle(fontSize: 14),),
-            onPressed: () => Navigator.pop(context, true),
+          content: const Text(
+            "We use your location to show real-time bus tracking and nearby routes.",
           ),
-        ],
-      );
-    },
-  );
-}
-
+          actions: [
+            TextButton(
+              child: const Text("Continue", style: TextStyle(fontSize: 14)),
+              onPressed: () => Navigator.pop(context, true),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

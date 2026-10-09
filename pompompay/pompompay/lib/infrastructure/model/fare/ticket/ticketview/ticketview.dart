@@ -6,6 +6,8 @@ part 'ticketview.g.dart';
 class Ticketview {
   @JsonKey(name: 'tiket_no')
   String? tiketNo;
+  @JsonKey(name: 'ticket_no')
+  String? ticketNo;
   @JsonKey(name: 'bus_id')
   String? busId;
   @JsonKey(name: 'trip_id')
@@ -73,6 +75,7 @@ class Ticketview {
 
   Ticketview({
     this.tiketNo,
+    this.ticketNo,
     this.busId,
     this.tripId,
     this.seatno,

@@ -22,10 +22,14 @@ class Datumlist {
   String? busType;
   @JsonKey(name: 'trip_nos')
   dynamic tripNos;
+  @JsonKey(name: 'trip_no')
+  dynamic tripNo;
   @JsonKey(name: 'active_trip')
-  String? activeTrip;
+  dynamic activeTrip;
   @JsonKey(name: 'permit_no')
   String? permitNo;
+  @JsonKey(name: 'permit_id')
+  String? permitId;
   @JsonKey(name: 'valid_from')
   String? validFrom;
   @JsonKey(name: 'valid_to')
@@ -40,8 +44,8 @@ class Datumlist {
   String? modifiedDate;
   @JsonKey(name: 'trip_id')
   String? tripId;
-  @JsonKey(name: 'trip_no')
-  String? tripNo;
+  @JsonKey(name: 'route_id')
+  String? routeId;
   @JsonKey(name: 'trip_name')
   String? tripName;
   String? via;
@@ -63,6 +67,9 @@ class Datumlist {
   String? toArrival;
   String? duration;
   dynamic status;
+  @JsonKey(name: 'trip_status')
+  dynamic tripStatus;
+
   Datumlist({
     this.busId,
     this.shortName,
@@ -82,6 +89,8 @@ class Datumlist {
     this.modifiedBy,
     this.modifiedDate,
     this.tripId,
+    this.routeId,
+    this.permitId,
     this.tripNo,
     this.tripName,
     this.via,
@@ -94,7 +103,8 @@ class Datumlist {
     this.fromArrival,
     this.toArrival,
     this.duration,
-    this.status
+    this.status,
+    this.tripStatus,
   });
 
   factory Datumlist.fromJson(Map<String, dynamic> json) =>

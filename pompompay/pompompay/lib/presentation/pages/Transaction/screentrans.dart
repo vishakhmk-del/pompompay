@@ -16,7 +16,9 @@ class _ScreenTransactionState extends State<ScreenTransaction>
   @override
   void initState() {
     super.initState();
-    TicketFun.instance.getHistoryTktListNotifier.value=[];
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      TicketFun.instance.getHistoryTktListNotifier.value = [];
+    });
     fetchtkt(context);
 
     _tabController = TabController(
@@ -119,7 +121,7 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                     //     ),
                     //     onPressed: () {
                     //       TicketFun.instance.getHistoryTktListNotifier.value = [];
-        
+
                     //       Navigator.pushReplacement(
                     //         context,
                     //         Approutes().mainScreen,
@@ -130,8 +132,9 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                     Center(
                       child: Text(
                         'History',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(color: Colors.white),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleMedium?.copyWith(color: Colors.white),
                       ),
                     ),
                   ],
@@ -140,14 +143,9 @@ class _ScreenTransactionState extends State<ScreenTransaction>
               const SizedBox(height: 10),
               Expanded(
                 child: ValueListenableBuilder(
-                  valueListenable:
-                      TicketFun.instance.getHistoryTktListNotifier,
-        
-                  builder: (
-                    BuildContext context,
-                    List<Ticketview> newList,
-                    Widget? _,
-                  ) {
+                  valueListenable: TicketFun.instance.getHistoryTktListNotifier,
+
+                  builder: (BuildContext context, List<Ticketview> newList, Widget? _) {
                     if (newList.isNotEmpty) {
                       return ListView.builder(
                         padding: const EdgeInsets.all(6),
@@ -181,9 +179,7 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                     child: Card(
                                       elevation: 8,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                          15,
-                                        ),
+                                        borderRadius: BorderRadius.circular(15),
                                       ),
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(
@@ -213,11 +209,10 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                                   ],
                                                 ),
                                                 const SizedBox(height: 8),
-        
+
                                                 Row(
                                                   mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .center,
+                                                      MainAxisAlignment.center,
                                                   children: [
                                                     Text(
                                                       ticket.busName
@@ -229,8 +224,7 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                                           ?.copyWith(
                                                             fontSize: 14,
                                                             fontWeight:
-                                                                FontWeight
-                                                                    .w500,
+                                                                FontWeight.w500,
                                                           ),
                                                     ),
                                                     const SizedBox(width: 8),
@@ -243,8 +237,7 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                                           ?.copyWith(
                                                             fontSize: 14,
                                                             fontWeight:
-                                                                FontWeight
-                                                                    .w500,
+                                                                FontWeight.w500,
                                                           ),
                                                     ),
                                                   ],
@@ -252,8 +245,7 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                                 const SizedBox(height: 2),
                                                 Row(
                                                   mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .center,
+                                                      MainAxisAlignment.center,
                                                   children: [
                                                     Text(
                                                       ticket.travelDate ?? '',
@@ -263,8 +255,7 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                                           ?.copyWith(
                                                             fontSize: 12,
                                                             fontWeight:
-                                                                FontWeight
-                                                                    .w500,
+                                                                FontWeight.w500,
                                                           ),
                                                     ),
                                                     const SizedBox(width: 8),
@@ -276,8 +267,7 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                                           ?.copyWith(
                                                             fontSize: 12,
                                                             fontWeight:
-                                                                FontWeight
-                                                                    .w500,
+                                                                FontWeight.w500,
                                                           ),
                                                     ),
                                                   ],
@@ -320,9 +310,7 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                                     children: [
                                                       Text(
                                                         "FROM STOP",
-                                                        style: Theme.of(
-                                                              context,
-                                                            )
+                                                        style: Theme.of(context)
                                                             .textTheme
                                                             .bodySmall
                                                             ?.copyWith(
@@ -333,11 +321,8 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                                             ),
                                                       ),
                                                       Text(
-                                                        ticket.fromPlace ??
-                                                            '',
-                                                        style: Theme.of(
-                                                              context,
-                                                            )
+                                                        ticket.fromPlace ?? '',
+                                                        style: Theme.of(context)
                                                             .textTheme
                                                             .bodySmall
                                                             ?.copyWith(
@@ -358,12 +343,9 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                                           dashLength: 4,
                                                           dashGapLength: 3,
                                                           lineThickness: 2,
-                                                          dashColor:
-                                                              Theme.of(
-                                                                    context,
-                                                                  )
-                                                                  .colorScheme
-                                                                  .primary,
+                                                          dashColor: Theme.of(
+                                                            context,
+                                                          ).colorScheme.primary,
                                                           direction:
                                                               Axis.horizontal,
                                                           lineLength: 30,
@@ -372,8 +354,7 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                                           width: 4,
                                                         ),
                                                         const Icon(
-                                                          Icons
-                                                              .directions_bus,
+                                                          Icons.directions_bus,
                                                           color: Colors.blue,
                                                           size: 25,
                                                         ),
@@ -384,12 +365,9 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                                           dashLength: 4,
                                                           dashGapLength: 3,
                                                           lineThickness: 2,
-                                                          dashColor:
-                                                              Theme.of(
-                                                                    context,
-                                                                  )
-                                                                  .colorScheme
-                                                                  .primary,
+                                                          dashColor: Theme.of(
+                                                            context,
+                                                          ).colorScheme.primary,
                                                           direction:
                                                               Axis.horizontal,
                                                           lineLength: 30,
@@ -398,19 +376,16 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                                     ),
                                                   ],
                                                 ),
-        
+
                                                 /// TO
                                                 Expanded(
                                                   child: Column(
                                                     crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .end,
+                                                        CrossAxisAlignment.end,
                                                     children: [
                                                       Text(
                                                         "TO STOP",
-                                                        style: Theme.of(
-                                                              context,
-                                                            )
+                                                        style: Theme.of(context)
                                                             .textTheme
                                                             .bodySmall
                                                             ?.copyWith(
@@ -422,9 +397,7 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                                       ),
                                                       Text(
                                                         ticket.toPlace ?? '',
-                                                        style: Theme.of(
-                                                              context,
-                                                            )
+                                                        style: Theme.of(context)
                                                             .textTheme
                                                             .bodySmall
                                                             ?.copyWith(
@@ -439,7 +412,7 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                                 ),
                                               ],
                                             ),
-        
+
                                             const SizedBox(height: 14),
                                             CustomPaint(
                                               painter: DottedSeparatorLine(
@@ -451,9 +424,9 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                                 height: 1,
                                               ),
                                             ),
-        
+
                                             const SizedBox(height: 14),
-        
+
                                             /// Fare breakdown
                                             Column(
                                               crossAxisAlignment:
@@ -470,8 +443,7 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                                   },
                                                   children: [
                                                     if (int.tryParse(
-                                                          ticket.adults ??
-                                                              "0",
+                                                          ticket.adults ?? "0",
                                                         ) !=
                                                         0)
                                                       TableRow(
@@ -482,8 +454,7 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                                           ),
                                                           _buildFareCell(
                                                             context,
-                                                            ticket.adults ??
-                                                                '',
+                                                            ticket.adults ?? '',
                                                           ),
                                                           _buildFareCell(
                                                             context,
@@ -540,8 +511,7 @@ class _ScreenTransactionState extends State<ScreenTransaction>
                                                         ],
                                                       ),
                                                     if (int.tryParse(
-                                                          ticket.student ??
-                                                              "0",
+                                                          ticket.student ?? "0",
                                                         ) !=
                                                         0)
                                                       TableRow(

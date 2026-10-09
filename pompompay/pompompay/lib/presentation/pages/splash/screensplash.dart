@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:pompompay/core/hook/hooks.dart';
-import 'package:pompompay/presentation/pages/main_page/screen_MainPage.dart';
 
 class ScreenSplash extends StatefulWidget {
   const ScreenSplash({super.key});
@@ -25,11 +24,32 @@ class _ScreenSplashState extends State<ScreenSplash> {
     final userLoggedIn = sharedPref.getBool(savekeyname) ?? false;
 
     if (!userLoggedIn) {
+      final onboardingShown = await SharedPrefManager.instance
+          .hasSeenOnboarding();
+
+      if (!onboardingShown) {
+        // First time only
+        if (!context.mounted) return;
+
+        await getdeviceinform(context);
+
+        if (!context.mounted) return;
+
+        Navigator.pushReplacement(context, Approutes().splasharcPicture);
+      } else {
+        // Onboarding already completed
+        await Future.delayed(const Duration(seconds: 3));
+
+        if (!context.mounted) return;
+
+        gotoLogin(context);
+      }
+
+      return;
+    } else {
       if (!context.mounted) return;
 
-      gotoLogin(context);
-    } else {
-        getdeviceinform();
+      getdeviceinform(context);
 
       final sharevalue = await SharedPrefManager.instance.getSharedData();
 
@@ -48,95 +68,78 @@ class _ScreenSplashState extends State<ScreenSplash> {
         //   deviceTokn=val.devicetoken;
         // }
         final shareddevice = Deviceinfo(
-          userid: sharevalue.userId??'',
+          userid: sharevalue.userId ?? '',
           phone: value.phone,
           deviceid: value.deviceid,
           // devicetoken: deviceTokn??'',
           phoneos: value.phoneos,
-          androidid: value.androidid??'',
+          androidid: value.androidid ?? '',
           osversion: value.osversion,
           appversion: value.appversion,
           buildnumber: value.buildnumber,
           // buildtime: value.buildtime
-          );
-          try{
-      // final api = await Ciadata.getInstance();
+        );
+        try {
+          // final api = await Ciadata.getInstance();
 
-          final deviceinforesp=await Pompaydata().checkUpdate(shareddevice);
+          final deviceinforesp = await Pompaydata().checkUpdate(shareddevice);
           final resultAsjson = jsonDecode(deviceinforesp.toString());
-          final deviceinfoval = UserCmnResp.fromJson(resultAsjson as Map<String, dynamic>);
-              if (deviceinforesp == null) {
-                log("deviceinfo response null");
-              } 
-              else if (deviceinforesp.statusCode == 200) {
-              if(deviceinfoval.status=='success'){
-                log("device details added");
-                if (!context.mounted) return;
-
-                Navigator.pushReplacement(
-                  context,
-                  Approutes().mainScreen,
-                );
-              }else if(deviceinfoval.status=='failed'){
-                if(deviceinfoval.errorCode==null){
-                  if (!context.mounted) return;
-                  Navigator.pushReplacement(
-                  context,
-                  Approutes().mainScreen,
-                );
-              }else if(deviceinfoval.errorCode=='VERSION_UPDATE'){
-                  if (!context.mounted) return;
-                
-                Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) => ScreenMainpage(
-                              version: deviceinfoval,
-                            ),
-                          ),
-                        );
-              }else{
-                if (!context.mounted) return;
-                         Navigator.pushReplacement(context, Approutes().mainScreen);
-
-              }
-                
-              }
-   
-            log("device details ${deviceinforesp.statusCode}");
-          }
-           else if (deviceinforesp.statusCode  == 500) {
-        if (!context.mounted) return;
-        CommonFun.instance.showApierror(context, "Sever Not Reachable");
-
-        // showLoginerror(context, 3);
-      } else if (deviceinforesp.statusCode  == 408) {
-        if (!context.mounted) return;
-        CommonFun.instance.showApierror(context, "Connection time out");
-
-        //showLoginerror(context, 4);
-      }else{
-            log("device details ${deviceinforesp.statusCode}");
-
-              
+          final deviceinfoval = UserCmnResp.fromJson(
+            resultAsjson as Map<String, dynamic>,
+          );
+          if (deviceinforesp == null) {
+            log("deviceinfo response null");
+          } else if (deviceinforesp.statusCode == 200) {
+            if (deviceinfoval.status == 'success') {
+              log("device details added");
               if (!context.mounted) return;
 
-                    Navigator.pushReplacement(context, Approutes().mainScreen);
+              Navigator.pushReplacement(context, Approutes().mainScreen);
+            } else if (deviceinfoval.status == 'failed') {
+              if (deviceinfoval.errorCode == null) {
+                if (!context.mounted) return;
+                Navigator.pushReplacement(context, Approutes().mainScreen);
+              } else if (deviceinfoval.errorCode == 'VERSION_UPDATE') {
+                if (!context.mounted) return;
 
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ScreenMainpage(version: deviceinfoval),
+                  ),
+                );
+              } else {
+                if (!context.mounted) return;
+                Navigator.pushReplacement(context, Approutes().mainScreen);
+              }
+            }
+            log("device details ${deviceinforesp.statusCode}");
+          } else if (deviceinforesp.statusCode == 500) {
+            if (!context.mounted) return;
+            CommonFun.instance.showApierror(context, "Sever Not Reachable");
+
+            // showLoginerror(context, 3);
+          } else if (deviceinforesp.statusCode == 408) {
+            if (!context.mounted) return;
+            CommonFun.instance.showApierror(context, "Connection time out");
+            //showLoginerror(context, 4);
+          } else {
+            log("device details ${deviceinforesp.statusCode}");
+
+            if (!context.mounted) return;
+
+            Navigator.pushReplacement(context, Approutes().mainScreen);
           }
-          
-          }catch(e){
-           if (!context.mounted) return;
+        } catch (e) {
+          if (!context.mounted) return;
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('An unexpected error occurred')),
-            );
-              // if (!context.mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('An unexpected error occurred')),
+          );
+          // if (!context.mounted) return;
 
-                  Navigator.pushReplacement(context, Approutes().mainScreen);
-
-        
-          }
-
+          Navigator.pushReplacement(context, Approutes().mainScreen);
+        }
       } else {
         if (!context.mounted) return;
 
@@ -147,10 +150,12 @@ class _ScreenSplashState extends State<ScreenSplash> {
 
   Future<void> gotoLogin(BuildContext context) async {
     await Future.delayed(const Duration(seconds: 3));
-    getdeviceinform();
+    if (!context.mounted) return;
+
+    getdeviceinform(context);
 
     if (!context.mounted) return;
-    Navigator.pushReplacement(context, Approutes().splasharcPicture);
+    Navigator.pushReplacement(context, Approutes().mainScreen);
 
     // Navigator.pushReplacement(context, Approutes().screenLogin);
   }
@@ -179,7 +184,7 @@ class _ScreenSplashState extends State<ScreenSplash> {
     );
   }
 
-  Future<void> getdeviceinform() async {
+  Future<void> getdeviceinform(BuildContext context) async {
     try {
       /*************deviceinfo*****************/
       final device = await DeviceInformation.getdeviceinfo();
@@ -223,10 +228,8 @@ class _ScreenSplashState extends State<ScreenSplash> {
 
       await SharedPrefManager.instance.setdeviceinfo(shareddevice);
     } catch (e) {
-      Navigator.pushReplacement(
-        _scaffoldKey.currentContext!,
-        Approutes().loginscreen,
-      );
+      if (!context.mounted) return;
+      Navigator.pushReplacement(context, Approutes().splasharcPicture);
     }
   }
 }

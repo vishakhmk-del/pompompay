@@ -8,6 +8,8 @@ class UserCmnReq {
   String? userName;
   @JsonKey(name: 'user_id')
   String? userId;
+  @JsonKey(name: 'user_type')
+  int? userType;
   String? mobno;
   String? pw;
   String? otp;
@@ -26,6 +28,7 @@ class UserCmnReq {
   UserCmnReq({
     this.userName,
     this.userId,
+    this.userType,
     this.mobno,
     this.pw,
     this.otp,

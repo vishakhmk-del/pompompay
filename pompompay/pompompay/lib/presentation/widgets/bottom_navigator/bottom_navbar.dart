@@ -3,15 +3,44 @@ import 'package:pompompay/core/hook/hooks.dart';
 ValueNotifier<int> selectindexNotifier = ValueNotifier(0);
 
 class BottomNavigationWidget extends StatelessWidget {
-  const BottomNavigationWidget({super.key});
+  final String login;
+  const BottomNavigationWidget({super.key, required this.login});
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: selectindexNotifier,
       builder: (context, int newindex, _) {
+        final items = login.isEmpty
+            ? [
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.home),
+                  label: 'Home',
+                ),
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.person_2_outlined),
+                  label: 'Profile',
+                ),
+              ]
+            : [
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.home),
+                  label: 'Home',
+                ),
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.history),
+                  label: 'History',
+                ),
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.person_2_outlined),
+                  label: 'Profile',
+                ),
+              ];
+
+        final safeIndex = newindex < items.length ? newindex : 0;
+
         return BottomNavigationBar(
-          currentIndex: newindex,
+          currentIndex: safeIndex,
           onTap: (index) {
             selectindexNotifier.value = index;
           },
@@ -19,22 +48,7 @@ class BottomNavigationWidget extends StatelessWidget {
           backgroundColor: Colors.white,
           selectedItemColor: Theme.of(context).colorScheme.primary,
           unselectedItemColor: Colors.black,
-          selectedIconTheme: IconThemeData(
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          unselectedIconTheme: IconThemeData(color: Colors.black),
-
-          items: [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.history),
-              label: 'History',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_2_outlined),
-              label: 'Profile',
-            ),
-          ],
+          items: items,
         );
       },
     );

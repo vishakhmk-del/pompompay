@@ -9,10 +9,9 @@ part of 'ticket_resp.dart';
 TicketResp _$TicketRespFromJson(Map<String, dynamic> json) => TicketResp(
   status: json['status'] as String?,
   message: json['message'] as String?,
-  data:
-      json['data'] == null
-          ? null
-          : Datatkt.fromJson(json['data'] as Map<String, dynamic>),
+  data: json['data'] == null
+      ? null
+      : Datatkt.fromJson(json['data'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$TicketRespToJson(TicketResp instance) =>

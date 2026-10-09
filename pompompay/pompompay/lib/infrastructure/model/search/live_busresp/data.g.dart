@@ -7,10 +7,9 @@ part of 'data.dart';
 // **************************************************************************
 
 Datalive _$DataliveFromJson(Map<String, dynamic> json) => Datalive(
-  busLocation:
-      json['bus_location'] == null
-          ? null
-          : BusLocation.fromJson(json['bus_location'] as Map<String, dynamic>),
+  busLocation: json['bus_location'] == null
+      ? null
+      : BusLocation.fromJson(json['bus_location'] as Map<String, dynamic>),
   busId: json['bus_id'] as String?,
   latitude: json['latitude'] as String?,
   longitude: json['longitude'] as String?,

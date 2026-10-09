@@ -16,7 +16,7 @@ Datumlist _$DatumlistFromJson(Map<String, dynamic> json) => Datumlist(
   driverId: json['driver_id'] as String?,
   busType: json['bus_type'] as String?,
   tripNos: json['trip_nos'],
-  activeTrip: json['active_trip'] as String?,
+  activeTrip: json['active_trip'],
   permitNo: json['permit_no'] as String?,
   validFrom: json['valid_from'] as String?,
   validTo: json['valid_to'] as String?,
@@ -25,7 +25,9 @@ Datumlist _$DatumlistFromJson(Map<String, dynamic> json) => Datumlist(
   modifiedBy: json['modified_by'] as String?,
   modifiedDate: json['modified_date'] as String?,
   tripId: json['trip_id'] as String?,
-  tripNo: json['trip_no'] as String?,
+  routeId: json['route_id'] as String?,
+  permitId: json['permit_id'] as String?,
+  tripNo: json['trip_no'],
   tripName: json['trip_name'] as String?,
   via: json['via'] as String?,
   fromStation: json['from_station'] as String?,
@@ -38,7 +40,7 @@ Datumlist _$DatumlistFromJson(Map<String, dynamic> json) => Datumlist(
   toArrival: json['to_arrival'] as String?,
   duration: json['duration'] as String?,
   status: json['status'],
-
+  tripStatus: json['trip_status'],
 );
 
 Map<String, dynamic> _$DatumlistToJson(Datumlist instance) => <String, dynamic>{
@@ -51,8 +53,10 @@ Map<String, dynamic> _$DatumlistToJson(Datumlist instance) => <String, dynamic>{
   'driver_id': instance.driverId,
   'bus_type': instance.busType,
   'trip_nos': instance.tripNos,
+  'trip_no': instance.tripNo,
   'active_trip': instance.activeTrip,
   'permit_no': instance.permitNo,
+  'permit_id': instance.permitId,
   'valid_from': instance.validFrom,
   'valid_to': instance.validTo,
   'created_by': instance.createdBy,
@@ -60,7 +64,7 @@ Map<String, dynamic> _$DatumlistToJson(Datumlist instance) => <String, dynamic>{
   'modified_by': instance.modifiedBy,
   'modified_date': instance.modifiedDate,
   'trip_id': instance.tripId,
-  'trip_no': instance.tripNo,
+  'route_id': instance.routeId,
   'trip_name': instance.tripName,
   'via': instance.via,
   'from_station': instance.fromStation,
@@ -72,5 +76,6 @@ Map<String, dynamic> _$DatumlistToJson(Datumlist instance) => <String, dynamic>{
   'from_arrival': instance.fromArrival,
   'to_arrival': instance.toArrival,
   'duration': instance.duration,
-  'status':instance.status
+  'status': instance.status,
+  'trip_status': instance.tripStatus,
 };

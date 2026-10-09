@@ -9,6 +9,7 @@ part of 'user_cmn_req.dart';
 UserCmnReq _$UserCmnReqFromJson(Map<String, dynamic> json) => UserCmnReq(
   userName: json['user_name'] as String?,
   userId: json['user_id'] as String?,
+  userType: (json['user_type'] as num?)?.toInt(),
   mobno: json['mobno'] as String?,
   pw: json['pw'] as String?,
   otp: json['otp'] as String?,
@@ -29,6 +30,7 @@ Map<String, dynamic> _$UserCmnReqToJson(UserCmnReq instance) =>
     <String, dynamic>{
       'user_name': instance.userName,
       'user_id': instance.userId,
+      'user_type': instance.userType,
       'mobno': instance.mobno,
       'pw': instance.pw,
       'otp': instance.otp,

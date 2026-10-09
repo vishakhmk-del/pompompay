@@ -7,14 +7,12 @@ part of 'data.dart';
 // **************************************************************************
 
 DataVal _$DataValFromJson(Map<String, dynamic> json) => DataVal(
-  busdetails:
-      json['busdetails'] == null
-          ? null
-          : Busdetails.fromJson(json['busdetails'] as Map<String, dynamic>),
-  stopsdetails:
-      (json['stopsdetails'] as List<dynamic>?)
-          ?.map((e) => Stopsdetail.fromJson(e as Map<String, dynamic>))
-          .toList(),
+  busdetails: json['busdetails'] == null
+      ? null
+      : Busdetails.fromJson(json['busdetails'] as Map<String, dynamic>),
+  stopsdetails: (json['stopsdetails'] as List<dynamic>?)
+      ?.map((e) => Stopsdetail.fromJson(e as Map<String, dynamic>))
+      .toList(),
 );
 
 Map<String, dynamic> _$DataValToJson(DataVal instance) => <String, dynamic>{

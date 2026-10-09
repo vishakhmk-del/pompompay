@@ -43,6 +43,8 @@ class Busdetails {
   String? seatno;
   @JsonKey(name: 'trip_id')
   String? tripId;
+  @JsonKey(name: 'trip_name')
+  String? tripName;
   String? busid;
   @JsonKey(name: 'bus_type')
   String? busType;
@@ -77,6 +79,7 @@ class Busdetails {
     this.registrationNo,
     this.seatno,
     this.tripId,
+    this.tripName,
     this.busid,
     this.busType,
     this.startTime,

@@ -97,15 +97,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
         ],
       ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     if (_currentIndex == tabs.length - 1) {
+
+      //       Navigator.push(context, Approutes().mainScreen);
+      //     } else {
+      //       _pageController.nextPage(
+      //         duration: const Duration(milliseconds: 300),
+      //         curve: Curves.linear,
+      //       );
+      //     }
+      //   },
+      //   backgroundColor: Color(0xff0077C8),
+      //   child: const Icon(Icons.chevron_right, color: Colors.white),
+      // ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
           if (_currentIndex == tabs.length - 1) {
-            // _pageController.animateToPage(
-            //   0,
-            //   duration: const Duration(milliseconds: 300),
-            //   curve: Curves.linear,
-            // );
-            Navigator.push(context, Approutes().loginscreen);
+            await SharedPrefManager.instance.setOnboardingShown();
+
+            if (!context.mounted) return;
+
+            Navigator.push(context, Approutes().mainScreen);
           } else {
             _pageController.nextPage(
               duration: const Duration(milliseconds: 300),
@@ -113,7 +127,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             );
           }
         },
-        backgroundColor: Color(0xff0077C8),
+        backgroundColor: const Color(0xff0077C8),
         child: const Icon(Icons.chevron_right, color: Colors.white),
       ),
     );
@@ -123,35 +137,33 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 class ArcPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    Path orangeArc =
-        Path()
-          ..moveTo(0, 0)
-          ..lineTo(0, size.height - 170)
-          ..quadraticBezierTo(
-            size.width / 2,
-            size.height,
-            size.width,
-            size.height - 170,
-          )
-          ..lineTo(size.width, size.height)
-          ..lineTo(size.width, 0)
-          ..close();
+    Path orangeArc = Path()
+      ..moveTo(0, 0)
+      ..lineTo(0, size.height - 170)
+      ..quadraticBezierTo(
+        size.width / 2,
+        size.height,
+        size.width,
+        size.height - 170,
+      )
+      ..lineTo(size.width, size.height)
+      ..lineTo(size.width, 0)
+      ..close();
 
     canvas.drawPath(orangeArc, Paint()..color = Colors.orange);
 
-    Path whiteArc =
-        Path()
-          ..moveTo(0.0, 0.0)
-          ..lineTo(0.0, size.height - 185)
-          ..quadraticBezierTo(
-            size.width / 2,
-            size.height - 70,
-            size.width,
-            size.height - 185,
-          )
-          ..lineTo(size.width, size.height)
-          ..lineTo(size.width, 0)
-          ..close();
+    Path whiteArc = Path()
+      ..moveTo(0.0, 0.0)
+      ..lineTo(0.0, size.height - 185)
+      ..quadraticBezierTo(
+        size.width / 2,
+        size.height - 70,
+        size.width,
+        size.height - 185,
+      )
+      ..lineTo(size.width, size.height)
+      ..lineTo(size.width, 0)
+      ..close();
 
     canvas.drawPath(whiteArc, Paint()..color = Colors.white);
   }

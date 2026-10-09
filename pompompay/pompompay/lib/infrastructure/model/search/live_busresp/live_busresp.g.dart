@@ -9,10 +9,9 @@ part of 'live_busresp.dart';
 LiveBusresp _$LiveBusrespFromJson(Map<String, dynamic> json) => LiveBusresp(
   status: json['status'] as String?,
   message: json['message'] as String?,
-  data:
-      json['data'] == null
-          ? null
-          : Datalive.fromJson(json['data'] as Map<String, dynamic>),
+  data: json['data'] == null
+      ? null
+      : Datalive.fromJson(json['data'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$LiveBusrespToJson(LiveBusresp instance) =>

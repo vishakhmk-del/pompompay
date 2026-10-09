@@ -247,16 +247,14 @@ class UserFun {
       );
     }
   }
+
   Future deleteuser(BuildContext context) async {
     try {
       final loadingProvider = context.read<LoadingProvider>();
       loadingProvider.show();
       final value = await SharedPrefManager.instance.getSharedData();
-      
 
-      final logreq = UserCmnReq(
-        userId: value?.userId??''
-      );
+      final logreq = UserCmnReq(userId: value?.userId ?? '');
 
       final loginResponse = await Pompaydata().deleteUser(logreq);
       final resultAsjson = jsonDecode(loginResponse.toString());
@@ -269,41 +267,34 @@ class UserFun {
         if (!context.mounted) return;
 
         CommonFun.instance.showApierror(context, "Something went wrong");
-      } else if (loginResponse.statusCode == 200 && loginval.status == 'success') {
-                        if (!context.mounted) return;
-                                
-                                  CommonFun.instance.showApierror(
-                                    context,
-                                    loginval.message,
-                                  );
-                                        final sharedprf = await SharedPreferences.getInstance();
-                                         
-                                          const secureStorage = FlutterSecureStorage();
+      } else if (loginResponse.statusCode == 200 &&
+          loginval.status == 'success') {
+        if (!context.mounted) return;
 
-                                        // Remove only the login-related keys
-                                        await sharedprf.remove('NAME');
-                                        await sharedprf.remove('MOBNO');
-                                        await sharedprf.remove('savekeyname'); // <- your login flag key
-                                        await sharedprf.remove('recent_searches');
-                                        // Remove secure storage keys
-                                        await secureStorage.delete(key: 'USERID');
-                                        await secureStorage.delete(key: 'ACCESSTOKEN');
-                                          if (!context.mounted) return;
-                                          
-                                          Navigator.of(context).pushAndRemoveUntil(
-                                            MaterialPageRoute(builder: (ctx) => const Screenlogin()),
-                                            (Route<dynamic> route) => false,
-                                          );
-                                           return;
-                                        
+        CommonFun.instance.showApierror(context, loginval.message);
+        final sharedprf = await SharedPreferences.getInstance();
+
+        const secureStorage = FlutterSecureStorage();
+
+        // Remove only the login-related keys
+        await sharedprf.remove('NAME');
+        await sharedprf.remove('MOBNO');
+        await sharedprf.remove('savekeyname'); // <- your login flag key
+        await sharedprf.remove('recent_searches');
+        // Remove secure storage keys
+        await secureStorage.delete(key: 'USERID');
+        await secureStorage.delete(key: 'ACCESSTOKEN');
+        if (!context.mounted) return;
+
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (ctx) => const Screenlogin()),
+          (Route<dynamic> route) => false,
+        );
+        return;
       } else if (loginval.status == 'failed') {
         if (!context.mounted) return;
-        
-          CommonFun.instance.showApierror(
-            context,
-            loginval.message,
-          );
 
+        CommonFun.instance.showApierror(context, loginval.message);
       } else if (loginResponse.statusCode == 500) {
         if (!context.mounted) return;
         CommonFun.instance.showApierror(context, "Sever Not Reachable");

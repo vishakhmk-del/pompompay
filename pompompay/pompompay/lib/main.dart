@@ -6,7 +6,7 @@ const savedeviceinfo = '_userDeviceIn';
 const savedevicetkn = '_userDeviceTkn';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  PaymentGatewayPlugin.init();
+  // PaymentGatewayPlugin.init();
   //  startForegroundService();
   runApp(const MyApp());
 }
@@ -15,6 +15,7 @@ void main() {
 //   ForegroundService().start();
 //   debugPrint("Started service");
 // }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -39,6 +40,7 @@ class MyApp extends StatelessWidget {
             child: Sizer(
               builder: (context, orientation, screenType) {
                 return MaterialApp(
+                  debugShowCheckedModeBanner: false,
                   // navigatorKey: navigatorKey,
                   title: 'PomPomPay',
                   themeMode: themeProvider.themeMode,

@@ -20,9 +20,8 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
     // Navigator.pushReplacement(context, Approutes().mytickets);
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder:
-            (originalContext) =>
-                ScreenMyTickets(initialTabIndex: widget.initialTab),
+        builder: (originalContext) =>
+            ScreenMyTickets(initialTabIndex: widget.initialTab),
       ),
     );
     return true;
@@ -69,10 +68,9 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                             onPressed: () {
                               Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(
-                                  builder:
-                                      (originalContext) => ScreenMyTickets(
-                                        initialTabIndex: widget.initialTab,
-                                      ),
+                                  builder: (originalContext) => ScreenMyTickets(
+                                    initialTabIndex: widget.initialTab,
+                                  ),
                                 ),
                               );
                             },
@@ -113,7 +111,9 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                               child: Stack(
                                 alignment: Alignment.center,
                                 children: [
-                                  _getWatermark(int.parse(widget.tktvw.status ?? "0")),
+                                  _getWatermark(
+                                    int.parse(widget.tktvw.status ?? "0"),
+                                  ),
                                   Column(
                                     children: [
                                       Column(
@@ -126,22 +126,27 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                                                 widget.tktvw.busName
                                                         ?.toUpperCase() ??
                                                     '',
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.bodySmall?.copyWith(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                               const SizedBox(width: 8),
                                               Text(
-                                                widget.tktvw.registrationNo ?? '',
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.bodySmall?.copyWith(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                widget.tktvw.registrationNo ??
+                                                    '',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                             ],
                                           ),
@@ -152,49 +157,55 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                                             children: [
                                               Text(
                                                 widget.tktvw.travelDate ?? '',
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.bodySmall?.copyWith(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                               const SizedBox(width: 8),
                                               Text(
                                                 widget.tktvw.travelTime ?? '',
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.bodySmall?.copyWith(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                             ],
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
                                             widget.tktvw.routename ?? '',
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.bodySmall?.copyWith(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                            ),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall
+                                                ?.copyWith(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
-                                            widget.tktvw.tiketNo ?? '',
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.bodySmall?.copyWith(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                            widget.tktvw.ticketNo ?? '',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall
+                                                ?.copyWith(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                           ),
                                           const SizedBox(height: 10),
                                         ],
                                       ),
-                                  
+
                                       /// Route section
                                       Row(
                                         children: [
@@ -206,26 +217,30 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                                               children: [
                                                 Text(
                                                   "FROM STOP",
-                                                  style: Theme.of(
-                                                    context,
-                                                  ).textTheme.bodySmall?.copyWith(
-                                                    fontSize: 10,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall
+                                                      ?.copyWith(
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
                                                 ),
                                                 Text(
                                                   widget.tktvw.fromPlace ?? '',
-                                                  style: Theme.of(
-                                                    context,
-                                                  ).textTheme.bodySmall?.copyWith(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall
+                                                      ?.copyWith(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
                                                 ),
                                               ],
                                             ),
                                           ),
-                                  
+
                                           /// Dotted line + bus
                                           Column(
                                             children: [
@@ -235,10 +250,9 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                                                     dashLength: 4,
                                                     dashGapLength: 3,
                                                     lineThickness: 2,
-                                                    dashColor:
-                                                        Theme.of(
-                                                          context,
-                                                        ).colorScheme.primary,
+                                                    dashColor: Theme.of(
+                                                      context,
+                                                    ).colorScheme.primary,
                                                     direction: Axis.horizontal,
                                                     lineLength: 30,
                                                   ),
@@ -253,10 +267,9 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                                                     dashLength: 4,
                                                     dashGapLength: 3,
                                                     lineThickness: 2,
-                                                    dashColor:
-                                                        Theme.of(
-                                                          context,
-                                                        ).colorScheme.primary,
+                                                    dashColor: Theme.of(
+                                                      context,
+                                                    ).colorScheme.primary,
                                                     direction: Axis.horizontal,
                                                     lineLength: 30,
                                                   ),
@@ -264,7 +277,7 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                                               ),
                                             ],
                                           ),
-                                  
+
                                           /// TO
                                           Expanded(
                                             child: Column(
@@ -273,28 +286,32 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                                               children: [
                                                 Text(
                                                   "TO STOP",
-                                                  style: Theme.of(
-                                                    context,
-                                                  ).textTheme.bodySmall?.copyWith(
-                                                    fontSize: 10,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall
+                                                      ?.copyWith(
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
                                                 ),
                                                 Text(
                                                   widget.tktvw.toPlace ?? '',
-                                                  style: Theme.of(
-                                                    context,
-                                                  ).textTheme.bodySmall?.copyWith(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall
+                                                      ?.copyWith(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
                                                 ),
                                               ],
                                             ),
                                           ),
                                         ],
                                       ),
-                                  
+
                                       const SizedBox(height: 14),
                                       CustomPaint(
                                         painter: DottedSeparatorLine(
@@ -306,7 +323,7 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                                           height: 1,
                                         ),
                                       ),
-                                  
+
                                       const SizedBox(height: 14),
                                       Column(
                                         crossAxisAlignment:
@@ -336,16 +353,25 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                                                       context,
                                                       widget.tktvw.adults ?? '',
                                                     ),
-                                                    _buildFareCell(context, "x"),
                                                     _buildFareCell(
                                                       context,
-                                                      widget.tktvw.singleadult ??
+                                                      "x",
+                                                    ),
+                                                    _buildFareCell(
+                                                      context,
+                                                      widget
+                                                              .tktvw
+                                                              .singleadult ??
                                                           '',
                                                     ),
-                                                    _buildFareCell(context, "="),
                                                     _buildFareCell(
                                                       context,
-                                                      widget.tktvw.adultfare ?? '',
+                                                      "=",
+                                                    ),
+                                                    _buildFareCell(
+                                                      context,
+                                                      widget.tktvw.adultfare ??
+                                                          '',
                                                     ),
                                                   ],
                                                 ),
@@ -363,15 +389,23 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                                                       context,
                                                       widget.tktvw.kids ?? '',
                                                     ),
-                                                    _buildFareCell(context, "x"),
                                                     _buildFareCell(
                                                       context,
-                                                      widget.tktvw.singlekids ?? '',
+                                                      "x",
                                                     ),
-                                                    _buildFareCell(context, "="),
                                                     _buildFareCell(
                                                       context,
-                                                      widget.tktvw.kidsfare ?? '',
+                                                      widget.tktvw.singlekids ??
+                                                          '',
+                                                    ),
+                                                    _buildFareCell(
+                                                      context,
+                                                      "=",
+                                                    ),
+                                                    _buildFareCell(
+                                                      context,
+                                                      widget.tktvw.kidsfare ??
+                                                          '',
                                                     ),
                                                   ],
                                                 ),
@@ -387,18 +421,98 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                                                     ),
                                                     _buildFareCell(
                                                       context,
-                                                      widget.tktvw.student ?? '',
-                                                    ),
-                                                    _buildFareCell(context, "x"),
-                                                    _buildFareCell(
-                                                      context,
-                                                      widget.tktvw.singlestudent ??
+                                                      widget.tktvw.student ??
                                                           '',
                                                     ),
-                                                    _buildFareCell(context, "="),
                                                     _buildFareCell(
                                                       context,
-                                                      widget.tktvw.kidsfare ?? '',
+                                                      "x",
+                                                    ),
+                                                    _buildFareCell(
+                                                      context,
+                                                      widget
+                                                              .tktvw
+                                                              .singlestudent ??
+                                                          '',
+                                                    ),
+                                                    _buildFareCell(
+                                                      context,
+                                                      "=",
+                                                    ),
+                                                    _buildFareCell(
+                                                      context,
+                                                      widget.tktvw.studentfare ??
+                                                          '',
+                                                    ),
+                                                  ],
+                                                ),
+                                                if (int.tryParse(
+                                                    widget.tktvw.handicapped ?? "0",
+                                                  ) !=
+                                                  0)
+                                                TableRow(
+                                                  children: [
+                                                    _buildFareCell(
+                                                      context,
+                                                      "Handicapped :",
+                                                    ),
+                                                    _buildFareCell(
+                                                      context,
+                                                      widget.tktvw.handicapped ??
+                                                          '',
+                                                    ),
+                                                    _buildFareCell(
+                                                      context,
+                                                      "x",
+                                                    ),
+                                                    _buildFareCell(
+                                                      context,
+                                                      widget
+                                                              .tktvw
+                                                              .singlehandicapped ??
+                                                          '',
+                                                    ),
+                                                    _buildFareCell(
+                                                      context,
+                                                      "=",
+                                                    ),
+                                                    _buildFareCell(
+                                                      context,
+                                                      widget.tktvw.handicappedfare ??
+                                                          '',
+                                                    ),
+                                                  ],
+                                                ),
+                                                if (int.tryParse(
+                                                    widget.tktvw.discount ?? "0",
+                                                  ) !=
+                                                  0)
+                                                TableRow(
+                                                  children: [
+                                                    _buildFareCell(
+                                                      context,
+                                                      "Discount :",
+                                                    ),
+                                                    _buildFareCell(
+                                                      context,
+                                                      " ",
+                                                    ),
+                                                    _buildFareCell(
+                                                      context,
+                                                      " ",
+                                                    ),
+                                                    _buildFareCell(
+                                                      context,
+                                                      " ",
+                                                    ),
+                                                    _buildFareCell(
+                                                      context,
+                                                      "=",
+                                                    ),
+                                                    _buildFareCell(
+                                                      context,
+                                                      widget.tktvw.discount ??
+                                                          '',
                                                     ),
                                                   ],
                                                 ),
@@ -407,18 +521,19 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                                           const SizedBox(height: 8),
                                           Text(
                                             "Rs ${widget.tktvw.totalfare}.0",
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.bodySmall?.copyWith(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall
+                                                ?.copyWith(
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                           ),
                                           const SizedBox(height: 14),
-                                  
-                                          if (widget.tktvw.tiketNo != null)
+
+                                          if (widget.tktvw.ticketNo != null)
                                             QrImageView(
-                                              data: widget.tktvw.tiketNo!,
+                                              data: widget.tktvw.ticketNo!,
                                               version: QrVersions.auto,
                                               size: 150.0,
                                               backgroundColor: Colors.white,
@@ -430,7 +545,8 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
                                                   const QrDataModuleStyle(
                                                     color: Colors.black,
                                                     dataModuleShape:
-                                                        QrDataModuleShape.square,
+                                                        QrDataModuleShape
+                                                            .square,
                                                   ),
                                               errorCorrectionLevel:
                                                   QrErrorCorrectLevel.H,
@@ -470,27 +586,52 @@ class _ScreenLiveTicketState extends State<ScreenLiveTicket> {
       ),
     );
   }
+
   Widget _getWatermark(int status) {
-  switch (status) {
-    case 0:
-      return Image.asset("assets/image/status/valid.png",
-          width: 250, height: 250, fit: BoxFit.contain, opacity: const AlwaysStoppedAnimation(.2));
-    case 1:
-      return Image.asset("assets/image/status/refund.png",
-          width: 250, height: 250, fit: BoxFit.contain, opacity: const AlwaysStoppedAnimation(.2));
-    case 2:
-      return Image.asset("assets/image/status/pending.png",
-          width: 250, height: 250, fit: BoxFit.contain, opacity: const AlwaysStoppedAnimation(.2));
-    case 3:
-      return Image.asset("assets/image/status/failed.png",
-          width: 250, height: 250, fit: BoxFit.contain, opacity: const AlwaysStoppedAnimation(.2));
-    case 4:
-      return Image.asset("assets/image/status/cancelled.png",
-          width: 250, height: 250, fit: BoxFit.contain, opacity: const AlwaysStoppedAnimation(.2));
+    switch (status) {
+      case 0:
+        return Image.asset(
+          "assets/image/status/valid.png",
+          width: 250,
+          height: 250,
+          fit: BoxFit.contain,
+          opacity: const AlwaysStoppedAnimation(.2),
+        );
+      case 1:
+        return Image.asset(
+          "assets/image/status/refund.png",
+          width: 250,
+          height: 250,
+          fit: BoxFit.contain,
+          opacity: const AlwaysStoppedAnimation(.2),
+        );
+      case 2:
+        return Image.asset(
+          "assets/image/status/pending.png",
+          width: 250,
+          height: 250,
+          fit: BoxFit.contain,
+          opacity: const AlwaysStoppedAnimation(.2),
+        );
+      case 3:
+        return Image.asset(
+          "assets/image/status/failed.png",
+          width: 250,
+          height: 250,
+          fit: BoxFit.contain,
+          opacity: const AlwaysStoppedAnimation(.2),
+        );
+      case 4:
+        return Image.asset(
+          "assets/image/status/cancelled.png",
+          width: 250,
+          height: 250,
+          fit: BoxFit.contain,
+          opacity: const AlwaysStoppedAnimation(.2),
+        );
 
-    default:
-      return const SizedBox();
+      default:
+        return const SizedBox();
+    }
   }
-}
-
 }

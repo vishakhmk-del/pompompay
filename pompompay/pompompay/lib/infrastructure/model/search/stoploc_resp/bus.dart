@@ -32,7 +32,8 @@ class BusValue {
     this.registrationNo,
   });
 
-  factory BusValue.fromJson(Map<String, dynamic> json) => _$BusValueFromJson(json);
+  factory BusValue.fromJson(Map<String, dynamic> json) =>
+      _$BusValueFromJson(json);
 
   Map<String, dynamic> toJson() => _$BusValueToJson(this);
 }

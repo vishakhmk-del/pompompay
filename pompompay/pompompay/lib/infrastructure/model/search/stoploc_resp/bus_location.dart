@@ -13,7 +13,13 @@ class BusLocation {
   @JsonKey(name: 'created_at')
   String? createdAt;
 
-  BusLocation({this.busId, this.latitude, this.longitude,this.date, this.createdAt});
+  BusLocation({
+    this.busId,
+    this.latitude,
+    this.longitude,
+    this.date,
+    this.createdAt,
+  });
 
   factory BusLocation.fromJson(Map<String, dynamic> json) {
     return _$BusLocationFromJson(json);

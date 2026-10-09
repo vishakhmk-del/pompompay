@@ -82,7 +82,7 @@ class TransResponse {
     this.custphone,
     this.customerName,
     this.custmail,
-    this.bankRefId
+    this.bankRefId,
   });
 
   factory TransResponse.fromJson(Map<String, dynamic> json) {

@@ -9,10 +9,9 @@ part of 'get_stagelist.dart';
 GetStagelist _$GetStagelistFromJson(Map<String, dynamic> json) => GetStagelist(
   status: json['status'] as String?,
   message: json['message'] as String?,
-  data:
-      (json['data'] as List<dynamic>?)
-          ?.map((e) => Datum.fromJson(e as Map<String, dynamic>))
-          .toList(),
+  data: (json['data'] as List<dynamic>?)
+      ?.map((e) => Datum.fromJson(e as Map<String, dynamic>))
+      .toList(),
 );
 
 Map<String, dynamic> _$GetStagelistToJson(GetStagelist instance) =>

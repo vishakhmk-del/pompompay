@@ -8,8 +8,8 @@ class TicketsaveReq {
   String? tripId;
   String? busid;
   String? approvalRefNo;
-  String? frmselected;
-  String? toselected;
+  dynamic frmselected;
+  dynamic toselected;
   int? adultsselected;
   String? seatno;
   @JsonKey(name: 'user_id')

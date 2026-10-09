@@ -70,10 +70,9 @@ class _TicketListWidgetState extends State<TicketListWidget> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable:
-          widget.ticketStatus == activetkt
-              ? TicketFun.instance.getActiveTktListNotifier
-              : TicketFun.instance.getDeactiveTktListNotifier,
+      valueListenable: widget.ticketStatus == activetkt
+          ? TicketFun.instance.getActiveTktListNotifier
+          : TicketFun.instance.getDeactiveTktListNotifier,
       builder: (BuildContext context, List<Ticketview> newList, Widget? _) {
         if (newList.isNotEmpty) {
           return ListView.builder(
@@ -93,18 +92,15 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder:
-                                  (originalContext) => ScreenLiveTicket(
-                                    tktvw: ticket,
-                                    title:
-                                        widget.ticketStatus == activetkt
-                                            ? "Active Ticket"
-                                            : "Inactive Ticket",
-                                    initialTab:
-                                        widget.ticketStatus == activetkt
-                                            ? 0
-                                            : 1,
-                                  ),
+                              builder: (originalContext) => ScreenLiveTicket(
+                                tktvw: ticket,
+                                title: widget.ticketStatus == activetkt
+                                    ? "Active Ticket"
+                                    : "Inactive Ticket",
+                                initialTab: widget.ticketStatus == activetkt
+                                    ? 0
+                                    : 1,
+                              ),
                             ),
                           );
                         },
@@ -115,7 +111,6 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                           ),
                           child: Stack(
                             children: [
-                              
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 10,
@@ -131,35 +126,39 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                                     Column(
                                       children: [
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
                                           children: [
                                             _getStatusIcon(ticket.status ?? 0),
                                           ],
                                         ),
                                         const SizedBox(height: 8),
-                              
+
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: [
                                             Text(
-                                              ticket.busName?.toUpperCase() ?? '',
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.bodySmall?.copyWith(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                              ticket.busName?.toUpperCase() ??
+                                                  '',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall
+                                                  ?.copyWith(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
                                             ),
                                             const SizedBox(width: 8),
                                             Text(
                                               ticket.registrationNo ?? '',
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.bodySmall?.copyWith(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall
+                                                  ?.copyWith(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
                                             ),
                                           ],
                                         ),
@@ -170,44 +169,48 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                                           children: [
                                             Text(
                                               ticket.travelDate ?? '',
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.bodySmall?.copyWith(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall
+                                                  ?.copyWith(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
                                             ),
                                             const SizedBox(width: 8),
                                             Text(
                                               ticket.travelTime ?? '',
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.bodySmall?.copyWith(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall
+                                                  ?.copyWith(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
                                             ),
                                           ],
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
                                           ticket.routename ?? '',
-                                          style: Theme.of(
-                                            context,
-                                          ).textTheme.bodySmall?.copyWith(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.copyWith(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
                                           ticket.tiketNo ?? '',
-                                          style: Theme.of(
-                                            context,
-                                          ).textTheme.bodySmall?.copyWith(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.copyWith(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                         ),
                                         const SizedBox(height: 10),
                                       ],
@@ -222,21 +225,25 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                                             children: [
                                               Text(
                                                 "FROM STOP",
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.bodySmall?.copyWith(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                               Text(
                                                 ticket.fromPlace ?? '',
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.bodySmall?.copyWith(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                             ],
                                           ),
@@ -249,10 +256,9 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                                                   dashLength: 4,
                                                   dashGapLength: 3,
                                                   lineThickness: 2,
-                                                  dashColor:
-                                                      Theme.of(
-                                                        context,
-                                                      ).colorScheme.primary,
+                                                  dashColor: Theme.of(
+                                                    context,
+                                                  ).colorScheme.primary,
                                                   direction: Axis.horizontal,
                                                   lineLength: 30,
                                                 ),
@@ -267,10 +273,9 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                                                   dashLength: 4,
                                                   dashGapLength: 3,
                                                   lineThickness: 2,
-                                                  dashColor:
-                                                      Theme.of(
-                                                        context,
-                                                      ).colorScheme.primary,
+                                                  dashColor: Theme.of(
+                                                    context,
+                                                  ).colorScheme.primary,
                                                   direction: Axis.horizontal,
                                                   lineLength: 30,
                                                 ),
@@ -278,7 +283,7 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                                             ),
                                           ],
                                         ),
-                              
+
                                         /// TO
                                         Expanded(
                                           child: Column(
@@ -287,28 +292,32 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                                             children: [
                                               Text(
                                                 "TO STOP",
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.bodySmall?.copyWith(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                               Text(
                                                 ticket.toPlace ?? '',
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.bodySmall?.copyWith(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                             ],
                                           ),
                                         ),
                                       ],
                                     ),
-                              
+
                                     const SizedBox(height: 14),
                                     CustomPaint(
                                       painter: DottedSeparatorLine(
@@ -320,12 +329,13 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                                         height: 1,
                                       ),
                                     ),
-                              
+
                                     const SizedBox(height: 14),
-                              
+
                                     /// Fare breakdown
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: [
                                         Table(
                                           columnWidths: const {
@@ -343,7 +353,10 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                                                 0)
                                               TableRow(
                                                 children: [
-                                                  _buildFareCell(context, "Full :"),
+                                                  _buildFareCell(
+                                                    context,
+                                                    "Full :",
+                                                  ),
                                                   _buildFareCell(
                                                     context,
                                                     ticket.adults ?? '',
@@ -360,11 +373,16 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                                                   ),
                                                 ],
                                               ),
-                                            if (int.tryParse(ticket.kids ?? "0") !=
+                                            if (int.tryParse(
+                                                  ticket.kids ?? "0",
+                                                ) !=
                                                 0)
                                               TableRow(
                                                 children: [
-                                                  _buildFareCell(context, "Kids :"),
+                                                  _buildFareCell(
+                                                    context,
+                                                    "Kids :",
+                                                  ),
                                                   _buildFareCell(
                                                     context,
                                                     ticket.kids ?? '',
@@ -407,17 +425,70 @@ class _TicketListWidgetState extends State<TicketListWidget> {
                                                   ),
                                                 ],
                                               ),
+                                              if (int.tryParse(
+                                                  ticket.handicapped ?? "0",
+                                                ) !=
+                                                0)
+                                              TableRow(
+                                                children: [
+                                                  _buildFareCell(
+                                                    context,
+                                                    "Handicapped :",
+                                                  ),
+                                                  _buildFareCell(
+                                                    context,
+                                                    ticket.handicapped ?? '',
+                                                  ),
+                                                  _buildFareCell(context, "x"),
+                                                  _buildFareCell(
+                                                    context,
+                                                    ticket.singlehandicapped ?? '',
+                                                  ),
+                                                  _buildFareCell(context, "="),
+                                                  _buildFareCell(
+                                                    context,
+                                                    ticket.handicappedfare ?? '',
+                                                  ),
+                                                ],
+                                              ),
+                                              if (int.tryParse(
+                                                  ticket.discount ?? "0",
+                                                ) !=
+                                                0)
+                                              TableRow(
+                                                children: [
+                                                  _buildFareCell(
+                                                    context,
+                                                    "Discount :",
+                                                  ),
+                                                  _buildFareCell(
+                                                    context,
+                                                    " ",
+                                                  ),
+                                                  _buildFareCell(context, " "),
+                                                  _buildFareCell(
+                                                    context,
+                                                    " ",
+                                                  ),
+                                                  _buildFareCell(context, " "),
+                                                  _buildFareCell(
+                                                    context,
+                                                    ticket.discount ?? '',
+                                                  ),
+                                                ],
+                                              ),
                                           ],
                                         ),
                                         const SizedBox(height: 8),
                                         Text(
                                           "Rs ${ticket.totalfare}.0",
-                                          style: Theme.of(
-                                            context,
-                                          ).textTheme.bodySmall?.copyWith(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.copyWith(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                         ),
                                       ],
                                     ),

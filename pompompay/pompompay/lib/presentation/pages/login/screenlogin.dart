@@ -1,6 +1,6 @@
 import 'dart:developer';
 import 'package:pompompay/core/hook/hooks.dart';
-import 'package:pompompay/core/security/security_check.dart';
+// import 'package:pompompay/core/security/security_check.dart';
 import 'package:sizer/sizer.dart';
 
 class Screenlogin extends StatefulWidget {
@@ -21,9 +21,9 @@ class _ScreenloginState extends State<Screenlogin> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async{
-    //  await SecurityCheck.checkAndExitIfCompromised(context);
-if(!mounted)return;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      //  await SecurityCheck.checkAndExitIfCompromised(context);
+      if (!mounted) return;
       Livelocationfun.instance.startTracking(
         context: context,
         onLocationUpdate: (position) {
@@ -99,9 +99,9 @@ if(!mounted)return;
                                 ),
                               ),
                               inputFormatters: [
-                                    LengthLimitingTextInputFormatter(10),
-                                    FilteringTextInputFormatter.digitsOnly,
-                                  ],
+                                LengthLimitingTextInputFormatter(10),
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
                               validator: (value) {
                                 if (value!.isEmpty) {
                                   return "Mobile Number";
@@ -110,9 +110,9 @@ if(!mounted)return;
                                     value.contains(" ") ||
                                     value.contains(",")) {
                                   return "Enter valid Mobile Number";
-                                }else if (_usercontroller.text.length < 10 ||
-                                        _usercontroller.text.length > 10) {
-                                      return "Enter valid Mobile number";
+                                } else if (_usercontroller.text.length < 10 ||
+                                    _usercontroller.text.length > 10) {
+                                  return "Enter valid Mobile number";
                                 }
                                 return null;
                               },
@@ -216,6 +216,7 @@ if(!mounted)return;
                                 ),
                               ),
                             ),
+
                             SizedBox(height: 2.h),
 
                             Text(
@@ -224,6 +225,7 @@ if(!mounted)return;
                                 context,
                               ).textTheme.labelSmall?.copyWith(fontSize: 16),
                             ),
+
                             Center(
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -249,8 +251,8 @@ if(!mounted)return;
                                           ),
                                         ),
                                         context: context,
-                                        builder:
-                                            (context) => const ScreenRegister(),
+                                        builder: (context) =>
+                                            const ScreenRegister(),
                                       ).whenComplete(() {
                                         // Reset the button state when bottom sheet is closed
                                         if (!context.mounted) return;
@@ -261,30 +263,34 @@ if(!mounted)return;
                                     },
                                     child: Text(
                                       'Sign UP',
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.labelSmall?.copyWith(
-                                        fontSize: 20,
-                                        decoration: TextDecoration.underline,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall
+                                          ?.copyWith(
+                                            fontSize: 20,
+                                            decoration:
+                                                TextDecoration.underline,
+                                          ),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
                             SizedBox(height: 1.h),
-                          Consumer<LoadingProvider>(
+                            Consumer<LoadingProvider>(
                               builder: (context, loadingProvider, child) {
-                            return loadingProvider.isLoading
-                                ? const Center(
-                                    child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white,
-                                      ),
-                                    ),
-                                  )
-                                : const SizedBox.shrink();
-                          }),
+                                return loadingProvider.isLoading
+                                    ? const Center(
+                                        child: CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Colors.white,
+                                              ),
+                                        ),
+                                      )
+                                    : const SizedBox.shrink();
+                              },
+                            ),
                           ],
                         ),
                       ),
@@ -292,7 +298,6 @@ if(!mounted)return;
                   ),
                 ),
               ),
-                 
             ],
           ),
         ),

@@ -12,17 +12,17 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
   final TextEditingController sortTimeController = TextEditingController();
   final TextEditingController sortTypeController = TextEditingController();
 
-  List<String> filteredBYTime = ["Duration", "Departure", "Arrival"];
+  List<String> filteredBYTime = ["Departure", "Arrival", "Duration"];
   List<String> byType = ["ALL", "FP", "LS", "SF", "TT", "ORD"];
 
   bool showFromDropdown = false;
   bool showToDropdown = false;
   final Map<String, String> timeOptions = {
-    "Duration": duration,
     "Departure": start,
     "Arrival": end,
+    "Duration": duration,
   };
-  String selectedSortTimeValue = duration;
+  String selectedSortTimeValue = start;
   String? fromplace;
   String? toplace;
 
@@ -37,10 +37,9 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
         },
       );
     });
-    sortTimeController.text =
-        timeOptions.entries
-            .firstWhere((e) => e.value == selectedSortTimeValue)
-            .key;
+    sortTimeController.text = timeOptions.entries
+        .firstWhere((e) => e.value == selectedSortTimeValue)
+        .key;
     sortTypeController.text = "ALL";
     fromplace = widget.req.fromPlace;
     toplace = widget.req.toPlace;
@@ -107,7 +106,8 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                   color: Colors.white,
                                 ),
                                 onPressed: () {
-                                  SearchFun.instance.getBusListNotifier.value =[];
+                                  SearchFun.instance.getBusListNotifier.value =
+                                      [];
 
                                   Navigator.pushReplacement(
                                     context,
@@ -142,12 +142,11 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                       }
                                     });
                                   },
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.bodySmall?.copyWith(
-                                    fontSize: 16,
-                                    color: Colors.white,
-                                  ),
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                      ),
                                   decoration: InputDecoration(
                                     labelText: "Sort by Time",
                                     suffixIcon: const Icon(
@@ -197,12 +196,11 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                       }
                                     });
                                   },
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.bodySmall?.copyWith(
-                                    fontSize: 16,
-                                    color: Colors.white,
-                                  ),
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                      ),
                                   decoration: InputDecoration(
                                     labelText: "Sort by Type",
                                     suffixIcon: const Icon(
@@ -262,18 +260,16 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                             ),
                             child: Text(
                               '${fromplace?.toUpperCase() ?? ''}  →  ${toplace?.toUpperCase() ?? ''}',
-                              style: Theme.of(
-                                context,
-                              ).textTheme.titleMedium?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.2,
-                              ),
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1.2,
+                                  ),
                               textAlign: TextAlign.center,
                               softWrap: true,
-                              overflow:
-                                  TextOverflow
-                                      .visible, // OR .ellipsis if you want to cut it
+                              overflow: TextOverflow
+                                  .visible, // OR .ellipsis if you want to cut it
                               maxLines: 2,
                             ),
                           ),
@@ -282,11 +278,7 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                           child: ValueListenableBuilder(
                             valueListenable:
                                 SearchFun.instance.getBusListNotifier,
-                            builder: (
-                              BuildContext context,
-                              List<Datumlist> newList,
-                              Widget? _,
-                            ) {
+                            builder: (BuildContext context, List<Datumlist> newList, Widget? _) {
                               if (newList.isNotEmpty) {
                                 return ListView.builder(
                                   padding: const EdgeInsets.all(6),
@@ -338,17 +330,15 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                                   userId: val?.userId ?? '',
                                                   from: ticket.fromStop,
                                                   to: ticket.toStop,
-                                                  status: ticket.status
+                                                  status: ticket.tripStatus,
                                                 );
                                                 if (!context.mounted) return;
                                                 Navigator.of(context).push(
                                                   MaterialPageRoute(
-                                                    builder:
-                                                        (context) =>
-                                                            ScreenMapTrack(
-                                                              stoploc:
-                                                                  stoplocReq,
-                                                            ),
+                                                    builder: (context) =>
+                                                        ScreenMapTrack(
+                                                          stoploc: stoplocReq,
+                                                        ),
                                                   ),
                                                 );
                                               },
@@ -371,10 +361,9 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                                           15,
                                                         ),
                                                     border: Border.all(
-                                                      color:
-                                                          Theme.of(
-                                                            context,
-                                                          ).colorScheme.primary,
+                                                      color: Theme.of(
+                                                        context,
+                                                      ).colorScheme.primary,
                                                     ),
                                                   ),
                                                   child: Column(
@@ -383,49 +372,84 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                                       Column(
                                                         children: [
                                                           Stack(
-                                                          alignment: Alignment.center,
-                                                          children: [
-                                                            Row(
-                                                              mainAxisAlignment: MainAxisAlignment.center,
-                                                              children: [
-                                                                Text(
-                                                                  ticket.busName?.toUpperCase() ?? '',
-                                                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                                        fontSize: 14,
-                                                                        fontWeight: FontWeight.bold,
-                                                                      ),
-                                                                ),
-                                                                const SizedBox(width: 8),
-                                                                Text(
-                                                                  ticket.registrationNo?.toUpperCase() ?? '',
-                                                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                                        fontSize: 14,
-                                                                        fontWeight: FontWeight.bold,
-                                                                      ),
-                                                                ),
-                                                                const SizedBox(width: 8),
-                                                                Text(
-                                                                  ticket.busType?.toUpperCase() ?? '',
-                                                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                                        fontSize: 16,
-                                                                        fontWeight: FontWeight.bold,
-                                                                      ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            Positioned(
-                                                              right: 0,
-                                                              child: Container(
-                                                                width: 12,
-                                                                height: 12,
-                                                                decoration: BoxDecoration(
-                                                                  color: ticket.status == "1" ? Colors.green : Colors.red,
-                                                                  shape: BoxShape.circle,
+                                                            alignment: Alignment
+                                                                .center,
+                                                            children: [
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  Text(
+                                                                    ticket.busName
+                                                                            ?.toUpperCase() ??
+                                                                        '',
+                                                                    style: Theme.of(context)
+                                                                        .textTheme
+                                                                        .bodySmall
+                                                                        ?.copyWith(
+                                                                          fontSize:
+                                                                              14,
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                        ),
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    width: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    ticket.registrationNo
+                                                                            ?.toUpperCase() ??
+                                                                        '',
+                                                                    style: Theme.of(context)
+                                                                        .textTheme
+                                                                        .bodySmall
+                                                                        ?.copyWith(
+                                                                          fontSize:
+                                                                              14,
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                        ),
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    width: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    ticket.busType
+                                                                            ?.toUpperCase() ??
+                                                                        '',
+                                                                    style: Theme.of(context)
+                                                                        .textTheme
+                                                                        .bodySmall
+                                                                        ?.copyWith(
+                                                                          fontSize:
+                                                                              16,
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                        ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Positioned(
+                                                                right: 0,
+                                                                child: Container(
+                                                                  width: 12,
+                                                                  height: 12,
+                                                                  decoration: BoxDecoration(
+                                                                    color:
+                                                                        ticket.tripStatus ==
+                                                                            1
+                                                                        ? Colors
+                                                                              .green
+                                                                        : Colors
+                                                                              .red,
+                                                                    shape: BoxShape
+                                                                        .circle,
+                                                                  ),
                                                                 ),
                                                               ),
-                                                            ),
-                                                          ],
-                                                        ),
+                                                            ],
+                                                          ),
 
                                                           Row(
                                                             mainAxisAlignment:
@@ -434,9 +458,7 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                                             children: [
                                                               Text(
                                                                 "Via",
-                                                                style: Theme.of(
-                                                                      context,
-                                                                    )
+                                                                style: Theme.of(context)
                                                                     .textTheme
                                                                     .bodySmall
                                                                     ?.copyWith(
@@ -453,9 +475,7 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                                               Text(
                                                                 ticket.via ??
                                                                     '',
-                                                                style: Theme.of(
-                                                                      context,
-                                                                    )
+                                                                style: Theme.of(context)
                                                                     .textTheme
                                                                     .bodySmall
                                                                     ?.copyWith(
@@ -481,9 +501,7 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                                           Text(
                                                             ticket.fromArrival ??
                                                                 '',
-                                                            style: Theme.of(
-                                                                  context,
-                                                                )
+                                                            style: Theme.of(context)
                                                                 .textTheme
                                                                 .bodySmall
                                                                 ?.copyWith(
@@ -510,8 +528,8 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                                                         Theme.of(
                                                                           context,
                                                                         ).colorScheme.primary,
-                                                                    direction:
-                                                                        Axis.horizontal,
+                                                                    direction: Axis
+                                                                        .horizontal,
                                                                     lineLength:
                                                                         30,
                                                                   ),
@@ -523,15 +541,15 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                                                       ticket
                                                                           .duration,
                                                                     ),
-                                                                    style: Theme.of(
-                                                                      context,
-                                                                    ).textTheme.bodySmall?.copyWith(
-                                                                      fontSize:
-                                                                          14,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500,
-                                                                    ),
+                                                                    style: Theme.of(context)
+                                                                        .textTheme
+                                                                        .bodySmall
+                                                                        ?.copyWith(
+                                                                          fontSize:
+                                                                              14,
+                                                                          fontWeight:
+                                                                              FontWeight.w500,
+                                                                        ),
                                                                   ),
                                                                   const SizedBox(
                                                                     width: 4,
@@ -547,8 +565,8 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                                                         Theme.of(
                                                                           context,
                                                                         ).colorScheme.primary,
-                                                                    direction:
-                                                                        Axis.horizontal,
+                                                                    direction: Axis
+                                                                        .horizontal,
                                                                     lineLength:
                                                                         30,
                                                                   ),
@@ -561,9 +579,7 @@ class _ScreenSearchListState extends State<ScreenSearchList> {
                                                           Text(
                                                             ticket.toArrival ??
                                                                 '',
-                                                            style: Theme.of(
-                                                                  context,
-                                                                )
+                                                            style: Theme.of(context)
                                                                 .textTheme
                                                                 .bodySmall
                                                                 ?.copyWith(

@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:intl/intl.dart';
 import 'package:pompompay/core/hook/hooks.dart';
-import 'package:pompompay/core/security/security_check.dart';
+// import 'package:pompompay/core/security/security_check.dart';
 import 'package:sizer/sizer.dart';
 
 class ScreenHome extends StatefulWidget {
@@ -31,42 +31,57 @@ class _ScreenHomeState extends State<ScreenHome> {
   final _formkey = GlobalKey<FormState>();
   bool isLoadingRecent = true;
   List<Farereq> recentSearches = [];
+  String username = '';
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async{
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       // await SecurityCheck.checkAndExitIfCompromised(context);
-        if(!mounted)return;
-        setState(() {
-          final DateFormat timeFormat = DateFormat('hh:mm a');
+      if (!mounted) return;
+      setState(() {
+        final DateFormat timeFormat = DateFormat('hh:mm a');
 
-            // Current time
-            final DateTime now = DateTime.now();
-            _fromtimeController.text = timeFormat.format(now);
+        // Current time
+        final DateTime now = DateTime.now();
+        _fromtimeController.text = timeFormat.format(now);
 
-            // To Time → 11:59 PM
-            final DateTime endOfDay = DateTime(now.year, now.month, now.day, 23, 59);
-            _totimeController.text = timeFormat.format(endOfDay);
-        });
-      Livelocationfun.instance.startTracking(
-        context: context,
-        onLocationUpdate: (position) {
-          if (!mounted) return;
-          setState(() {
-            
-
-            doublelat = position.latitude;
-            doublelong = position.longitude;
-            locationMessage =
-                'Latitude: ${position.latitude}, Longitude: ${position.longitude}';
-            log("homescreen init:$locationMessage");
-          });
-        },
-      );
+        // To Time → 11:59 PM
+        final DateTime endOfDay = DateTime(
+          now.year,
+          now.month,
+          now.day,
+          23,
+          59,
+        );
+        _totimeController.text = timeFormat.format(endOfDay);
+      });
+      // Livelocationfun.instance.startTracking(
+      //   context: context,
+      //   onLocationUpdate: (position) {
+      //     if (!mounted) return;
+      //     setState(() {
+      //       doublelat = position.latitude;
+      //       doublelong = position.longitude;
+      //       locationMessage =
+      //           'Latitude: ${position.latitude}, Longitude: ${position.longitude}';
+      //       log("homescreen init:$locationMessage");
+      //     });
+      //   },
+      // );
       fetchstop(context);
       userdet();
       recentValue();
+      _getSharedata();
+    });
+  }
+
+  void _getSharedata() async {
+    final sharevalue = await SharedPrefManager.instance.getSharedData();
+    if (!mounted) return;
+    setState(() {
+      username = sharevalue?.name ?? '';
+      log(username);
     });
   }
 
@@ -85,14 +100,12 @@ class _ScreenHomeState extends State<ScreenHome> {
       if (query.isEmpty) {
         filteredFromPlace = cpayMoblst;
       } else {
-        filteredFromPlace =
-            cpayMoblst
-                ?.where(
-                  (item) => item.stopName!.toLowerCase().contains(
-                    query.toLowerCase(),
-                  ),
-                )
-                .toList();
+        filteredFromPlace = cpayMoblst
+            ?.where(
+              (item) =>
+                  item.stopName!.toLowerCase().contains(query.toLowerCase()),
+            )
+            .toList();
       }
     });
   }
@@ -103,14 +116,12 @@ class _ScreenHomeState extends State<ScreenHome> {
       if (query.isEmpty) {
         filteredToPlace = cpayMoblst;
       } else {
-        filteredToPlace =
-            cpayMoblst
-                ?.where(
-                  (item) => item.stopName!.toLowerCase().contains(
-                    query.toLowerCase(),
-                  ),
-                )
-                .toList();
+        filteredToPlace = cpayMoblst
+            ?.where(
+              (item) =>
+                  item.stopName!.toLowerCase().contains(query.toLowerCase()),
+            )
+            .toList();
       }
     });
   }
@@ -183,10 +194,9 @@ class _ScreenHomeState extends State<ScreenHome> {
                       ),
                     ],
                   ),
-    
+
                   Positioned(
-                    top:
-                        MediaQuery.of(context).size.height /12.2,
+                    top: MediaQuery.of(context).size.height / 12.2,
                     left: MediaQuery.of(context).size.width / 20,
                     right: MediaQuery.of(context).size.width / 20,
                     child: Card(
@@ -220,12 +230,13 @@ class _ScreenHomeState extends State<ScreenHome> {
                                 enableSuggestions: false,
                                 decoration: InputDecoration(
                                   hintText: 'From',
-                                  hintStyle: Theme.of(
-                                    context,
-                                  ).textTheme.bodySmall?.copyWith(
-                                    fontSize: 16,
-                                    color: Colors.grey[700],
-                                  ),
+                                  hintStyle: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        fontSize: 16,
+                                        color: Colors.grey[700],
+                                      ),
                                   prefixIcon: const Icon(
                                     Icons.location_on_outlined,
                                     color: Colors.grey,
@@ -236,19 +247,35 @@ class _ScreenHomeState extends State<ScreenHome> {
                                     fontSize: 0,
                                   ),
                                 ),
+                                // onChanged: (value) {
+                                //   filterFromList(value);
+                                //   showFromDropdown = true;
+                                // },
                                 onChanged: (value) {
                                   filterFromList(value);
-                                  showFromDropdown = true;
-                                },
-                                onTap: () {
                                   setState(() {
-                                    showFromDropdown = !showFromDropdown;
-                                    if (showFromDropdown) {
-                                      showToDropdown = false;
-                                    }
+                                    showFromDropdown =
+                                        value.isNotEmpty; // ONLY when typing
+                                    showToDropdown = false;
                                   });
                                 },
-    
+
+                                // onTap: () {
+                                //   setState(() {
+                                //     showFromDropdown = !showFromDropdown;
+                                //     if (showFromDropdown) {
+                                //       showToDropdown = false;
+                                //     }
+                                //   });
+                                // },
+                                onTap: () {
+                                  setState(() {
+                                    showFromDropdown =
+                                        false; // just tapping won't open
+                                    showToDropdown = false;
+                                  });
+                                },
+
                                 validator: (value) {
                                   if (value!.isEmpty) {
                                     CommonFun.instance.showApierror(
@@ -261,7 +288,7 @@ class _ScreenHomeState extends State<ScreenHome> {
                                 },
                               ),
                               SizedBox(height: 1.5.h),
-    
+
                               // TO TextFormField
                               TextFormField(
                                 controller: tocontroller,
@@ -271,12 +298,13 @@ class _ScreenHomeState extends State<ScreenHome> {
                                 ).textTheme.bodySmall?.copyWith(fontSize: 18),
                                 decoration: InputDecoration(
                                   hintText: 'To',
-                                  hintStyle: Theme.of(
-                                    context,
-                                  ).textTheme.bodySmall?.copyWith(
-                                    fontSize: 16,
-                                    color: Colors.grey[700],
-                                  ),
+                                  hintStyle: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        fontSize: 16,
+                                        color: Colors.grey[700],
+                                      ),
                                   prefixIcon: const Icon(
                                     Icons.flag_outlined,
                                     color: Colors.grey,
@@ -287,19 +315,34 @@ class _ScreenHomeState extends State<ScreenHome> {
                                     fontSize: 0,
                                   ),
                                 ),
+                                // onChanged: (value) {
+                                //   filterToList(value);
+                                //   showToDropdown = true;
+                                // },
                                 onChanged: (value) {
                                   filterToList(value);
-                                  showToDropdown = true;
-                                },
-                                onTap: () {
                                   setState(() {
-                                    showToDropdown = !showToDropdown;
-                                    if (showToDropdown) {
-                                      showFromDropdown = false;
-                                    }
+                                    showToDropdown =
+                                        value.isNotEmpty; // ONLY when typing
+                                    showFromDropdown = false;
                                   });
                                 },
-    
+
+                                // onTap: () {
+                                //   setState(() {
+                                //     showToDropdown = !showToDropdown;
+                                //     if (showToDropdown) {
+                                //       showFromDropdown = false;
+                                //     }
+                                //   });
+                                // },
+                                onTap: () {
+                                  setState(() {
+                                    showToDropdown = false;
+                                    showFromDropdown = false;
+                                  });
+                                },
+
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     CommonFun.instance.showApierror(
@@ -311,7 +354,7 @@ class _ScreenHomeState extends State<ScreenHome> {
                                   return null;
                                 },
                               ),
-    
+
                               SizedBox(height: .5.h),
                               Row(
                                 children: [
@@ -341,11 +384,10 @@ class _ScreenHomeState extends State<ScreenHome> {
                                           fontSize: 0,
                                         ),
                                       ),
-                                      onTap:
-                                          () => _selectTime(
-                                            context,
-                                            _fromtimeController,
-                                          ),
+                                      onTap: () => _selectTime(
+                                        context,
+                                        _fromtimeController,
+                                      ),
                                       validator: (value) {
                                         if (value!.isEmpty) {
                                           CommonFun.instance.showApierror(
@@ -382,17 +424,16 @@ class _ScreenHomeState extends State<ScreenHome> {
                                             color: Colors.grey,
                                           ),
                                         ),
-                                       border: InputBorder.none,
+                                        border: InputBorder.none,
                                         errorStyle: const TextStyle(
                                           height: 0,
                                           fontSize: 0,
                                         ),
                                       ),
-                                      onTap:
-                                          () => _selectTime(
-                                            context,
-                                            _totimeController,
-                                          ),
+                                      onTap: () => _selectTime(
+                                        context,
+                                        _totimeController,
+                                      ),
                                       validator: (value) {
                                         if (value!.isEmpty) {
                                           CommonFun.instance.showApierror(
@@ -408,67 +449,66 @@ class _ScreenHomeState extends State<ScreenHome> {
                                   ),
                                 ],
                               ),
-    
+
                               SizedBox(height: 1.5.h),
                               GestureDetector(
-                                onTap: () async{
+                                onTap: () async {
                                   if (_formkey.currentState!.validate()) {
-                                        final String from =
-                                            fromcontroller.text;
-                                        final String to = tocontroller.text;
-                                        final String frmTime =
-                                            _fromtimeController.text;
-                                        final String toTime =
-                                            _totimeController.text;
-    
-                                        final DateFormat inputFormat =
-                                            DateFormat('hh:mm a');
-                                        final DateTime datefrmTime =
-                                            inputFormat.parse(frmTime);
-                                        final DateTime datetoTime =
-                                            inputFormat.parse(toTime);
-    
-                                        final DateFormat outputFormat =
-                                            DateFormat('hh:mm:ss a');
-                                        final frmtm = outputFormat.format(
-                                          datefrmTime,
-                                        );
-                                        final totm = outputFormat.format(
-                                          datetoTime,
-                                        );
-                                        log("fromtime:$frmtm,totime:$totm");
-                                        final now = DateTime.now();
-                                        final date = DateFormat(
-                                          'dd-MM-yyyy',
-                                        ).format(now);
-                                        final time = DateFormat(
-                                          'hh:mm a',
-                                        ).format(now);
-                                        final farereq = Farereq(
-                                          fromPlace: from,
-                                          toPlace: to,
-                                          startTime: frmtm,
-                                          endTime: totm,
-                                          crntDt: date,
-                                          crntTm: time,
-                                        );
-                                        await SharedPrefManager.instance
-                                            .saveRecentSearch(farereq);
-                                        if (!context.mounted) return;
-                                        await SearchFun.instance.searchBus(
-                                          farereq,
-                                          context,
-                                        );
-                                        if (!context.mounted) return;
-                                        Navigator.of(context).pushReplacement(
-                                          MaterialPageRoute(
-                                            builder:
-                                                (context) => ScreenSearchList(
-                                                  req: farereq,
-                                                ),
-                                          ),
-                                        );
-                                      }
+                                    final String from = fromcontroller.text;
+                                    final String to = tocontroller.text;
+                                    final String frmTime =
+                                        _fromtimeController.text;
+                                    final String toTime =
+                                        _totimeController.text;
+
+                                    final DateFormat inputFormat = DateFormat(
+                                      'hh:mm a',
+                                    );
+                                    final DateTime datefrmTime = inputFormat
+                                        .parse(frmTime);
+                                    final DateTime datetoTime = inputFormat
+                                        .parse(toTime);
+
+                                    final DateFormat outputFormat = DateFormat(
+                                      'hh:mm:ss a',
+                                    );
+                                    final frmtm = outputFormat.format(
+                                      datefrmTime,
+                                    );
+                                    final totm = outputFormat.format(
+                                      datetoTime,
+                                    );
+                                    log("fromtime:$frmtm,totime:$totm");
+                                    final now = DateTime.now();
+                                    final date = DateFormat(
+                                      'dd-MM-yyyy',
+                                    ).format(now);
+                                    final time = DateFormat(
+                                      'hh:mm a',
+                                    ).format(now);
+                                    final farereq = Farereq(
+                                      fromPlace: from,
+                                      toPlace: to,
+                                      startTime: frmtm,
+                                      endTime: totm,
+                                      crntDt: date,
+                                      crntTm: time,
+                                    );
+                                    await SharedPrefManager.instance
+                                        .saveRecentSearch(farereq);
+                                    if (!context.mounted) return;
+                                    await SearchFun.instance.searchBus(
+                                      farereq,
+                                      context,
+                                    );
+                                    if (!context.mounted) return;
+                                    Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ScreenSearchList(req: farereq),
+                                      ),
+                                    );
+                                  }
                                 },
                                 child: Container(
                                   height: 7.h,
@@ -478,24 +518,21 @@ class _ScreenHomeState extends State<ScreenHome> {
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomCenter,
                                       colors: [
-                                        Theme.of(
-                                          context,
-                                        ).colorScheme.secondary,
+                                        Theme.of(context).colorScheme.secondary,
                                         Theme.of(context).colorScheme.primary,
                                       ],
                                     ),
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                      color:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.primary,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
                                     ),
                                   ),
                                   child: Center(
                                     child: Text(
                                       'Search For Bus',
-                                      style:  Theme.of(context)
+                                      style: Theme.of(context)
                                           .textTheme
                                           .titleMedium
                                           ?.copyWith(fontSize: 18),
@@ -503,7 +540,6 @@ class _ScreenHomeState extends State<ScreenHome> {
                                   ),
                                 ),
                               ),
-                             
                             ],
                           ),
                         ),
@@ -512,7 +548,8 @@ class _ScreenHomeState extends State<ScreenHome> {
                   ),
                   Positioned(
                     top:
-                        MediaQuery.of(context).size.height /7.3, // Adjust position
+                        MediaQuery.of(context).size.height /
+                        7.3, // Adjust position
                     left: MediaQuery.of(context).size.width / 28,
                     right: MediaQuery.of(context).size.width / 28,
                     child: Padding(
@@ -553,7 +590,7 @@ class _ScreenHomeState extends State<ScreenHome> {
                       ),
                     ),
                   ),
-    
+
                   Positioned(
                     top: MediaQuery.of(context).size.height / 2.3,
                     left: MediaQuery.of(context).size.width / 28,
@@ -561,16 +598,10 @@ class _ScreenHomeState extends State<ScreenHome> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: GestureDetector(
+                        username.isEmpty
+                            ? GestureDetector(
                                 onTap: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    Approutes().qrscreen,
-                                  );
+                                  loginalert(context);
                                 },
                                 child: Container(
                                   height: 7.h,
@@ -586,13 +617,12 @@ class _ScreenHomeState extends State<ScreenHome> {
                                     ),
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                      color:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.primary,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
                                     ),
                                   ),
-    
+
                                   child: Center(
                                     child: Row(
                                       children: [
@@ -608,10 +638,9 @@ class _ScreenHomeState extends State<ScreenHome> {
                                           child: IconButton(
                                             icon: Icon(
                                               Icons.qr_code_scanner,
-                                              color:
-                                                  Theme.of(
-                                                    context,
-                                                  ).colorScheme.primary,
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.primary,
                                               size: 25,
                                             ),
                                             onPressed: () {},
@@ -620,88 +649,165 @@ class _ScreenHomeState extends State<ScreenHome> {
                                         Text(
                                           'Get Ticket',
                                           style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(fontSize: 16),
+                                              .textTheme
+                                              .titleMedium
+                                              ?.copyWith(fontSize: 16),
                                           textAlign: TextAlign.center,
                                         ),
                                       ],
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    Approutes().mytickets,
-                                  );
-                                },
-                                child: Container(
-                                  height: 7.h,
-                                  margin: EdgeInsets.only(left: 8),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Theme.of(
+                              )
+                            : Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.pushReplacement(
                                           context,
-                                        ).colorScheme.secondary,
-                                        Theme.of(context).colorScheme.primary,
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.primary,
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          height: 4.8.h,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                              color: Colors.grey.shade300,
-                                            ),
+                                          Approutes().qrscreen,
+                                        );
+                                      },
+                                      child: Container(
+                                        height: 7.h,
+                                        margin: EdgeInsets.only(right: 8),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomCenter,
+                                            colors: [
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.secondary,
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.primary,
+                                            ],
                                           ),
-                                          child: IconButton(
-                                            icon: Icon(
-                                              Icons.local_activity_outlined,
-                                              color:
-                                                  Theme.of(
-                                                    context,
-                                                  ).colorScheme.primary,
-                                              size: 25,
-                                            ),
-                                            onPressed: () {},
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          border: Border.all(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.primary,
                                           ),
                                         ),
-                                        //SizedBox(width: 3.w),
-                                        Text(
-                                          'Show Ticket',
-                                          style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(fontSize: 16),
-                                          textAlign: TextAlign.center,
+
+                                        child: Center(
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                height: 4.8.h,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: Colors.grey.shade300,
+                                                  ),
+                                                ),
+                                                child: IconButton(
+                                                  icon: Icon(
+                                                    Icons.qr_code_scanner,
+                                                    color: Theme.of(
+                                                      context,
+                                                    ).colorScheme.primary,
+                                                    size: 25,
+                                                  ),
+                                                  onPressed: () {},
+                                                ),
+                                              ),
+                                              Text(
+                                                'Get Ticket',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .titleMedium
+                                                    ?.copyWith(fontSize: 16),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ],
+                                      ),
                                     ),
                                   ),
-                                ),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.pushReplacement(
+                                          context,
+                                          Approutes().mytickets,
+                                        );
+                                      },
+                                      child: Container(
+                                        height: 7.h,
+                                        margin: EdgeInsets.only(left: 8),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomCenter,
+                                            colors: [
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.secondary,
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.primary,
+                                            ],
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          border: Border.all(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.primary,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                height: 4.8.h,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: Colors.grey.shade300,
+                                                  ),
+                                                ),
+                                                child: IconButton(
+                                                  icon: Icon(
+                                                    Icons
+                                                        .local_activity_outlined,
+                                                    color: Theme.of(
+                                                      context,
+                                                    ).colorScheme.primary,
+                                                    size: 25,
+                                                  ),
+                                                  onPressed: () {},
+                                                ),
+                                              ),
+                                              //SizedBox(width: 3.w),
+                                              Text(
+                                                'Show Ticket',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .titleMedium
+                                                    ?.copyWith(fontSize: 16),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
-                        ),
                       ],
                     ),
                   ),
@@ -726,20 +832,23 @@ class _ScreenHomeState extends State<ScreenHome> {
                           itemCount: filteredFromPlace!.length,
                           itemBuilder: (context, index) {
                             final item = filteredFromPlace![index];
-                            return ListTile(
-                              title: Text(
-                                item.stopName ?? '',
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.bodySmall?.copyWith(fontSize: 16),
+                            return Material(
+                              color: Colors.transparent,
+                              child: ListTile(
+                                title: Text(
+                                  item.stopName ?? '',
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.bodySmall?.copyWith(fontSize: 16),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    fromcontroller.text = item.stopName ?? '';
+                                    //addToRecentSearches(item);
+                                    showFromDropdown = false;
+                                  });
+                                },
                               ),
-                              onTap: () {
-                                setState(() {
-                                  fromcontroller.text = item.stopName ?? '';
-                                  //addToRecentSearches(item);
-                                  showFromDropdown = false;
-                                });
-                              },
                             );
                           },
                         ),
@@ -795,20 +904,23 @@ class _ScreenHomeState extends State<ScreenHome> {
                           itemCount: filteredToPlace!.length,
                           itemBuilder: (context, index) {
                             final item = filteredToPlace![index];
-                            return ListTile(
-                              title: Text(
-                                item.stopName ?? '',
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.bodySmall?.copyWith(fontSize: 16),
+                            return Material(
+                              color: Colors.transparent,
+                              child: ListTile(
+                                title: Text(
+                                  item.stopName ?? '',
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.bodySmall?.copyWith(fontSize: 16),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    tocontroller.text = item.stopName ?? '';
+                                    //addToRecentSearches(item);
+                                    showToDropdown = false;
+                                  });
+                                },
                               ),
-                              onTap: () {
-                                setState(() {
-                                  tocontroller.text = item.stopName ?? '';
-                                  //addToRecentSearches(item);
-                                  showToDropdown = false;
-                                });
-                              },
                             );
                           },
                         ),
@@ -843,7 +955,7 @@ class _ScreenHomeState extends State<ScreenHome> {
                       ),
                     ),
                   ],
-    
+
                   Positioned(
                     top: MediaQuery.of(context).size.height / 1.9,
                     left: MediaQuery.of(context).size.width / 28,
@@ -854,13 +966,12 @@ class _ScreenHomeState extends State<ScreenHome> {
                         children: [
                           Text(
                             'Recent Search',
-                            style: Theme.of(
-                              context,
-                            ).textTheme.headlineLarge?.copyWith(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[700],
-                            ),
+                            style: Theme.of(context).textTheme.headlineLarge
+                                ?.copyWith(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey[700],
+                                ),
                           ),
                           SizedBox(height: 1.h),
                           if (isLoadingRecent)
@@ -878,10 +989,9 @@ class _ScreenHomeState extends State<ScreenHome> {
                           else
                             ListView.builder(
                               shrinkWrap: true,
-                              itemCount:
-                                  recentSearches.length > 3
-                                      ? 3
-                                      : recentSearches.length,
+                              itemCount: recentSearches.length > 3
+                                  ? 3
+                                  : recentSearches.length,
                               itemBuilder: (context, index) {
                                 final item = recentSearches[index];
                                 return Card(
@@ -899,74 +1009,95 @@ class _ScreenHomeState extends State<ScreenHome> {
                                       // ),
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                        color:
-                                            Theme.of(
-                                              context,
-                                            ).colorScheme.primary,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.primary,
                                       ),
                                     ),
-                                    child: ListTile(
-                                      leading: Icon(
-                                        Icons.history,
-                                        color: Colors.black,
-                                      ),
-                                      title: Text(
-                                        '${item.fromPlace} → ${item.toPlace}',
-                                        style: Theme.of(
-                                          context,
-                                        ).textTheme.bodySmall?.copyWith(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w800,
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: ListTile(
+                                        leading: Icon(
+                                          Icons.history,
+                                          color: Colors.black,
                                         ),
+                                        title: Text(
+                                          '${item.fromPlace} → ${item.toPlace}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.copyWith(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                        ),
+                                        subtitle: Text(
+                                          'Date: ${item.crntDt} | Time: ${item.crntTm}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.copyWith(fontSize: 12),
+                                        ),
+                                        onTap: () async {
+                                          setState(() {
+                                            fromcontroller.text =
+                                                item.fromPlace ?? '';
+                                            tocontroller.text =
+                                                item.toPlace ?? '';
+
+                                            final inputFormat = DateFormat(
+                                              'hh:mm:ss a',
+                                            ); // your stored format
+                                            final outputFormat = DateFormat(
+                                              'hh:mm a',
+                                            ); // display format
+
+                                            final DateTime startDt = inputFormat
+                                                .parse(item.startTime);
+                                            final DateTime endDt = inputFormat
+                                                .parse(item.endTime);
+
+                                            _fromtimeController.text =
+                                                outputFormat.format(startDt);
+                                            _totimeController.text =
+                                                outputFormat.format(endDt);
+
+                                            showFromDropdown = false;
+                                            showToDropdown = false;
+                                          });
+
+                                          final now = DateTime.now();
+                                          final date = DateFormat(
+                                            'dd-MM-yyyy',
+                                          ).format(now);
+                                          final time = DateFormat(
+                                            'hh:mm a',
+                                          ).format(now);
+
+                                          final farereq = Farereq(
+                                            fromPlace: item.fromPlace ?? '',
+                                            toPlace: item.toPlace ?? '',
+                                            startTime: item.startTime,
+                                            endTime: item.endTime,
+                                            crntDt: date,
+                                            crntTm: time,
+                                          );
+                                          await SharedPrefManager.instance
+                                              .saveRecentSearch(farereq);
+                                          // if (!context.mounted) return;
+                                          // await SearchFun.instance.searchBus(
+                                          //   farereq,
+                                          //   context,
+                                          // );
+                                          // if (!context.mounted) return;
+                                          // Navigator.of(context).pushReplacement(
+                                          //   MaterialPageRoute(
+                                          //     builder: (context) =>
+                                          //         ScreenSearchList(req: farereq),
+                                          //   ),
+                                          // );
+                                        },
                                       ),
-                                      subtitle: Text(
-                                        'Date: ${item.crntDt} | Time: ${item.crntTm}',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.copyWith(fontSize: 12),
-                                      ),
-                                      onTap: () async {
-                                        // setState(() {
-                                        //   fromcontroller.text = item.fromPlace ?? '';
-                                        //   tocontroller.text = item.toPlace ?? '';
-                                        // _fromtimeController.text=item.startTime;
-                                        // _totimeController.text=item.endTime;
-    
-                                        // });
-                                        final now = DateTime.now();
-                                        final date = DateFormat(
-                                          'dd-MM-yyyy',
-                                        ).format(now);
-                                        final time = DateFormat(
-                                          'hh:mm a',
-                                        ).format(now);
-    
-                                        final farereq = Farereq(
-                                          fromPlace: item.fromPlace ?? '',
-                                          toPlace: item.toPlace ?? '',
-                                          startTime: item.startTime,
-                                          endTime: item.endTime,
-                                          crntDt: date,
-                                          crntTm: time,
-                                        );
-                                        await SharedPrefManager.instance
-                                            .saveRecentSearch(farereq);
-                                        if (!context.mounted) return;
-                                        await SearchFun.instance.searchBus(
-                                          farereq,
-                                          context,
-                                        );
-                                        if (!context.mounted) return;
-                                        Navigator.of(context).pushReplacement(
-                                          MaterialPageRoute(
-                                            builder:
-                                                (context) => ScreenSearchList(
-                                                  req: farereq,
-                                                ),
-                                          ),
-                                        );
-                                      },
                                     ),
                                   ),
                                 );
@@ -976,68 +1107,103 @@ class _ScreenHomeState extends State<ScreenHome> {
                       ),
                     ),
                   ),
-                  Positioned(
-                    top: MediaQuery.of(context).size.height * 0.02,
-                    left: MediaQuery.of(context).size.width * 0.017,
-                    right: MediaQuery.of(context).size.width * 0.017,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Builder(
-                          builder:
-                              (context) => Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                  username.isEmpty
+                      ? Positioned(
+                          top: MediaQuery.of(context).size.height * 0.02,
+                          left: MediaQuery.of(context).size.width * 0.017,
+                          right: MediaQuery.of(context).size.width * 0.017,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "PomPomPay",
+                                style: Theme.of(context).textTheme.headlineLarge
+                                    ?.copyWith(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                              ),
+                              Stack(
                                 children: [
-                                  Text(
-                                    "Welcome,",
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins-Medium',
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.normal,
-                                      color:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.onPrimary,
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.menu,
+                                      color: Colors.white, // Icon color
+                                      size: 30,
+                                      //fill:10
                                     ),
-                                    textScaler: TextScaler.noScaling,
-                                  ),
-                                  Text(
-                                    "$usrNm".toUpperCase(),
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins-Medium',
-                                      fontSize: 18.sp,
-                                      fontWeight: FontWeight.w600,
-                                      color:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.onPrimary,
-                                    ),
-                                    textScaler: TextScaler.noScaling,
+                                    onPressed: () {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        Approutes().menuScreen,
+                                      );
+                                    },
                                   ),
                                 ],
                               ),
-                        ),
-                        Stack(
-                          children: [
-                            IconButton(
-                              icon: Icon(
-                                Icons.menu,
-                                color: Colors.white, // Icon color
-                                size: 30,
-                                //fill:10
+                            ],
+                          ),
+                        )
+                      : Positioned(
+                          top: MediaQuery.of(context).size.height * 0.02,
+                          left: MediaQuery.of(context).size.width * 0.017,
+                          right: MediaQuery.of(context).size.width * 0.017,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Builder(
+                                builder: (context) => Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Welcome,",
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins-Medium',
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.normal,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onPrimary,
+                                      ),
+                                      textScaler: TextScaler.noScaling,
+                                    ),
+                                    Text(
+                                      "$usrNm".toUpperCase(),
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins-Medium',
+                                        fontSize: 18.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onPrimary,
+                                      ),
+                                      textScaler: TextScaler.noScaling,
+                                    ),
+                                  ],
+                                ),
                               ),
-                              onPressed: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  Approutes().menuScreen,
-                                );
-                              },
-                            ),
-                          ],
+                              Stack(
+                                children: [
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.menu,
+                                      color: Colors.white, // Icon color
+                                      size: 30,
+                                      //fill:10
+                                    ),
+                                    onPressed: () {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        Approutes().menuScreen,
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -1085,4 +1251,118 @@ class _ScreenHomeState extends State<ScreenHome> {
       });
     }
   }
+}
+
+Future<void> loginalert(BuildContext originalContext) async {
+  if (!originalContext.mounted) return;
+
+  showDialog(
+    context: originalContext,
+    barrierDismissible: false,
+    builder: (context) {
+      return PopScope(
+        canPop: false,
+        child: StatefulBuilder(
+          builder: (context, setState) {
+            return Center(
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  margin: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 10,
+                        offset: Offset(0, -4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.warning, color: Colors.amber, size: 35),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Login Required",
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Please log in to access all features of the application",
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
+                            ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              elevation: 2,
+                              backgroundColor: const Color(0xffffa600),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            onPressed: () async {
+                              Navigator.pop(context);
+                            },
+                            child: Text(
+                              "cancel",
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              elevation: 2,
+                              backgroundColor: const Color(0xffffa600),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            onPressed: () async {
+                              Navigator.pushReplacement(
+                                context,
+                                Approutes().loginscreen,
+                              );
+                            },
+                            child: Text(
+                              "Login",
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    },
+  );
 }

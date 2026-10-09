@@ -65,12 +65,12 @@ class _ScreenRegisterState extends State<ScreenRegister> {
       //     _mobcontroller.text = formattedNumber;
       //   });
       // }
-      if (number != null && number.isNotEmpty) 
-      { final formattedNumber = number.replaceFirst(RegExp(r'^\+\d{1,2}'), '');
+      if (number != null && number.isNotEmpty) {
+        final formattedNumber = number.replaceFirst(RegExp(r'^\+\d{1,2}'), '');
         log('Formatted Number: $formattedNumber');
-       WidgetsBinding.instance.addPostFrameCallback((_) {
-         if (mounted) _mobcontroller.text = formattedNumber;
-      });
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _mobcontroller.text = formattedNumber;
+        });
       }
     } on PlatformException {
       log('Failed to get platform version.');
@@ -99,11 +99,8 @@ class _ScreenRegisterState extends State<ScreenRegister> {
           return ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
             child: GestureDetector(
-              onTap:
-                  () =>
-                      FocusScope.of(
-                        context,
-                      ).unfocus(), // Dismiss keyboard on tap
+              onTap: () =>
+                  FocusScope.of(context).unfocus(), // Dismiss keyboard on tap
               child: Padding(
                 padding: EdgeInsets.only(
                   left: 15,
@@ -112,14 +109,15 @@ class _ScreenRegisterState extends State<ScreenRegister> {
                   bottom: MediaQuery.of(context).viewInsets.bottom,
                 ),
                 child: NotificationListener<ScrollEndNotification>(
-                onNotification: (_) {
-                  // Prevent setState during layout
-                  WidgetsBinding.instance.addPostFrameCallback((_) {});
-                  return false;
-                },
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                  onNotification: (_) {
+                    // Prevent setState during layout
+                    WidgetsBinding.instance.addPostFrameCallback((_) {});
+                    return false;
+                  },
+                  child: SingleChildScrollView(
+                    controller: scrollController,
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
                     child: Form(
                       key: _formkey,
                       child: Theme(
@@ -144,8 +142,9 @@ class _ScreenRegisterState extends State<ScreenRegister> {
                                   cursorColor: Colors.white,
                                   controller: _namecontroller,
                                   style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onPrimary,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimary,
                                   ),
                                   decoration: InputDecoration(
                                     labelText: 'Name',
@@ -174,7 +173,7 @@ class _ScreenRegisterState extends State<ScreenRegister> {
                               ),
                             ),
                             const SizedBox(height: 20),
-                  
+
                             SizedBox(
                               width: MediaQuery.of(context).size.width,
                               child: Padding(
@@ -191,8 +190,9 @@ class _ScreenRegisterState extends State<ScreenRegister> {
                                   controller: _mobcontroller,
                                   keyboardType: TextInputType.phone,
                                   style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onPrimary,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimary,
                                   ),
                                   // style:kBodyText,
                                   inputFormatters: [
@@ -202,7 +202,8 @@ class _ScreenRegisterState extends State<ScreenRegister> {
                                   validator: (value) {
                                     if (value!.isEmpty) {
                                       return "Enter mobile Number";
-                                    } else if (_mobcontroller.text.length < 10 ||
+                                    } else if (_mobcontroller.text.length <
+                                            10 ||
                                         _mobcontroller.text.length > 10) {
                                       return "Enter valid Mobile number";
                                     } else if (value.contains(' ')) {
@@ -216,7 +217,7 @@ class _ScreenRegisterState extends State<ScreenRegister> {
                                         fontSize: 15.0,
                                       );
                                     }
-                  
+
                                     return null;
                                   },
                                   decoration: InputDecoration(
@@ -242,9 +243,9 @@ class _ScreenRegisterState extends State<ScreenRegister> {
                                 ),
                               ),
                             ),
-                  
+
                             const SizedBox(height: 20),
-                  
+
                             SizedBox(
                               width: MediaQuery.of(context).size.width,
                               child: Padding(
@@ -256,8 +257,9 @@ class _ScreenRegisterState extends State<ScreenRegister> {
                                   cursorColor: Colors.white,
                                   controller: _passcontroller,
                                   style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onPrimary,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimary,
                                   ),
                                   decoration: InputDecoration(
                                     labelText: 'Password',
@@ -290,6 +292,8 @@ class _ScreenRegisterState extends State<ScreenRegister> {
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Please enter a password';
+                                    } else if (value.contains(' ')) {
+                                      return 'Password must not contain spaces';
                                     } else if (value.length < 8) {
                                       return 'Password must be at least 8 characters';
                                     } else if (!RegExp(
@@ -318,8 +322,9 @@ class _ScreenRegisterState extends State<ScreenRegister> {
                                   cursorColor: Colors.white,
                                   controller: _cnfrmpswrdcontroller,
                                   style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onPrimary,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimary,
                                   ),
                                   decoration: InputDecoration(
                                     labelText: 'Confirm Password',
@@ -397,23 +402,26 @@ class _ScreenRegisterState extends State<ScreenRegister> {
                                   },
                                   child: Text(
                                     'SIGNUP',
-                                    style: Theme.of(context).textTheme.titleMedium
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
                                         ?.copyWith(fontSize: 20),
                                   ),
                                 ),
                               ),
                             ),
-                  
+
                             Consumer<LoadingProvider>(
                               builder: (context, loadingProvider, child) {
                                 return loadingProvider.isLoading
                                     ? const Center(
-                                      child: CircularProgressIndicator(
-                                        valueColor: AlwaysStoppedAnimation<Color>(
-                                          Color.fromARGB(255, 2, 128, 6),
+                                        child: CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Color.fromARGB(255, 2, 128, 6),
+                                              ),
                                         ),
-                                      ),
-                                    )
+                                      )
                                     : const SizedBox.shrink();
                               },
                             ),

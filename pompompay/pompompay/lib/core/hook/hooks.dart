@@ -33,7 +33,7 @@ export 'package:dotted_line/dotted_line.dart';
 
 export 'package:dropdown_button2/dropdown_button2.dart';
 
-export 'package:payment_gateway_plugin/payment_gateway_plugin.dart';
+// export 'package:payment_gateway_plugin/payment_gateway_plugin.dart';
 
 export 'package:crypto/crypto.dart';
 
@@ -41,9 +41,15 @@ export 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
 
 export 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 
-export 'package:flutter_polyline_points/flutter_polyline_points.dart';
+// export 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 export 'package:qr_flutter/qr_flutter.dart';
+
+export 'package:webview_flutter/webview_flutter.dart';
+
+export 'package:webview_flutter_android/webview_flutter_android.dart';
+
+export 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 // *************************************
 
 // ***************Core*****************
@@ -96,7 +102,7 @@ export 'package:pompompay/presentation/pages/home/screenhome.dart';
 
 export 'package:pompompay/presentation/pages/Transaction/screentrans.dart';
 
-export 'package:pompompay/presentation/pages/menu/screenmenu.dart';
+export 'package:pompompay/presentation/pages/menu/menuscreen/screenmenu.dart';
 
 export 'package:pompompay/presentation/pages/forgotpswrd/forgotpswrdScreen.dart';
 
@@ -113,6 +119,12 @@ export 'package:pompompay/presentation/pages/ticket/activetkt/screenLiveTicket.d
 export 'package:pompompay/presentation/pages/ticket/myticket/activeTkt.dart';
 
 export 'package:pompompay/presentation/pages/ticket/myticket/screenMyTicket.dart';
+
+export 'package:pompompay/presentation/pages/main_page/screen_MainPage.dart';
+
+export 'package:pompompay/presentation/pages/menu/about/screenAbout.dart';
+
+export 'package:pompompay/presentation/pages/menu/privacypolicy/ScreenPrivacySec.dart';
 
 // *************************************
 

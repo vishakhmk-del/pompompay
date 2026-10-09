@@ -9,10 +9,9 @@ part of 'stoploc_resp.dart';
 StoplocResp _$StoplocRespFromJson(Map<String, dynamic> json) => StoplocResp(
   status: json['status'] as String?,
   message: json['message'] as String?,
-  data:
-      json['data'] == null
-          ? null
-          : DataList.fromJson(json['data'] as Map<String, dynamic>),
+  data: json['data'] == null
+      ? null
+      : DataList.fromJson(json['data'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$StoplocRespToJson(StoplocResp instance) =>

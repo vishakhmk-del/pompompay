@@ -14,7 +14,13 @@ class UserCmnResp {
 
   Data? data;
 
-  UserCmnResp({this.status, this.message,this.errorCode,this.mandatory, this.data});
+  UserCmnResp({
+    this.status,
+    this.message,
+    this.errorCode,
+    this.mandatory,
+    this.data,
+  });
 
   factory UserCmnResp.fromJson(Map<String, dynamic> json) {
     return _$UserCmnRespFromJson(json);

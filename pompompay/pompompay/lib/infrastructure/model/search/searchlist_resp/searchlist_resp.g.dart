@@ -10,10 +10,9 @@ SearchlistResp _$SearchlistRespFromJson(Map<String, dynamic> json) =>
     SearchlistResp(
       status: json['status'] as String?,
       message: json['message'] as String?,
-      data:
-          (json['data'] as List<dynamic>?)
-              ?.map((e) => Datumlist.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      data: (json['data'] as List<dynamic>?)
+          ?.map((e) => Datumlist.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$SearchlistRespToJson(SearchlistResp instance) =>

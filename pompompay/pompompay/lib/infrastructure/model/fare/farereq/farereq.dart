@@ -10,8 +10,8 @@ class Farereq {
   String? busId;
   @JsonKey(name: 'busid')
   String? busidNo;
-  String? from;
-  String? to;
+  dynamic from;
+  dynamic to;
   String? adults;
   String? stud;
   String? handi;

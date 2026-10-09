@@ -19,6 +19,6 @@ Map<String, dynamic> _$BusLocationToJson(BusLocation instance) =>
       'bus_id': instance.busId,
       'latitude': instance.latitude,
       'longitude': instance.longitude,
-      'date':instance.date,
+      'date': instance.date,
       'created_at': instance.createdAt,
     };

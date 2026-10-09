@@ -16,10 +16,10 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.8+10008
+version: 1.2.5+10205
 
 environment:
-  sdk: ^3.7.0
+  sdk: '>=3.8.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -36,46 +36,50 @@ dependencies:
   cupertino_icons: ^1.0.8
   provider: ^6.1.2
   json_annotation: ^4.9.0
-  json_serializable: ^6.8.0
   dio: ^5.7.0
   shared_preferences: ^2.5.3
-  page_transition: ^2.1.0
-  fluttertoast: ^8.2.6
-  intl: ^0.19.0
+  page_transition: ^2.2.2
+  fluttertoast: ^10.0.0
+  intl: ^0.20.3
   sizer: ^3.0.5
   lottie: ^3.1.2
   sim_number_picker: ^0.0.1
   geolocator: ^14.0.1
   get: ^4.6.6
   otp_text_field: ^1.1.3
-  permission_handler: ^11.3.1
-  android_id: ^0.4.0
-  device_info_plus: ^11.1.1
-  package_info_plus: ^8.1.1
+  permission_handler: ^13.0.0
+  android_id: ^0.5.2+1
+  device_info_plus: ^13.2.0
+  package_info_plus: ^10.2.1
   get_ip_address: ^0.0.7
-  file_picker: ^8.1.4
+  file_picker: ^12.0.0-beta.7
   path_provider: ^2.1.5
-  open_file: ^3.5.10
-  app_settings: ^5.2.0
+  open_file: ^4.0.0
+  app_settings: ^8.0.3
   mobile_scanner: ^7.0.1
   dropdown_button2: ^2.3.9
   dotted_line: ^3.1.0
-  payment_gateway_plugin: ^5.0.9
+  # payment_gateway_plugin: ^5.0.9
+  flutter_payment_plugin: ^1.0.19
   crypto: ^3.0.3
-  webview_flutter: ^4.4.2
   qr_flutter: ^4.1.0
   latlong2: ^0.9.1
   flutter_map: ^8.1.1
   flutter_map_location_marker: ^10.1.0
   flutter_map_marker_popup: ^8.0.1
-  location: ^8.0.1
-  flutter_polyline_points: ^2.1.0
+  location: ^10.0.2
+  flutter_polyline_points: ^3.1.0
   http: ^1.4.0
   root_checker_plus: ^1.0.0
-  flutter_secure_storage: ^9.2.4
+  flutter_secure_storage: ^10.3.1
   url_launcher: ^6.3.2
   marquee: ^2.3.0
+  webview_flutter: ^4.13.0
+  webview_flutter_wkwebview: ^3.23.1
+  webview_flutter_android: ^4.10.9
+  cryptography: ^2.7.0
 dev_dependencies:
+  json_serializable: ^6.8.0
   build_runner: ^2.4.11
   flutter_test:
     sdk: flutter
@@ -85,7 +89,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -122,6 +126,9 @@ flutter:
     - assets/image/status/pending.png
     - assets/image/status/refund.png
     - assets/image/status/valid.png
+    - assets/image/applogo/pompompay.png
+    - assets/image/login/logo_dits.png
+    - assets/image/about/aboutimg.jpg
   fonts:
     - family: Poppins-Medium
       fonts: 
